@@ -27,7 +27,15 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Invalid email or password.");
+      
+
+      if (err.response?.status === 403) {
+        setError("Your account has been blocked. Please contact support.");
+      } else if (err.response?.status === 401) {
+        setError("Invalid email or password.");
+      } else {
+        setError(err.response?.data?.message || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -53,7 +61,7 @@ const Login = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded text-sm text-center border border-red-100">
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-200">
               {error}
             </div>
           )}

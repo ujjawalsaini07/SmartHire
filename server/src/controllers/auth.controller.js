@@ -127,7 +127,7 @@ export const refreshAccessToken = async (req, res) => {
 
     const user = await User.findById(decoded.userId);
     if (!user || user.isBlocked) {
-      return res.status(401).json({ message: "User not authorized" });
+      return res.status(403).json({ message: "User not authorized" });
     }
 
     const newAccessToken = jwt.sign(

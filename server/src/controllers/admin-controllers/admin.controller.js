@@ -1,5 +1,5 @@
-import User from "../models/User.model.js";
-import Job from "../models/Job.model.js";
+import User from "../../models/User.model.js";
+import Job from "../../models/Job.model.js";
 
 export const getAllUsers = async (req, res) => {
   const users = await User.find().select("-password");
@@ -18,7 +18,7 @@ export const toggleBlockUser = async (req, res) => {
   await user.save();
 
   res.json({
-    message: `User ${user.isBlocked ? "blocked" : "unblocked"}`
+    message: `User ${user.isBlocked ? "blocked" : "unblocked"}`,
   });
 };
 
@@ -28,6 +28,6 @@ export const getAdminStats = async (req, res) => {
 
   res.json({
     usersCount,
-    jobsCount
+    jobsCount,
   });
 };

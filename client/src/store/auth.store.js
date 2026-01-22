@@ -1,45 +1,62 @@
-
 import { create } from "zustand";
-import api from "../services/api"; // Ensure api is imported if not already in the file context
+import api from "../services/api";
 
 const useAuthStore = create((set) => ({
   user: null,
   accesstoken: null,
   isAuthenticated: false,
-  loading: true, // <--- ADD THIS LINE
+  loading: true,
 
   login: (user, accesstoken) =>
     set({
       user,
       accesstoken,
       isAuthenticated: true,
-      loading: false, // It's good practice to ensure this is false here too
-    }),
-
-  logout: () =>
-    set({
-      user: null,
-      accesstoken: null,
-      isAuthenticated: false,
       loading: false,
     }),
 
-  refresh: async () => {
+  logout: async () => {
     try {
-      const res = await api.get("/auth/refresh");
-      set({
-        user: res.data.user,
-        accesstoken: res.data.accesstoken,
-        isAuthenticated: true,
-        loading: false, 
-      });
-    } catch {
+    
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+ 
       set({
         user: null,
         accesstoken: null,
         isAuthenticated: false,
-        loading: false, 
+        loading: false,
       });
+    }
+  },
+
+  refresh: async () => {
+    try {
+      
+      const res = await api.get("/auth/refresh");
+      
+      set({
+        user: res.data.user,
+        accesstoken: res.data.accesstoken,
+        isAuthenticated: true,
+        loading: false,
+      });
+      
+      return true; 
+    } catch (err) {
+      console.error("Refresh token error:", err);
+      
+      
+      set({
+        user: null,
+        accesstoken: null,
+        isAuthenticated: false,
+        loading: false,
+      });
+      
+      return false; 
     }
   },
 }));

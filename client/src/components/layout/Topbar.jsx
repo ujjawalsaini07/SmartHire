@@ -1,8 +1,4 @@
-import useAuthStore from "../../store/auth.store";
-
-const Topbar = () => {
-  const { user, logout } = useAuthStore();
-
+const Topbar = ({ user, logout }) => {  
   return (
     <div className="bg-white border-b px-6 py-3 flex justify-between">
       <p className="font-medium">Welcome, {user.name}</p>

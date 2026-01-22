@@ -1,8 +1,11 @@
 import DashboardLayout from "../../components/layout/DashboardLayout";
+import useAuthStore from "../../store/auth.store";
 
 const RecruiterDashboard = () => {
+  const { user, logout } = useAuthStore(); 
+
   return (
-    <DashboardLayout>
+    <DashboardLayout user={user} logout={logout}> 
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Recruiter Dashboard</h1>
         <p className="text-gray-500">Manage your job postings and candidate applications.</p>

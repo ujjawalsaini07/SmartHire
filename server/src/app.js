@@ -16,7 +16,14 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-app.use("/api/v1/admin", adminRoutes);
+// to log the request 
+app.use((req,res,next) => {
+  console.log(`request ${req.url}`);
+  next();
+})
+
+
+app.use("/api/v1/admin", adminRoutes);  // admin 
 
 app.use("/api/v1/auth", authRoutes);
 
