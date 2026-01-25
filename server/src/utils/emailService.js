@@ -42,13 +42,4 @@ export const sendPasswordResetEmail = async (email, token) => {
   });
 };
 
-// export const sendVerificationEmail = async (email, token) => {
-//   // Implement with your email provider (SendGrid, Mailgun, etc.)
-//   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-//   // Send email with verificationUrl
-// };
 
-// export const sendPasswordResetEmail = async (email, token) => {
-//   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-//   // Send email with resetUrl
-// };

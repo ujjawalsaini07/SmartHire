@@ -1,5 +1,5 @@
 import e from "express";
-
+import { protect,authorize } from "../middlewares/auth/auth.middleware.js";
 import {
     getUsers,
     getUsersbyId,
@@ -10,11 +10,11 @@ import {
 
 const userRouter = e.Router();
 
-userRouter.get("/" getUsers);
-userRouter.get("/:id" getUsersbyId);
-userRouter.patch("/:id/activate" activateUser);
-userRouter.patch("/:id/deactivate" deactivateUser);
-userRouter.delete("/:id" deleteUser);
+userRouter.get("/" ,protect, authorize("admin"), getUsers);
+userRouter.get("/:id",protect, authorize("admin","recruiter"), getUsersbyId);
+userRouter.patch("/:id/activate" ,protect, authorize("admin"),activateUser);
+userRouter.patch("/:id/deactivate",protect, authorize("admin"), deactivateUser);
+userRouter.delete("/:id",protect, authorize("admin"), deleteUser);
 
 
 

@@ -1,9 +1,18 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+
+
+
+
+
 import authRoutes from "./routes/auth.routes.js";
-// import userRouter from "./routes/user.routes.js";
-// import jobseekerRoutes from "./routes/jobseeker.routes.js";
+import userRouter from "./routes/user.routes.js";
+import jobseekerRoutes from "./routes/jobseeker.routes.js";
 // import recruiterRoutes from "./routes/recruiter.routes.js";
 // import adminJobRoutes from "./routes/adminJob.routes.js";
 // import adminRecruiterRoutes from "./routes/adminRecruiter.routes.js";
@@ -16,8 +25,16 @@ import authRoutes from "./routes/auth.routes.js";
 // import jobRoutes from "./routes/job.routes.js";
 import {requestLogger} from "./config/logger.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+
+
+
+
+// Serve static files from uploads directory
+
 
 
 app.use(requestLogger);
@@ -32,6 +49,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 app.use("/api/v1/auth", authRoutes);  // auth routes
@@ -39,8 +57,8 @@ app.use("/api/v1/auth", authRoutes);  // auth routes
 
 
 
-// app.use("/api/v1/user", userRouter); // user routes
-// app.use("/api/v1/jobseekers", jobseekerRoutes); // jobseeker routes
+app.use("/api/v1/users", userRouter); // user routes
+app.use("/api/v1/jobseekers", jobseekerRoutes); // jobseeker routes
 // app.use("/api/v1/recruiters", recruiterRoutes); // recruiter routes
 // app.use("/api/v1/admin/recruiters", adminRecruiterRoutes); // adminrecruiter routes
 // app.use("/api/v1/admin/jobs", adminJobRoutes); // admin job routes
