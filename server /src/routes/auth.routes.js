@@ -10,7 +10,28 @@ import {
   refreshToken,
 } from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/auth/auth.middleware.js";
+import { body, validationResult } from "express-validator";
 const authrouter = express.Router();
+
+
+const validateRegister = [
+    body('name').notEmpty().withMessage('Name is required'),
+    body('email').isEmail().withMessage('Must be a valid email'),
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+        .matches(/\d/).withMessage('Password must contain a number')
+        .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter'),
+    // This function checks if there were errors
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
+        next();
+    }
+];
+
+
 
 /**
  * @route   POST /api/v1/auth/register
@@ -30,7 +51,7 @@ const authrouter = express.Router();
  * @response 400 - { success: false, message: "Validation error message" }
  * @response 500 - { success: false, message: "Server error" }
  */
-authrouter.post("/register", register);
+authrouter.post("/register",validateRegister, register);
 
 /**
  * @route   POST /api/v1/auth/login
