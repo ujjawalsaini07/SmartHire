@@ -1,67 +1,210 @@
-# SmartHire Job Portal - API Documentation
+# Job Portal Backend API Documentation
 
-## Overview
+## 🚀 Overview
 
-SmartHire is a comprehensive job portal backend built with Node.js, Express, and MongoDB. It provides RESTful APIs for job seekers, recruiters, and administrators to manage job postings, applications, and user profiles.
+This is a comprehensive **Job Portal Backend** built with **Node.js**, **Express.js**, and **MongoDB**. It provides a complete RESTful API for a job marketplace platform connecting job seekers with recruiters and companies. The backend supports role-based access control with three primary user roles: **Admin**, **Recruiter**, and **Job Seeker**.
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
+## 📋 Table of Contents
 
-- Node.js (v18 or higher)
-- MongoDB (v5.0 or higher)
+- [Key Features](#-key-features)
+- [Technical Stack](#-technical-stack)
+- [Architecture & Design](#-architecture--design)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [API Documentation](#-api-documentation)
+  - [Public Routes](#1-public-routes)
+  - [Authentication Routes](#2-authentication-routes)
+  - [Admin Routes](#3-admin-routes)
+  - [Recruiter Routes](#4-recruiter-routes)
+  - [Job Seeker Routes](#5-job-seeker-routes)
+- [Database Models](#-database-models)
+- [Security Features](#-security-features)
+- [Error Handling](#-error-handling)
+- [Deployment](#-deployment)
+
+---
+
+## ✨ Key Features
+
+### **Core Functionality**
+- ✅ **Role-Based Access Control (RBAC)** - Admin, Recruiter, and Job Seeker roles
+- ✅ **JWT Authentication** - Access and refresh token mechanism
+- ✅ **Email Verification** - Secure email verification workflow
+- ✅ **Password Reset** - Forgot password and reset functionality
+- ✅ **File Upload** - Resume, portfolio, company logos, and banners
+- ✅ **Job Search & Filtering** - Advanced search with multiple filters
+- ✅ **Job Recommendations** - ML-ready recommendation system for job seekers
+- ✅ **Application Tracking System (ATS)** - Complete application management
+- ✅ **Analytics Dashboard** - Recruiter and Admin analytics
+- ✅ **Recruiter Verification** - Admin approval workflow for recruiters
+
+### **Security Features**
+- 🔒 **Helmet.js** - Security headers
+- 🔒 **Rate Limiting** - API rate limiting (100 requests per 15 minutes)
+- 🔒 **CORS Configuration** - Controlled cross-origin requests
+- 🔒 **Password Hashing** - bcryptjs encryption
+- 🔒 **JWT Token Management** - Secure token-based authentication
+- 🔒 **Input Validation** - express-validator for request validation
+
+### **Advanced Features**
+- 📊 **Job Analytics** - View tracking, application metrics
+- 📧 **Email Service** - Nodemailer integration for transactional emails
+- 🔍 **Full-Text Search** - MongoDB text search for jobs
+- 📁 **File Management** - Multer for file uploads
+- 📝 **Logging** - Winston and Morgan for comprehensive logging
+- 🎯 **Pagination** - All list endpoints support pagination
+
+---
+
+## 🛠 Technical Stack
+
+### **Core Technologies**
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Node.js** | Latest | JavaScript runtime |
+| **Express.js** | ^5.2.1 | Web framework |
+| **MongoDB** | ^9.1.5 (Mongoose) | NoSQL database |
+| **JWT** | ^9.0.3 | Authentication |
+| **bcryptjs** | ^3.0.3 | Password hashing |
+
+### **Security & Middleware**
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **helmet** | ^8.1.0 | Security headers |
+| **cors** | ^2.8.5 | Cross-origin resource sharing |
+| **express-rate-limit** | ^8.2.1 | Rate limiting |
+| **express-validator** | ^7.3.1 | Input validation |
+| **cookie-parser** | ^1.4.7 | Cookie parsing |
+
+### **Utilities**
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **nodemailer** | ^7.0.12 | Email service |
+| **multer** | ^2.0.2 | File uploads |
+| **winston** | ^3.19.0 | Logging |
+| **morgan** | ^1.10.1 | HTTP request logging |
+| **dotenv** | ^17.2.3 | Environment variables |
+
+---
+
+## 🏗 Architecture & Design
+
+### **Project Structure**
+```
+server/
+├── src/
+│   ├── config/          # Database, logger configuration
+│   ├── controllers/     # Request handlers
+│   ├── middlewares/     # Auth, upload, error handling
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # API route definitions
+│   ├── utils/           # Helper functions (JWT, email, seeders)
+│   └── app.js           # Express app configuration
+├── uploads/             # File upload directory
+├── .env                 # Environment variables
+├── .env.example         # Environment template
+├── index.js             # Server entry point
+└── package.json         # Dependencies
+```
+
+### **Design Patterns**
+- **MVC Architecture** - Separation of concerns
+- **Repository Pattern** - Data access abstraction through Mongoose models
+- **Middleware Chain** - Modular request processing
+- **Error-First Callbacks** - Consistent error handling
+- **Factory Pattern** - Email service, file upload configuration
+
+---
+
+## 🚀 Getting Started
+
+### **Prerequisites**
+- Node.js (v16 or higher)
+- MongoDB (Local or Atlas)
 - npm or yarn
 
-### Installation
+### **Installation**
 
-1. Clone the repository
-2. Install dependencies:
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd backend/server
+```
 
-   ```bash
-   npm install
-   ```
+2. **Install dependencies**
+```bash
+npm install
+```
 
-3. Set up environment variables:
+3. **Configure environment variables**
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+4. **Start the server**
 
-4. Start the server:
+**Development mode:**
+```bash
+npm run dev
+```
 
-   ```bash
-   # Development
-   npm run dev
+**Production mode:**
+```bash
+npm start
+```
 
-   # Production
-   npm start
-   ```
+The server will start on `http://localhost:5000` (or your configured PORT).
 
-The server will start on `http://localhost:5000` by default.
+---
 
-## 📋 API Documentation
+## 🔐 Environment Variables
 
-### Base URL
+Create a `.env` file in the `server` directory with the following variables:
 
+```env
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# Database
+MONGO_URI=mongodb://127.0.0.1:27017/smartHire
+
+# JWT Secrets
+JWT_ACCESS_SECRET=your_access_secret_key_here
+JWT_REFRESH_SECRET=your_refresh_secret_key_here
+
+# Frontend URL (CORS)
+FRONTEND_URL=http://localhost:5173
+
+# Admin Credentials (for seeding)
+ADMIN_NAME=Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=SecurePassword123!
+
+# Email Configuration (Nodemailer)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+```
+
+> **Important:** Never commit your `.env` file to version control!
+
+---
+
+## 📚 API Documentation
+
+### **Base URL**
 ```
 http://localhost:5000/api/v1
 ```
 
-### Authentication
-
-The API uses JWT (JSON Web Tokens) for authentication. Include the token in the Authorization header:
-
-```
-Authorization: Bearer <your_access_token>
-```
-
-### Response Format
-
-All API responses follow this format:
+### **Common Response Format**
 
 **Success Response:**
-
 ```json
 {
   "success": true,
@@ -71,163 +214,811 @@ All API responses follow this format:
 ```
 
 **Error Response:**
-
 ```json
 {
   "success": false,
   "message": "Error description",
-  "error": "Detailed error information"
+  "errors": [ ... ] // Optional validation errors
 }
 ```
 
 ---
 
-## 🔐 Authentication Routes
+## 1. Public Routes
 
-### Register User
+These routes are accessible without authentication.
 
-- **Endpoint:** `POST /auth/register`
-- **Access:** Public
-- **Description:** Register a new user account
+### **Health Check**
 
-**Request Body:**
-
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "role": "jobseeker" // optional: admin, recruiter, jobseeker
-}
+```http
+GET /health
 ```
 
-**Response (201):**
+**Description:** Check if the server is running and healthy.
 
+**Response:**
 ```json
 {
   "success": true,
-  "message": "User registered successfully",
+  "message": "Server is healthy",
+  "timestamp": "2026-01-29T16:00:00.000Z"
+}
+```
+
+---
+
+### **Job Routes (Public)**
+
+#### 1.1 Get All Jobs
+
+```http
+GET /api/v1/jobs
+```
+
+**Description:** Retrieve all active job postings with pagination and filtering.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+| `experienceLevel` | String | No | - | Filter by experience level |
+| `employmentType` | String | No | - | Filter by employment type |
+| `location` | String | No | - | Search by city, state, or country |
+| `isRemote` | Boolean | No | - | Filter remote jobs |
+| `isFeatured` | Boolean | No | - | Filter featured jobs |
+| `sortBy` | String | No | `postedAt` | Sort field |
+| `order` | String | No | `desc` | Sort order (`asc` or `desc`) |
+
+**Request Example:**
+```http
+GET /api/v1/jobs?page=1&limit=10&isRemote=true&sortBy=postedAt&order=desc
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "count": 10,
+  "totalJobs": 45,
+  "totalPages": 5,
+  "currentPage": 1,
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "description": "We are looking for an experienced developer...",
+      "company": "Tech Corp",
+      "location": {
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "USA",
+        "isRemote": true
+      },
+      "salary": {
+        "min": 120000,
+        "max": 180000,
+        "currency": "USD"
+      },
+      "employmentType": "Full-Time",
+      "experienceLevel": "Senior",
+      "requiredSkills": [
+        { "_id": "...", "name": "JavaScript" },
+        { "_id": "...", "name": "React" }
+      ],
+      "category": {
+        "_id": "...",
+        "name": "Software Development"
+      },
+      "companyId": {
+        "_id": "...",
+        "companyName": "Tech Corp",
+        "companyLogo": "/uploads/logos/...",
+        "industry": "Technology"
+      },
+      "recruiterId": {
+        "_id": "...",
+        "name": "John Recruiter",
+        "email": "john@techcorp.com"
+      },
+      "isFeatured": false,
+      "status": "active",
+      "views": 234,
+      "applicationCount": 42,
+      "postedAt": "2026-01-20T10:00:00.000Z",
+      "createdAt": "2026-01-20T10:00:00.000Z",
+      "updatedAt": "2026-01-29T15:30:00.000Z"
+    }
+    // ... more jobs
+  ]
+}
+```
+
+---
+
+#### 1.2 Search Jobs
+
+```http
+GET /api/v1/jobs/search
+```
+
+**Description:** Advanced job search with full-text search and multiple filters.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `q` | String | No | - | Search query (full-text search) |
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+| `experienceLevel` | String | No | - | Filter by experience level |
+| `employmentType` | String | No | - | Filter by employment type |
+| `location` | String | No | - | Search by location |
+| `isRemote` | Boolean | No | - | Remote jobs only |
+| `salaryMin` | Number | No | - | Minimum salary |
+| `salaryMax` | Number | No | - | Maximum salary |
+| `skills` | String | No | - | Comma-separated skill IDs |
+| `category` | String | No | - | Category ID |
+| `sortBy` | String | No | `relevance` | Sort by (`relevance`, `date`, `salary`) |
+
+**Request Example:**
+```http
+GET /api/v1/jobs/search?q=javascript developer&location=San Francisco&salaryMin=100000&isRemote=true&sortBy=relevance
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "count": 8,
+  "totalJobs": 8,
+  "totalPages": 1,
+  "currentPage": 1,
+  "searchQuery": "javascript developer",
+  "data": [
+    // ... array of job objects (same structure as Get All Jobs)
+  ]
+}
+```
+
+---
+
+#### 1.3 Get Job by ID
+
+```http
+GET /api/v1/jobs/:id
+```
+
+**Description:** Retrieve detailed information about a specific job posting.
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Job ID (MongoDB ObjectId) |
+
+**Request Example:**
+```http
+GET /api/v1/jobs/65f1234567890abcdef12345
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
   "data": {
-    "user": {
-      "id": "user_id",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "role": "jobseeker",
-      "isVerified": false
+    "_id": "65f1234567890abcdef12345",
+    "title": "Senior Full Stack Developer",
+    "description": "Detailed job description...",
+    "responsibilities": [
+      "Design and develop scalable web applications",
+      "Lead technical architecture decisions",
+      "Mentor junior developers"
+    ],
+    "requirements": [
+      "5+ years of full-stack development experience",
+      "Expert knowledge of JavaScript, React, Node.js",
+      "Experience with cloud platforms (AWS/GCP)"
+    ],
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA",
+      "isRemote": true
     },
-    "token": "jwt_access_token"
+    "salary": {
+      "min": 120000,
+      "max": 180000,
+      "currency": "USD"
+    },
+    "employmentType": "Full-Time",
+    "experienceLevel": "Senior",
+    "benefits": [
+      "Health insurance",
+      "401(k) matching",
+      "Remote work flexibility"
+    ],
+    "requiredSkills": [
+      { "_id": "...", "name": "JavaScript" },
+      { "_id": "...", "name": "React" },
+      { "_id": "...", "name": "Node.js" }
+    ],
+    "category": {
+      "_id": "...",
+      "name": "Software Development"
+    },
+    "companyId": {
+      "_id": "...",
+      "companyName": "Tech Corp",
+      "companyLogo": "/uploads/logos/techcorp.png",
+      "companyDescription": "Leading technology company...",
+      "industry": "Technology",
+      "location": {
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "USA"
+      },
+      "website": "https://techcorp.com"
+    },
+    "recruiterId": {
+      "_id": "...",
+      "name": "John Recruiter",
+      "email": "john@techcorp.com"
+    },
+    "isFeatured": false,
+    "status": "active",
+    "views": 234,
+    "applicationCount": 42,
+    "applicationDeadline": "2026-03-01T23:59:59.000Z",
+    "postedAt": "2026-01-20T10:00:00.000Z",
+    "createdAt": "2026-01-20T10:00:00.000Z",
+    "updatedAt": "2026-01-29T15:30:00.000Z"
   }
 }
 ```
 
-### Login
-
-- **Endpoint:** `POST /auth/login`
-- **Access:** Public
-- **Description:** Authenticate user and return tokens
-
-**Request Body:**
-
+**Error Response (Job Not Found):**
 ```json
 {
-  "email": "john@example.com",
-  "password": "password123"
+  "success": false,
+  "message": "Job not found"
 }
 ```
 
-**Response (200):**
+---
 
+#### 1.4 Track Job View
+
+```http
+POST /api/v1/jobs/:id/view
+```
+
+**Description:** Track when a user views a job posting (for analytics).
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Job ID (MongoDB ObjectId) |
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "ipAddress": "192.168.1.1",
+  "userAgent": "Mozilla/5.0..."
+}
+```
+
+**Request Example:**
+```http
+POST /api/v1/jobs/65f1234567890abcdef12345/view
+
+{
+  "ipAddress": "192.168.1.1",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+}
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Job view tracked successfully"
+}
+```
+
+---
+
+### **Skills Routes (Public)**
+
+#### 1.5 Get All Skills
+
+```http
+GET /api/v1/skills
+```
+
+**Description:** Retrieve all available skills with pagination.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `50` | Skills per page |
+| `search` | String | No | - | Search by skill name |
+| `category` | String | No | - | Filter by category |
+
+**Request Example:**
+```http
+GET /api/v1/skills?page=1&limit=50&search=javascript
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "skills": [
+      {
+        "_id": "65f1234567890abcdef12345",
+        "name": "JavaScript",
+        "category": "Programming Languages",
+        "description": "Popular programming language for web development"
+      },
+      {
+        "_id": "65f1234567890abcdef12346",
+        "name": "React",
+        "category": "Frontend Frameworks",
+        "description": "JavaScript library for building user interfaces"
+      }
+      // ... more skills
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 120,
+      "pages": 3
+    }
+  }
+}
+```
+
+---
+
+#### 1.6 Search Skills
+
+```http
+GET /api/v1/skills/search
+```
+
+**Description:** Search skills by name or partial match (for autocomplete).
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `q` | String | Yes | - | Search term |
+| `limit` | Number | No | `10` | Max results (max: 50) |
+
+**Request Example:**
+```http
+GET /api/v1/skills/search?q=java&limit=10
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "skills": [
+      {
+        "_id": "65f1234567890abcdef12345",
+        "name": "JavaScript",
+        "category": "Programming Languages"
+      },
+      {
+        "_id": "65f1234567890abcdef12346",
+        "name": "Java",
+        "category": "Programming Languages"
+      }
+    ]
+  }
+}
+```
+
+**Error Response (Missing Query):**
+```json
+{
+  "success": false,
+  "message": "Search query required"
+}
+```
+
+---
+
+### **Job Categories Routes (Public)**
+
+#### 1.7 Get All Categories
+
+```http
+GET /api/v1/categories
+```
+
+**Description:** Retrieve all job categories with optional hierarchical structure.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `view` | String | No | `flat` | View type (`flat` or `tree`) |
+| `parentId` | String | No | - | Get subcategories of parent |
+| `q` | String | No | - | Search by category name |
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `50` | Categories per page |
+
+**Request Example (Flat View):**
+```http
+GET /api/v1/categories?view=flat&page=1&limit=50
+```
+
+**Response Example (Flat View):**
+```json
+{
+  "success": true,
+  "data": {
+    "categories": [
+      {
+        "_id": "65f1234567890abcdef12345",
+        "name": "Software Development",
+        "description": "Roles related to software engineering and development",
+        "parentId": null,
+        "level": 0
+      },
+      {
+        "_id": "65f1234567890abcdef12346",
+        "name": "Frontend Development",
+        "description": "Client-side web development",
+        "parentId": "65f1234567890abcdef12345",
+        "level": 1
+      }
+      // ... more categories
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 25,
+      "pages": 1
+    }
+  }
+}
+```
+
+**Request Example (Tree View):**
+```http
+GET /api/v1/categories?view=tree
+```
+
+**Response Example (Tree View):**
+```json
+{
+  "success": true,
+  "data": {
+    "categories": [
+      {
+        "_id": "65f1234567890abcdef12345",
+        "name": "Software Development",
+        "description": "Roles related to software engineering",
+        "children": [
+          {
+            "_id": "65f1234567890abcdef12346",
+            "name": "Frontend Development",
+            "description": "Client-side development",
+            "children": []
+          },
+          {
+            "_id": "65f1234567890abcdef12347",
+            "name": "Backend Development",
+            "description": "Server-side development",
+            "children": []
+          }
+        ]
+      }
+      // ... more categories
+    ]
+  }
+}
+```
+
+---
+
+### **Public Company Profile**
+
+#### 1.8 Get Public Company Profile
+
+```http
+GET /api/v1/recruiters/:id/profile
+```
+
+**Description:** View public company profile (accessible without authentication).
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Recruiter Profile ID |
+
+**Request Example:**
+```http
+GET /api/v1/recruiters/65f1234567890abcdef12345/profile
+```
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "companyName": "Tech Corp",
+    "companyLogo": "/uploads/logos/techcorp.png",
+    "companyBanner": "/uploads/banners/techcorp-banner.jpg",
+    "companyDescription": "Leading technology innovation company...",
+    "industry": "Technology",
+    "companySize": "500-1000",
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA"
+    },
+    "website": "https://techcorp.com",
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/techcorp",
+      "twitter": "https://twitter.com/techcorp"
+    },
+    "foundedYear": 2015,
+    "isVerified": true,
+    "activeJobCount": 12,
+    "createdAt": "2025-01-15T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+## Key Notes for Public Routes:
+
+1. **No Authentication Required**: All public routes can be accessed without providing an `Authorization` header.
+
+2. **Rate Limiting**: All API endpoints are rate-limited to **100 requests per 15 minutes** per IP address.
+
+3. **Pagination**: Most list endpoints support pagination with `page` and `limit` query parameters.
+
+4. **CORS**: The API is configured to accept requests from the frontend URL specified in environment variables.
+
+5. **Text Search**: Job search uses MongoDB's full-text search capabilities for relevant results.
+
+---
+
+*Continue to [Authentication Routes](#2-authentication-routes) →*
+
+## 2. Authentication Routes
+
+All authentication routes are publicly accessible but some require specific tokens or cookies.
+
+### **Authentication Flow Overview**
+
+1. **Registration** → User registers with email/password
+2. **Email Verification** → User verifies email via token
+3. **Login** → User logs in with credentials → Receives access token + refresh token (cookie)
+4. **Access Protected Routes** → Use access token in Authorization header
+5. **Token Refresh** → When access token expires, use refresh token to get new access token
+6. **Logout** → Clear tokens and sessions
+
+---
+
+### 2.1 Register User
+
+```http
+POST /api/v1/auth/register
+```
+
+**Description:** Register a new user account. Sends a verification email to the provided email address.
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | String | Yes | User's full name |
+| `email` | String | Yes | Valid email address |
+| `password` | String | Yes | Min 8 chars, 1 number, 1 uppercase |
+| `role` | String | No | User role: `jobseeker`, `recruiter` (default: `jobseeker`) |
+
+**Request Example:**
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "SecurePass123",
+  "role": "jobseeker"
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Registration successful. Please verify your email.",
+  "data": {
+    "userId": "65f1234567890abcdef12345",
+    "email": "john.doe@example.com",
+    "role": "jobseeker"
+  }
+}
+```
+
+**Error Response - User Already Exists (400):**
+```json
+{
+  "success": false,
+  "message": "User already exists with this email"
+}
+```
+
+**Error Response - Validation Error (400):**
+```json
+{
+  "success": false,
+  "errors": [
+    { "msg": "Name is required", "param": "name" },
+    { "msg": "Password must be at least 8 characters long", "param": "password" },
+    { "msg": "Password must contain a number", "param": "password" }
+  ]
+}
+```
+
+---
+
+### 2.2 Login
+
+```http
+POST /api/v1/auth/login
+```
+
+**Description:** Authenticate user and receive access token + refresh token.
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | String | Yes | User's email |
+| `password` | String | Yes | User's password |
+
+**Request Example:**
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
   "message": "Login successful",
   "data": {
     "user": {
-      "id": "user_id",
+      "id": "65f1234567890abcdef12345",
       "name": "John Doe",
-      "email": "john@example.com",
-      "role": "jobseeker"
+      "email": "john.doe@example.com",
+      "role": "jobseeker",
+      "isVerified": true
     },
-    "accessToken": "jwt_access_token"
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
 }
 ```
 
-### Logout
+**Cookies Set:**
+```
+refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict; Max-Age=604800
+```
 
-- **Endpoint:** `POST /auth/logout`
-- **Access:** Private
-- **Description:** Logout user and clear refresh token cookie
-- **Headers:** `Authorization: Bearer <access_token>`
+**Error Response - Invalid Credentials (401):**
+```json
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
+```
 
-**Response (200):**
+**Error Response - Email Not Verified (403):**
+```json
+{
+  "success": false,
+  "message": "Please verify your email before logging in"
+}
+```
 
+**Error Response - Account Deactivated (403):**
+```json
+{
+  "success": false,
+  "message": "Your account has been deactivated. Please contact support."
+}
+```
+
+---
+
+### 2.3 Logout
+
+```http
+POST /api/v1/auth/logout
+```
+
+**Description:** Logout user and invalidate refresh token.
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+**Request Example:**
+```http
+POST /api/v1/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Logged out successfully"
+  "message": "Logout successful"
 }
 ```
 
-**Error Responses:**
-
+**Error Response - Not Authorized (401):**
 ```json
 {
   "success": false,
-  "message": "Not authorized"
+  "message": "Not authorized, token failed"
 }
 ```
 
-### Refresh Token
+---
 
-- **Endpoint:** `POST /auth/refresh-token`
-- **Access:** Public (requires refresh token cookie)
-- **Description:** Refresh access token using refresh token
+### 2.4 Verify Email
 
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "Token refreshed successfully",
-  "data": {
-    "accessToken": "new_jwt_access_token"
-  }
-}
+```http
+POST /api/v1/auth/verify-email
 ```
 
-**Error Responses:**
+**Description:** Verify user's email address using the verification token sent via email.
 
-```json
-{
-  "success": false,
-  "message": "Refresh token not found"
-}
+**Headers:**
 ```
-
-```json
-{
-  "success": false,
-  "message": "Invalid refresh token"
-}
+Content-Type: application/json
 ```
-
-### Verify Email
-
-- **Endpoint:** `POST /auth/verify-email`
-- **Access:** Public
-- **Description:** Verify user email address
 
 **Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `token` | String | Yes | Email verification token |
 
+**Request Example:**
 ```json
 {
-  "token": "verification_token"
+  "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
 }
 ```
 
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
@@ -235,128 +1026,209 @@ All API responses follow this format:
 }
 ```
 
-**Error Responses:**
-
+**Error Response - Invalid/Expired Token (400):**
 ```json
 {
   "success": false,
-  "message": "Invalid or expired token"
+  "message": "Invalid or expired verification token"
 }
 ```
 
-```json
-{
-  "success": false,
-  "message": "Verification token is required"
-}
+---
+
+### 2.5 Forgot Password
+
+```http
+POST /api/v1/auth/forgot-password
 ```
 
-### Forgot Password
+**Description:** Request a password reset link. Sends email with reset token if account exists.
 
-- **Endpoint:** `POST /auth/forgot-password`
-- **Access:** Public
-- **Description:** Send password reset email
+**Headers:**
+```
+Content-Type: application/json
+```
 
 **Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | String | Yes | User's registered email |
 
+**Request Example:**
 ```json
 {
-  "email": "john@example.com"
+  "email": "john.doe@example.com"
 }
 ```
 
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Password reset email sent"
+  "message": "If an account exists, a password reset link will be sent"
 }
 ```
 
-**Error Responses:**
+> **Note:** For security reasons, the response is the same whether the email exists or not.
 
-```json
-{
-  "success": false,
-  "message": "Email is required"
-}
+---
+
+### 2.6 Reset Password
+
+```http
+POST /api/v1/auth/reset-password
 ```
 
-```json
-{
-  "success": false,
-  "message": "User not found"
-}
+**Description:** Reset user password using the reset token received via email.
+
+**Headers:**
 ```
-
-### Reset Password
-
-- **Endpoint:** `POST /auth/reset-password`
-- **Access:** Public
-- **Description:** Reset password using reset token
+Content-Type: application/json
+```
 
 **Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `token` | String | Yes | Password reset token from email |
+| `newPassword` | String | Yes | New password (min 6 characters) |
 
+**Request Example:**
 ```json
 {
-  "token": "reset_token",
-  "password": "new_password123"
+  "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "newPassword": "NewSecurePass456"
 }
 ```
 
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Password reset successfully"
+  "message": "Password reset successful. Please login with your new password."
 }
 ```
 
-**Error Responses:**
-
+**Error Response - Invalid/Expired Token (400):**
 ```json
 {
   "success": false,
-  "message": "Token and new password are required"
+  "message": "Invalid or expired reset token"
 }
 ```
 
+**Error Response - Weak Password (400):**
 ```json
 {
   "success": false,
-  "message": "Invalid or expired token"
+  "message": "Password must be at least 6 characters"
 }
 ```
 
-### Get Current User
+---
 
-- **Endpoint:** `GET /auth/me`
-- **Access:** Private
-- **Description:** Get current authenticated user information
-- **Headers:** `Authorization: Bearer <access_token>`
+### 2.7 Refresh Access Token
 
-**Response (200):**
+```http
+POST /api/v1/auth/refresh-token
+```
 
+**Description:** Get a new access token using the refresh token from cookies.
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Cookies Required:**
+```
+refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Request Example:**
+```http
+POST /api/v1/auth/refresh-token
+Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
+  "message": "Token refreshed successfully",
   "data": {
-    "id": "user_id",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "jobseeker",
-    "isVerified": true,
-    "isActive": true,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "lastLogin": "2024-01-15T10:30:00.000Z"
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
 }
 ```
 
-**Error Responses:**
+**New Cookie Set:**
+```
+refreshToken=<new_refresh_token>; HttpOnly; Secure; SameSite=Strict; Max-Age=604800
+```
 
+**Error Response - No Refresh Token (401):**
+```json
+{
+  "success": false,
+  "message": "Refresh token not found"
+}
+```
+
+**Error Response - Invalid Refresh Token (401):**
+```json
+{
+  "success": false,
+  "message": "Invalid or expired refresh token"
+}
+```
+
+---
+
+### 2.8 Get Current User
+
+```http
+GET /api/v1/auth/me
+```
+
+**Description:** Get information about the currently authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Request Example:**
+```http
+GET /api/v1/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "65f1234567890abcdef12345",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "jobseeker",
+    "isVerified": true,
+    "isActive": true,
+    "lastLogin": "2026-01-29T16:30:00.000Z",
+    "createdAt": "2026-01-15T10:00:00.000Z"
+  }
+}
+```
+
+**Error Response - Not Authorized (401):**
+```json
+{
+  "success": false,
+  "message": "Not authorized, token failed"
+}
+```
+
+**Error Response - User Not Found (404):**
 ```json
 {
   "success": false,
@@ -366,86 +1238,167 @@ All API responses follow this format:
 
 ---
 
-## 👥 User Management Routes
+## Authentication Key Notes:
 
-### Get All Users
+### **Token Management**
 
-- **Endpoint:** `GET /users`
-- **Access:** Admin only
-- **Description:** Get all users with pagination and filtering
-- **Headers:** `Authorization: Bearer <access_token>`
+1. **Access Token**: 
+   - Expires in 15 minutes
+   - Sent in response body
+   - Use in `Authorization: Bearer <token>` header for protected routes
+   - Claims: `{ id, role, iat, exp }`
+
+2. **Refresh Token**: 
+   - Expires in 7 days
+   - Stored as httpOnly cookie
+   - Used to get new access tokens
+   - Claims: `{ id, iat, exp }`
+
+### **Security Features**
+
+1. **Password Requirements**:
+   - Minimum 8 characters
+   - At least 1 number
+   - At least 1 uppercase letter
+
+2. **Token Security**:
+   - Refresh tokens stored in httpOnly cookies (prevents XSS)
+   - Secure flag enabled in production
+   - SameSite=Strict prevents CSRF
+
+3. **Account Security**:
+   - Email verification required before login
+   - Password reset tokens expire after 10 minutes
+   - Email verification tokens expire after 24 hours
+   - All refresh tokens invalidated on password reset
+
+### **Error Codes Summary**
+
+| Status Code | Meaning |
+|-------------|---------|
+| `200` | Success |
+| `201` | Resource created successfully |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid credentials |
+| `403` | Forbidden / Email not verified / Account deactivated |
+| `404` | User/Resource not found |
+| `500` | Server error |
+
+---
+
+*Continue to [Admin Routes](#3-admin-routes) →*
+
+
+## 3. Admin Routes
+
+All admin routes require authentication with an admin role. Include the access token in the Authorization header.
+
+**Required Headers:**
+```
+Authorization: Bearer <admin_access_token>
+Content-Type: application/json
+```
+
+---
+
+### **3.1 User Management**
+
+#### 3.1.1 Get All Users
+
+```http
+GET /api/v1/users
+```
+
+**Description:** Retrieve all users with pagination and filtering options.
+
+**Headers:**
+```
+Authorization: Bearer <admin_access_token>
+```
 
 **Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Users per page |
+| `role` | String | No | - | Filter by role (`admin`, `recruiter`, `jobseeker`) |
+| `isActive` | Boolean | No | - | Filter by active status |
+| `isVerified` | Boolean | No | - | Filter by verification status |
+| `search` | String | No | - | Search by name or email |
 
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `role` (string, optional filter)
-- `isActive` (boolean, optional filter)
-- `search` (string, optional search by name/email)
+**Request Example:**
+```http
+GET /api/v1/users?page=1&limit=20&role=recruiter&isActive=true&search=john
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "data": {
-    "users": [
-      {
-        "id": "user_id",
-        "name": "John Doe",
-        "email": "john@example.com",
-        "role": "jobseeker",
-        "isActive": true,
-        "isVerified": true,
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "lastLogin": "2024-01-15T10:30:00.000Z"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 50,
-      "pages": 5
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12345",
+      "name": "John Recruiter",
+      "email": "john@company.com",
+      "role": "recruiter",
+      "isActive": true,
+      "isVerified": true,
+      "lastLogin": "2026-01-29T10:00:00.000Z",
+      "createdAt": "2026-01-15T08:00:00.000Z",
+      "updatedAt": "2026-01-29T10:00:00.000Z"
     }
+    // ... more users
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 150,
+    "pages": 8
   }
 }
 ```
 
-**Error Responses:**
+---
 
-```json
-{
-  "success": false,
-  "message": "Admin access required"
-}
+#### 3.1.2 Get User by ID
+
+```http
+GET /api/v1/users/:id
 ```
 
-### Get User by ID
+**Description:** Retrieve detailed information about a specific user.
 
-- **Endpoint:** `GET /users/:id`
-- **Access:** Admin or Recruiter
-- **Description:** Get specific user by ID
-- **Headers:** `Authorization: Bearer <access_token>`
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | User ID |
 
-**Response (200):**
+**Request Example:**
+```http
+GET /api/v1/users/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
+**Success Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": "user_id",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "jobseeker",
+    "_id": "65f1234567890abcdef12345",
+    "name": "John Recruiter",
+    "email": "john@company.com",
+    "role": "recruiter",
     "isActive": true,
     "isVerified": true,
-    "createdAt": "2024-01-01T00:00:00.000Z"
+    "lastLogin": "2026-01-29T10:00:00.000Z",
+    "createdAt": "2026-01-15T08:00:00.000Z",
+    "updatedAt": "2026-01-29T10:00:00.000Z"
   }
 }
 ```
 
-**Error Responses:**
-
+**Error Response (404):**
 ```json
 {
   "success": false,
@@ -453,1060 +1406,2652 @@ All API responses follow this format:
 }
 ```
 
-### Activate User
+---
 
-- **Endpoint:** `PATCH /users/:id/activate`
-- **Access:** Admin only
-- **Description:** Activate a user account
-- **Headers:** `Authorization: Bearer <access_token>`
+#### 3.1.3 Activate User
 
-**Response (200):**
+```http
+PATCH /api/v1/users/:id/activate
+```
 
+**Description:** Activate a deactivated user account.
+
+**Request Example:**
+```http
+PATCH /api/v1/users/65f1234567890abcdef12345/activate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "User activated successfully",
+  "message": "User account activated successfully",
   "data": {
-    "id": "user_id",
+    "id": "65f1234567890abcdef12345",
+    "name": "John Recruiter",
+    "email": "john@company.com",
     "isActive": true
   }
 }
 ```
 
-**Error Responses:**
-
+**Error Response (400):**
 ```json
 {
   "success": false,
-  "message": "User not found"
-}
-```
-
-### Deactivate User
-
-- **Endpoint:** `PATCH /users/:id/deactivate`
-- **Access:** Admin only
-- **Description:** Deactivate a user account
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "User deactivated successfully",
-  "data": {
-    "id": "user_id",
-    "isActive": false
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "User not found"
-}
-```
-
-### Delete User
-
-- **Endpoint:** `DELETE /users/:id`
-- **Access:** Admin only
-- **Description:** Delete a user account permanently
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "User deleted successfully"
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "User not found"
+  "message": "User account is already active"
 }
 ```
 
 ---
 
-## 💼 Job Routes
+#### 3.1.4 Deactivate User
 
-### Public Routes
+```http
+PATCH /api/v1/users/:id/deactivate
+```
 
-#### Get All Jobs
+**Description:** Deactivate a user account (prevents login).
 
-- **Endpoint:** `GET /jobs`
-- **Access:** Public
-- **Description:** Get all active jobs with pagination and filters
+**Request Example:**
+```http
+PATCH /api/v1/users/65f1234567890abcdef12345/deactivate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `category` (string, optional)
-- `location` (string, optional)
-- `experienceLevel` (string, optional)
-- `employmentType` (string, optional)
-- `salaryMin` (number, optional)
-- `salaryMax` (number, optional)
-- `isRemote` (boolean, optional)
-
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
+  "message": "User account deactivated successfully",
   "data": {
-    "jobs": [
-      {
-        "id": "job_id",
-        "title": "Senior Frontend Developer",
-        "description": "Job description...",
-        "company": {
-          "id": "company_id",
-          "name": "Tech Company",
-          "logo": "logo_url"
-        },
-        "location": {
-          "city": "New York",
-          "state": "NY",
-          "country": "USA",
-          "isRemote": true
-        },
-        "salary": {
-          "min": 80000,
-          "max": 120000,
-          "currency": "USD",
-          "isVisible": true
-        },
-        "experienceLevel": "senior",
-        "employmentType": "full-time",
-        "requiredSkills": [
-          {
-            "id": "skill_id",
-            "name": "JavaScript",
-            "category": "Programming"
-          }
-        ],
-        "status": "active",
-        "isFeatured": false,
-        "views": 150,
-        "applicationCount": 25,
-        "postedAt": "2024-01-01T00:00:00.000Z",
-        "applicationDeadline": "2024-12-31T23:59:59Z"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 100,
-      "pages": 10
-    }
+    "id": "65f1234567890abcdef12345",
+    "name": "John Recruiter",
+    "email": "john@company.com",
+    "isActive": false
   }
 }
 ```
 
-#### Search Jobs
-
-- **Endpoint:** `GET /jobs/search`
-- **Access:** Public
-- **Description:** Search jobs with advanced filters
-
-**Query Parameters:**
-
-- `q` (string, required) - Search term
-- All parameters from Get All Jobs
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "jobs": [
-      {
-        "id": "job_id",
-        "title": "Senior Frontend Developer",
-        "description": "Job description...",
-        "relevanceScore": 0.95
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 25,
-      "pages": 3
-    }
-  }
-}
-```
-
-**Error Responses:**
-
+**Error Response (400):**
 ```json
 {
   "success": false,
-  "message": "Search query is required"
+  "message": "You cannot deactivate your own account"
 }
 ```
 
-#### Get Job by ID
+---
 
-- **Endpoint:** `GET /jobs/:id`
-- **Access:** Public
-- **Description:** Get job details by ID
+#### 3.1.5 Delete User
 
-**Response (200):**
+```http
+DELETE /api/v1/users/:id
+```
 
+**Description:** Permanently delete a user account.
+
+**Request Example:**
+```http
+DELETE /api/v1/users/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
+  "message": "User deleted successfully",
   "data": {
-    "id": "job_id",
-    "title": "Senior Frontend Developer",
-    "description": "Detailed job description...",
-    "company": {
-      "id": "company_id",
-      "name": "Tech Company",
-      "logo": "logo_url",
-      "website": "https://techcompany.com"
-    },
-    "location": {
-      "city": "New York",
-      "state": "NY",
-      "country": "USA",
-      "isRemote": true,
-      "remoteType": "fully-remote"
-    },
-    "salary": {
-      "min": 80000,
-      "max": 120000,
-      "currency": "USD",
-      "isVisible": true
-    },
-    "experienceLevel": "senior",
-    "employmentType": "full-time",
-    "requiredSkills": [
+    "id": "65f1234567890abcdef12345",
+    "name": "John Recruiter",
+    "email": "john@company.com"
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "You cannot delete your own account"
+}
+```
+
+---
+
+### **3.2 Recruiter Verification Management**
+
+#### 3.2.1 Get Pending Recruiter Verifications
+
+```http
+GET /api/v1/admin/recruiters/pending
+```
+
+**Description:** Retrieve all recruiters awaiting verification.
+
+**Request Example:**
+```http
+GET /api/v1/admin/recruiters/pending
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12345",
+      "userId": {
+        "_id": "65f1234567890abcdef12346",
+        "name": "Jane Smith",
+        "email": "jane@techcorp.com"
+      },
+      "companyName": "Tech Corp",
+      "companyLogo": "/uploads/logos/techcorp.png",
+      "industry": "Technology",
+      "companySize": "100-500",
+      "website": "https://techcorp.com",
+      "verificationStatus": "pending",
+      "createdAt": "2026-01-28T09:00:00.000Z"
+    }
+    // ... more pending recruiters
+  ]
+}
+```
+
+---
+
+#### 3.2.2 Verify Recruiter
+
+```http
+PATCH /api/v1/admin/recruiters/:id/verify
+```
+
+**Description:** Approve and verify a recruiter account.
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Recruiter Profile ID |
+
+**Request Example:**
+```http
+PATCH /api/v1/admin/recruiters/65f1234567890abcdef12345/verify
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Recruiter verified successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "companyName": "Tech Corp",
+    "isVerified": true,
+    "verificationStatus": "verified",
+    "verifiedAt": "2026-01-29T16:00:00.000Z"
+  }
+}
+```
+
+---
+
+#### 3.2.3 Reject Recruiter
+
+```http
+PATCH /api/v1/admin/recruiters/:id/reject
+```
+
+**Description:** Reject a recruiter verification request with notes.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `notes` | String | Yes | Rejection reason (max 1000 chars) |
+
+**Request Example:**
+```json
+{
+  "notes": "Company website is not accessible. Please provide valid company documentation."
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Recruiter verification rejected",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "companyName": "Tech Corp",
+    "verificationStatus": "rejected",
+    "verificationNotes": "Company website is not accessible..."
+  }
+}
+```
+
+---
+
+### **3.3 Job Management**
+
+#### 3.3.1 Get Pending Job Approvals
+
+```http
+GET /api/v1/admin/jobs/pending
+```
+
+**Description:** Retrieve all jobs awaiting approval.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+| `sortBy` | String | No | `createdAt` | Sort field |
+| `order` | String | No | `desc` | Sort order |
+
+**Request Example:**
+```http
+GET /api/v1/admin/jobs/pending?page=1&limit=20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Pending job approvals retrieved successfully",
+  "data": {
+    "jobs": [
       {
-        "id": "skill_id",
-        "name": "JavaScript",
-        "category": "Programming"
+        "_id": "65f1234567890abcdef12345",
+        "title": "Senior Full Stack Developer",
+        "description": "We are seeking...",
+        "status": "pending-approval",
+        "recruiterId": {
+          "_id": "...",
+          "name": "John Recruiter",
+          "email": "john@company.com"
+        },
+        "companyId": {
+          "_id": "...",
+          "companyName": "Tech Corp",
+          "companyLogo": "/uploads/logos/techcorp.png",
+          "industry": "Technology"
+        },
+        "location": {
+          "city": "San Francisco",
+          "state": "CA",
+          "country": "USA"
+        },
+        "salary": {
+          "min": 120000,
+          "max": 180000,
+          "currency": "USD"
+        },
+        "createdAt": "2026-01-28T12:00:00.000Z"
       }
+      // ... more pending jobs
     ],
-    "qualifications": ["Bachelor's degree", "5+ years experience"],
-    "benefits": ["Health insurance", "401k", "Remote work"],
-    "status": "active",
-    "isFeatured": false,
-    "views": 150,
-    "applicationCount": 25,
-    "postedAt": "2024-01-01T00:00:00.000Z",
-    "applicationDeadline": "2024-12-31T23:59:59Z",
-    "screeningQuestions": [
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 3,
+      "totalJobs": 25,
+      "jobsPerPage": 10,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  }
+}
+```
+
+---
+
+#### 3.3.2 Approve Job
+
+```http
+PATCH /api/v1/admin/jobs/:id/approve
+```
+
+**Description:** Approve a pending job posting (makes it live/active).
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Job ID |
+
+**Request Example:**
+```http
+PATCH /api/v1/admin/jobs/65f1234567890abcdef12345/approve
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job approved and published successfully",
+  "data": {
+    "job": {
+      "id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "status": "active",
+      "postedAt": "2026-01-29T16:30:00.000Z",
+      "recruiter": "John Recruiter",
+      "company": "Tech Corp"
+    }
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Cannot approve job with status 'active'. Only pending jobs can be approved."
+}
+```
+
+---
+
+#### 3.3.3 Reject Job
+
+```http
+PATCH /api/v1/admin/jobs/:id/reject
+```
+
+**Description:** Reject a job posting with moderation notes.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `notes` | String | Yes | Rejection reason (max 1000 chars) |
+| `reason` | String | No | Category of rejection |
+
+**Request Example:**
+```json
+{
+  "reason": "Content Guidelines Violation",
+  "notes": "Job description contains discriminatory language. Please revise and resubmit."
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job rejected successfully",
+  "data": {
+    "job": {
+      "id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "status": "rejected",
+      "moderationNotes": "Reason: Content Guidelines Violation\n\nDetails: Job description contains...",
+      "recruiter": "John Recruiter",
+      "company": "Tech Corp"
+    }
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Rejection notes are required"
+}
+```
+
+---
+
+#### 3.3.4 Feature Job
+
+```http
+PATCH /api/v1/admin/jobs/:id/feature
+```
+
+**Description:** Toggle or set the featured status of an active job.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `isFeatured` | Boolean | No | Set featured status (if omitted, toggles) |
+
+**Request Example:**
+```json
+{
+  "isFeatured": true
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job featured successfully",
+  "data": {
+    "job": {
+      "id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "isFeatured": true,
+      "company": "Tech Corp"
+    }
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Only active jobs can be featured"
+}
+```
+
+---
+
+#### 3.3.5 Delete Job
+
+```http
+DELETE /api/v1/admin/jobs/:id
+```
+
+**Description:** Delete a job posting (soft delete by default, permanent with query param).
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `permanent` | Boolean | No | `false` | Permanent deletion if `true` |
+
+**Request Example (Soft Delete):**
+```http
+DELETE /api/v1/admin/jobs/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job closed successfully",
+  "data": {
+    "job": {
+      "id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "status": "closed",
+      "closedAt": "2026-01-29T16:45:00.000Z"
+    }
+  }
+}
+```
+
+**Request Example (Permanent Delete):**
+```http
+DELETE /api/v1/admin/jobs/65f1234567890abcdef12345?permanent=true
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Cannot permanently delete job with existing applications. Close it instead."
+}
+```
+
+---
+
+#### 3.3.6 Get All Jobs (Admin View)
+
+```http
+GET /api/v1/admin/jobs
+```
+
+**Description:** Get all jobs with advanced filtering for admin dashboard.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+| `status` | String | No | - | Filter by status |
+| `recruiterId` | String | No | - | Filter by recruiter |
+| `companyId` | String | No | - | Filter by company |
+| `category` | String | No | - | Filter by category |
+| `isFeatured` | Boolean | No | - | Filter featured jobs |
+| `search` | String | No | - | Full-text search |
+| `sortBy` | String | No | `createdAt` | Sort field |
+| `order` | String | No | `desc` | Sort order |
+
+**Request Example:**
+```http
+GET /api/v1/admin/jobs?status=active&isFeatured=true&page=1&limit=20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Jobs retrieved successfully",
+  "data": {
+    "jobs": [
+      // ... array of job objects
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalJobs": 98,
+      "jobsPerPage": 20,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    },
+    "statistics": {
+      "totalViews": 15234,
+      "totalApplications": 2456,
+      "avgViews": 155.5,
+      "avgApplications": 25.1
+    }
+  }
+}
+```
+
+---
+
+#### 3.3.7 Get Job Statistics
+
+```http
+GET /api/v1/admin/jobs/statistics
+```
+
+**Description:** Get comprehensive job statistics for admin dashboard.
+
+**Request Example:**
+```http
+GET /api/v1/admin/jobs/statistics
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job statistics retrieved successfully",
+  "data": {
+    "statusCounts": {
+      "active": 156,
+      "pending-approval": 23,
+      "closed": 89,
+      "rejected": 12,
+      "draft": 34
+    },
+    "categoryCounts": [
+      { "category": "Software Development", "count": 78 },
+      { "category": "Data Science", "count": 45 },
+      { "category": "Design", "count": 33 }
+    ],
+    "experienceLevelCounts": {
+      "Entry": 34,
+      "Mid": 89,
+      "Senior": 112,
+      "Lead": 23
+    },
+    "employmentTypeCounts": {
+      "Full-Time": 198,
+      "Part-Time": 23,
+      "Contract": 45,
+      "Freelance": 12
+    },
+    "recentJobTrends": [
+      { "_id": "2026-01-01", "count": 12 },
+      { "_id": "2026-01-02", "count": 15 },
+      { "_id": "2026-01-03", "count": 18 }
+    ],
+    "topCompanies": [
       {
-        "question": "What is your experience with React?",
-        "isRequired": true
+        "companyId": "65f1234567890abcdef12345",
+        "companyName": "Tech Corp",
+        "jobCount": 45,
+        "totalViews": 5678,
+        "totalApplications": 892
       }
     ]
   }
 }
 ```
 
-**Error Responses:**
+---
 
-```json
-{
-  "success": false,
-  "message": "Job not found"
-}
+#### 3.3.8 Bulk Approve Jobs
+
+```http
+PATCH /api/v1/admin/jobs/bulk/approve
 ```
 
-#### Track Job View
-
-- **Endpoint:** `POST /jobs/:id/view`
-- **Access:** Public
-- **Description:** Track job view (can be authenticated or anonymous)
-
-**Request Body (Optional):**
-
-```json
-{
-  "userId": "user_id"
-}
-```
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "Job view tracked",
-  "data": {
-    "jobId": "job_id",
-    "views": 151
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Job not found"
-}
-```
-
-### Job Seeker Routes
-
-#### Get Recommended Jobs
-
-- **Endpoint:** `GET /jobs/recommended`
-- **Access:** Job Seeker only
-- **Description:** Get recommended jobs based on job seeker profile
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "jobs": [
-      {
-        "id": "job_id",
-        "title": "Senior Frontend Developer",
-        "matchScore": 0.85,
-        "matchReasons": ["Skills match", "Experience level match"]
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 15,
-      "pages": 2
-    }
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Job seeker access required"
-}
-```
-
-### Recruiter Routes
-
-#### Get My Jobs
-
-- **Endpoint:** `GET /jobs/my-jobs`
-- **Access:** Recruiter only
-- **Description:** Get all jobs posted by the recruiter
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `status` (string, optional filter)
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "jobs": [
-      {
-        "id": "job_id",
-        "title": "Senior Frontend Developer",
-        "status": "active",
-        "views": 150,
-        "applicationCount": 25,
-        "postedAt": "2024-01-01T00:00:00.000Z"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 5,
-      "pages": 1
-    }
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Recruiter access required"
-}
-```
-
-#### Create Job
-
-- **Endpoint:** `POST /jobs`
-- **Access:** Recruiter (Verified)
-- **Description:** Create a new job posting
-- **Headers:** `Authorization: Bearer <access_token>`
+**Description:** Approve multiple jobs at once.
 
 **Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `jobIds` | Array | Yes | Array of job IDs to approve |
 
-### Delete User
+**Request Example:**
+```json
+{
+  "jobIds": [
+    "65f1234567890abcdef12345",
+    "65f1234567890abcdef12346",
+    "65f1234567890abcdef12347"
+  ]
+}
+```
 
-- **Endpoint:** `DELETE /users/:id`
-- **Access:** Admin only
-- **Description:** Delete a user account permanently
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bulk approval completed. 2 approved, 1 failed",
+  "data": {
+    "approved": [
+      "65f1234567890abcdef12345",
+      "65f1234567890abcdef12346"
+    ],
+    "failed": [
+      {
+        "jobId": "65f1234567890abcdef12347",
+        "reason": "Job status is 'active', not pending"
+      }
+    ]
+  }
+}
+```
 
 ---
 
-## 💼 Job Routes
+### **3.4 Skills Management**
 
-### Public Routes
+#### 3.4.1 Create Skill
 
-#### Get All Jobs
+```http
+POST /api/v1/skills
+```
 
-- **Endpoint:** `GET /jobs`
-- **Access:** Public
-- **Description:** Get all active jobs with pagination and filters
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `category` (string, optional)
-- `location` (string, optional)
-- `experienceLevel` (string, optional)
-- `employmentType` (string, optional)
-- `salaryMin` (number, optional)
-- `salaryMax` (number, optional)
-- `isRemote` (boolean, optional)
-
-#### Search Jobs
-
-- **Endpoint:** `GET /jobs/search`
-- **Access:** Public
-- **Description:** Search jobs with advanced filters
-
-**Query Parameters:**
-
-- `q` (string, required) - Search term
-- All parameters from Get All Jobs
-
-#### Get Job by ID
-
-- **Endpoint:** `GET /jobs/:id`
-- **Access:** Public
-- **Description:** Get job details by ID
-
-#### Track Job View
-
-- **Endpoint:** `POST /jobs/:id/view`
-- **Access:** Public
-- **Description:** Track job view (can be authenticated or anonymous)
-
-### Job Seeker Routes
-
-#### Get Recommended Jobs
-
-- **Endpoint:** `GET /jobs/recommended`
-- **Access:** Job Seeker only
-- **Description:** Get recommended jobs based on job seeker profile
-
-### Recruiter Routes
-
-#### Get My Jobs
-
-- **Endpoint:** `GET /jobs/my-jobs`
-- **Access:** Recruiter only
-- **Description:** Get all jobs posted by the recruiter
-
-#### Create Job
-
-- **Endpoint:** `POST /jobs`
-- **Access:** Recruiter (Verified)
-- **Description:** Create a new job posting
+**Description:** Create a new skill for the platform.
 
 **Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | String | Yes | Skill name (unique) |
+| `category` | String | No | Skill category |
+| `description` | String | No | Skill description (max 500 chars) |
 
+**Request Example:**
 ```json
 {
-  "title": "Senior Frontend Developer",
-  "description": "Job description...",
-  "requiredSkills": ["skill_id_1", "skill_id_2"],
-  "qualifications": ["Bachelor's degree", "5+ years experience"],
-  "experienceLevel": "senior",
-  "experienceYears": {
-    "min": 5,
-    "max": 10
+  "name": "TypeScript",
+  "category": "Programming Languages",
+  "description": "Typed superset of JavaScript"
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Skill created successfully",
+  "data": {
+    "skill": {
+      "_id": "65f1234567890abcdef12345",
+      "name": "TypeScript",
+      "category": "Programming Languages",
+      "description": "Typed superset of JavaScript",
+      "createdAt": "2026-01-29T17:00:00.000Z"
+    }
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Skill already exists"
+}
+```
+
+---
+
+#### 3.4.2 Update Skill
+
+```http
+PUT /api/v1/skills/:id
+```
+
+**Description:** Update an existing skill.
+
+**Request Body:**
+```json
+{
+  "name": "TypeScript Advanced",
+  "category": "Programming Languages",
+  "description": "Advanced TypeScript programming"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Skill updated successfully",
+  "data": {
+    "skill": {
+      "_id": "65f1234567890abcdef12345",
+      "name": "TypeScript Advanced",
+      "category": "Programming Languages",
+      "description": "Advanced TypeScript programming"
+    }
+  }
+}
+```
+
+---
+
+#### 3.4.3 Delete Skill
+
+```http
+DELETE /api/v1/skills/:id
+```
+
+**Description:** Delete a skill from the platform.
+
+**Request Example:**
+```http
+DELETE /api/v1/skills/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Skill deleted successfully"
+}
+```
+
+**Error Response (409):**
+```json
+{
+  "success": false,
+  "message": "Skill is in use and cannot be deleted"
+}
+```
+
+---
+
+### **3.5 Category Management**
+
+#### 3.5.1 Create Category
+
+```http
+POST /api/v1/categories
+```
+
+**Description:** Create a new job category.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | String | Yes | Category name (unique) |
+| `description` | String | No | Category description (max 1000 chars) |
+| `parentId` | String | No | Parent category ID (for subcategories) |
+| `icon` | String | No | Icon name or URL |
+
+**Request Example:**
+```json
+{
+  "name": "Machine Learning",
+  "description": "Roles related to ML and AI",
+  "parentId": "65f1234567890abcdef12300",
+  "icon": "brain-circuit"
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Category created successfully",
+  "data": {
+    "category": {
+      "_id": "65f1234567890abcdef12345",
+      "name": "Machine Learning",
+      "description": "Roles related to ML and AI",
+      "parentId": "65f1234567890abcdef12300",
+      "icon": "brain-circuit",
+      "level": 1
+    }
+  }
+}
+```
+
+---
+
+#### 3.5.2 Update Category
+
+```http
+PUT /api/v1/categories/:id
+```
+
+**Description:** Update an existing category.
+
+**Request Example:**
+```json
+{
+  "name": "Machine Learning & AI",
+  "description": "Updated description for ML and AI roles"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Category updated successfully",
+  "data": {
+    "category": {
+      "_id": "65f1234567890abcdef12345",
+      "name": "Machine Learning & AI",
+      "description": "Updated description for ML and AI roles"
+    }
+  }
+}
+```
+
+---
+
+#### 3.5.3 Delete Category
+
+```http
+DELETE /api/v1/categories/:id
+```
+
+**Description:** Delete a job category.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `force` | Boolean | No | `false` | Force delete even if category has jobs |
+
+**Request Example:**
+```http
+DELETE /api/v1/categories/65f1234567890abcdef12345?force=false
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Category deleted successfully"
+}
+```
+
+**Error Response (409):**
+```json
+{
+  "success": false,
+  "message": "Category has subcategories or jobs and cannot be deleted"
+}
+```
+
+---
+
+### **3.6 Email Management**
+
+#### 3.6.1 Send Broadcast Email
+
+```http
+POST /api/v1/emails/admin/broadcast
+```
+
+**Description:** Send broadcast email to multiple users with advanced targeting.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `subject` | String | Yes | Email subject (max 200 chars) |
+| `message` | String | Yes | Email message body (max 10000 chars) |
+| `targetAudience` | String | Yes | Target audience: `all`, `recruiters`, `jobseekers`, `active`, `inactive` |
+| `filters` | Object | No | Additional filters |
+| `scheduleAt` | String | No | ISO datetime for scheduled sending |
+| `testMode` | Boolean | No | Test mode (default: false) |
+
+**Request Example:**
+```json
+{
+  "subject": "Platform Update: New Features Available",
+  "message": "Dear users,\n\nWe are excited to announce...",
+  "targetAudience": "all",
+  "filters": {
+    "role": ["recruiter", "jobseeker"],
+    "registrationDate": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-01-31T23:59:59.000Z"
+    }
+  },
+  "testMode": false
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Broadcast email queued successfully",
+  "data": {
+    "campaignId": "65f1234567890abcdef12345",
+    "estimatedRecipients": 1250,
+    "scheduledAt": "2026-01-29T17:30:00.000Z",
+    "testMode": false
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Invalid target audience or filters"
+}
+```
+
+---
+
+## Admin Routes Summary
+
+### **Access Control**
+- All admin routes require `Authorization: Bearer <admin_access_token>`
+- Only users with `role: "admin"` can access these endpoints
+- Admins cannot deactivate or delete their own accounts
+
+### **Key Capabilities**
+1. **User Management** - View, activate, deactivate, and delete user accounts
+2. **Recruiter Verification** - Approve or reject recruiter verification requests
+3. **Job Moderation** - Approve, reject, feature, or delete job postings
+4. **Content Management** - Manage skills and job categories
+5. **Analytics** - Access platform-wide statistics
+6. **Communication** - Send broadcast emails to users
+
+### **Status Codes**
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid token |
+| `403` | Forbidden / Insufficient permissions |
+| `404` | Resource not found |
+| `409` | Conflict (e.g., skill in use) |
+| `500` | Server error |
+
+---
+
+*Continue to [Recruiter Routes](#4-recruiter-routes) →*
+
+
+## 4. Recruiter Routes
+
+All recruiter routes require authentication with a recruiter role. Include the access token in the Authorization header.
+
+**Required Headers:**
+```
+Authorization: Bearer <recruiter_access_token>
+Content-Type: application/json (for JSON requests)
+Content-Type: multipart/form-data (for file uploads)
+```
+
+---
+
+### **4.1 Company Profile Management**
+
+#### 4.1.1 Get My Company Profile
+
+```http
+GET /api/v1/recruiters/profile
+```
+
+**Description:** Retrieve the current recruiter's company profile.
+
+**Headers:**
+```
+Authorization: Bearer <recruiter_access_token>
+```
+
+**Request Example:**
+```http
+GET /api/v1/recruiters/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "userId": "65f1234567890abcdef12346",
+    "companyName": "Tech Corp",
+    "companyLogo": "/uploads/logos/techcorp.png",
+    "companyBanner": "/uploads/banners/techcorp-banner.jpg",
+    "companyDescription": "Leading technology innovation company...",
+    "industry": "Technology",
+    "companySize": "100-500",
+    "website": "https://techcorp.com",
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA",
+      "zipCode": "94105"
+    },
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/techcorp",
+      "twitter": "https://twitter.com/techcorp"
+    },
+    "foundedYear": 2015,
+    "isVerified": true,
+    "verificationStatus": "verified",
+    "createdAt": "2026-01-15T10:00:00.000Z",
+    "updatedAt": "2026-01-29T10:00:00.000Z"
+  }
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "Recruiter profile not found"
+}
+```
+
+---
+
+#### 4.1.2 Create Company Profile
+
+```http
+POST /api/v1/recruiters/profile
+```
+
+**Description:** Create a new company profile for the recruiter.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `companyName` | String | Yes | Company name |
+| `companyDescription` | String | Yes | Company description |
+| `industry` | String | Yes | Industry type |
+| `companySize` | String | Yes | Company size range |
+| `website` | String | No | Company website URL |
+| `location` | Object | Yes | Company location details |
+| `socialLinks` | Object | No | Social media links |
+| `foundedYear` | Number | No | Year company was founded |
+
+**Request Example:**
+```json
+{
+  "companyName": "Tech Corp",
+  "companyDescription": "We are a leading technology company specializing in innovative software solutions...",
+  "industry": "Technology",
+  "companySize": "100-500",
+  "website": "https://techcorp.com",
+  "location": {
+    "city": "San Francisco",
+    "state": "CA",
+    "country": "USA",
+    "zipCode": "94105"
+  },
+  "socialLinks": {
+    "linkedin": "https://linkedin.com/company/techcorp",
+    "twitter": "https://twitter.com/techcorp"
+  },
+  "foundedYear": 2015
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Company profile created successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "userId": "65f1234567890abcdef12346",
+    "companyName": "Tech Corp",
+    "companyDescription": "We are a leading technology company...",
+    "industry": "Technology",
+    "companySize": "100-500",
+    "website": "https://techcorp.com",
+    "verificationStatus": "pending",
+    "isVerified": false,
+    "createdAt": "2026-01-29T18:00:00.000Z"
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Profile already exists for this user"
+}
+```
+
+---
+
+#### 4.1.3 Update Company Profile
+
+```http
+PUT /api/v1/recruiters/profile
+```
+
+**Description:** Update the existing company profile.
+
+**Request Body:** (Same fields as Create, all optional)
+```json
+{
+  "companyDescription": "Updated company description...",
+  "companySize": "500-1000",
+  "website": "https://newtechcorp.com"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Company profile updated successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "companyName": "Tech Corp",
+    "companyDescription": "Updated company description...",
+    "companySize": "500-1000",
+    "website": "https://newtechcorp.com",
+    "updatedAt": "2026-01-29T18:15:00.000Z"
+  }
+}
+```
+
+---
+
+#### 4.1.4 Upload Company Logo
+
+```http
+POST /api/v1/recruiters/profile/logo
+```
+
+**Description:** Upload or update company logo image.
+
+**Headers:**
+```
+Authorization: Bearer <recruiter_access_token>
+Content-Type: multipart/form-data
+```
+
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | File | Yes | Image file (PNG, JPG, JPEG) |
+
+**Request Example:**
+```http
+POST /api/v1/recruiters/profile/logo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="logo.png"
+Content-Type: image/png
+
+[binary image data]
+--boundary--
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Company logo uploaded successfully",
+  "data": {
+    "companyLogo": "/uploads/logos/1738174800000-logo.png"
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Please upload a file"
+}
+```
+
+---
+
+#### 4.1.5 Upload Company Banner
+
+```http
+POST /api/v1/recruiters/profile/banner
+```
+
+**Description:** Upload or update company banner image.
+
+**Headers:**
+```
+Authorization: Bearer <recruiter_access_token>
+Content-Type: multipart/form-data
+```
+
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | File | Yes | Image file (PNG, JPG, JPEG) |
+
+**Request Example:**
+```http
+POST /api/v1/recruiters/profile/banner
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: multipart/form-data
+
+[multipart form data with image file]
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Company banner uploaded successfully",
+  "data": {
+    "companyBanner": "/uploads/banners/1738174900000-banner.jpg"
+  }
+}
+```
+
+---
+
+#### 4.1.6 Get Verification Status
+
+```http
+GET /api/v1/recruiters/verification-status
+```
+
+**Description:** Check the current verification status of recruiter account.
+
+**Request Example:**
+```http
+GET /api/v1/recruiters/verification-status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "isVerified": true,
+    "verificationStatus": "verified",
+    "verificationNotes": null
+  }
+}
+```
+
+**Response (Pending):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "isVerified": false,
+    "verificationStatus": "pending",
+    "verificationNotes": null
+  }
+}
+```
+
+**Response (Rejected):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "isVerified": false,
+    "verificationStatus": "rejected",
+    "verificationNotes": "Company website is not accessible. Please provide valid documentation."
+  }
+}
+```
+
+---
+
+### **4.2 Job Management**
+
+#### 4.2.1 Create Job Posting
+
+```http
+POST /api/v1/jobs
+```
+
+**Description:** Create a new job posting (requires verified recruiter account).
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | String | Yes | Job title |
+| `description` | String | Yes | Job description |
+| `responsibilities` | Array | No | List of responsibilities |
+| `requirements` | Array | No | List of requirements |
+| `location` | Object | Yes | Job location |
+| `salary` | Object | No | Salary range |
+| `employmentType` | String | Yes | `Full-Time`, `Part-Time`, `Contract`, `Freelance` |
+| `experienceLevel` | String | Yes | `Entry`, `Mid`, `Senior`, `Lead` |
+| `category` | String | Yes | Category ID |
+| `requiredSkills` | Array | Yes | Array of skill IDs |
+| `benefits` | Array | No | List of benefits |
+| `applicationDeadline` | String | No | ISO date string |
+
+**Request Example:**
+```json
+{
+  "title": "Senior Full Stack Developer",
+  "description": "We are seeking an experienced full-stack developer...",
+  "responsibilities": [
+    "Design and develop scalable web applications",
+    "Lead technical architecture decisions",
+    "Mentor junior developers"
+  ],
+  "requirements": [
+    "5+ years of full-stack development experience",
+    "Expert knowledge of JavaScript, React, Node.js",
+    "Experience with cloud platforms (AWS/GCP)"
+  ],
+  "location": {
+    "city": "San Francisco",
+    "state": "CA",
+    "country": "USA",
+    "isRemote": true
   },
   "salary": {
-    "min": 80000,
-    "max": 120000,
-    "currency": "USD",
-    "isVisible": true
+    "min": 120000,
+    "max": 180000,
+    "currency": "USD"
   },
-  "location": {
-    "city": "New York",
-    "state": "NY",
-    "country": "USA",
-    "isRemote": true,
-    "remoteType": "fully-remote"
-  },
-  "employmentType": "full-time",
-  "numberOfOpenings": 1,
-  "applicationDeadline": "2024-12-31T23:59:59Z",
-  "screeningQuestions": [
-    {
-      "question": "What is your experience with React?",
-      "isRequired": true
-    }
+  "employmentType": "Full-Time",
+  "experienceLevel": "Senior",
+  "category": "65f1234567890abcdef12300",
+  "requiredSkills": [
+    "65f1234567890abcdef12301",
+    "65f1234567890abcdef12302",
+    "65f1234567890abcdef12303"
   ],
-  "category": "category_id"
+  "benefits": [
+    "Health insurance",
+    "401(k) matching",
+    "Remote work flexibility",
+    "Professional development budget"
+  ],
+  "applicationDeadline": "2026-03-01T23:59:59.000Z"
 }
 ```
 
-#### Update Job
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Job posting created successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "title": "Senior Full Stack Developer",
+    "description": "We are seeking...",
+    "status": "pending-approval",
+    "recruiterId": {
+      "_id": "...",
+      "name": "John Recruiter",
+      "email": "john@techcorp.com"
+    },
+    "companyId": {
+      "_id": "...",
+      "companyName": "Tech Corp",
+      "companyLogo": "/uploads/logos/techcorp.png"
+    },
+    "createdAt": "2026-01-29T18:30:00.000Z"
+  }
+}
+```
 
-- **Endpoint:** `PUT /jobs/:id`
-- **Access:** Recruiter (Owner)
-- **Description:** Update job posting
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "message": "Your recruiter account must be verified before posting jobs."
+}
+```
 
-#### Delete Job
-
-- **Endpoint:** `DELETE /jobs/:id`
-- **Access:** Recruiter (Owner)
-- **Description:** Delete job posting
-
-#### Close Job
-
-- **Endpoint:** `PATCH /jobs/:id/close`
-- **Access:** Recruiter (Owner)
-- **Description:** Close or mark job as filled
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "Recruiter profile not found. Please complete your profile first."
+}
+```
 
 ---
 
-## 📄 Application Routes
+#### 4.2.2 Get My Jobs
 
-### Job Seeker Routes
+```http
+GET /api/v1/jobs/my-jobs
+```
 
-#### Apply to Job
+**Description:** Get all job postings created by the recruiter.
 
-- **Endpoint:** `POST /applications`
-- **Access:** Job Seeker only
-- **Description:** Apply to a job
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+| `status` | String | No | - | Filter by status |
+| `sortBy` | String | No | `createdAt` | Sort field |
+| `order` | String | No | `desc` | Sort order |
 
-**Request Body:**
+**Request Example:**
+```http
+GET /api/v1/jobs/my-jobs?page=1&limit=20&status=active&sortBy=postedAt&order=desc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
+**Success Response (200):**
 ```json
 {
-  "jobId": "job_id",
-  "coverLetter": "Your cover letter...",
-  "screeningAnswers": [
+  "success": true,
+  "count": 12,
+  "totalJobs": 45,
+  "totalPages": 3,
+  "currentPage": 1,
+  "statusSummary": {
+    "active": 12,
+    "pending-approval": 3,
+    "closed": 28,
+    "rejected": 2
+  },
+  "data": [
     {
-      "question": "What is your experience with React?",
-      "answer": "I have 5 years of experience..."
+      "_id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "status": "active",
+      "views": 234,
+      "applicationCount": 42,
+      "postedAt": "2026-01-20T10:00:00.000Z",
+      "companyId": {
+        "_id": "...",
+        "companyName": "Tech Corp",
+        "companyLogo": "/uploads/logos/techcorp.png"
+      },
+      "requiredSkills": [
+        { "_id": "...", "name": "JavaScript" },
+        { "_id": "...", "name": "React" }
+      ]
+    }
+    // ... more jobs
+  ]
+}
+```
+
+---
+
+#### 4.2.3 Update Job Posting
+
+```http
+PUT /api/v1/jobs/:id
+```
+
+**Description:** Update a job posting (must be owner).
+
+**Request Body:** (Same fields as Create, all optional)
+```json
+{
+  "title": "Senior Full Stack Developer (Updated)",
+  "description": "Updated job description...",
+  "salary": {
+    "min": 130000,
+    "max": 190000,
+    "currency": "USD"
+  }
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job posting updated successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "title": "Senior Full Stack Developer (Updated)",
+    "description": "Updated job description...",
+    "updatedAt": "2026-01-29T19:00:00.000Z"
+  }
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "message": "You are not authorized to update this job"
+}
+```
+
+---
+
+#### 4.2.4 Delete Job Posting
+
+```http
+DELETE /api/v1/jobs/:id
+```
+
+**Description:** Delete a job posting (must be owner).
+
+**Request Example:**
+```http
+DELETE /api/v1/jobs/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job posting deleted successfully"
+}
+```
+
+---
+
+#### 4.2.5 Close Job Posting
+
+```http
+PATCH /api/v1/jobs/:id/close
+```
+
+**Description:** Close a job posting (mark as filled or closed).
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `reason` | String | No | `filled` or `closed` (default: `closed`) |
+
+**Request Example:**
+```json
+{
+  "reason": "filled"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Job marked as filled successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "title": "Senior Full Stack Developer",
+    "status": "filled",
+    "closedAt": "2026-01-29T19:15:00.000Z"
+  }
+}
+```
+
+---
+
+### **4.3 Application Management**
+
+#### 4.3.1 Get Applications for Job
+
+```http
+GET /api/v1/applications/job/:jobId
+```
+
+**Description:** Get all applications for a specific job (must be job owner).
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Applications per page |
+| `status` | String | No | - | Filter by application status |
+
+**Request Example:**
+```http
+GET /api/v1/applications/job/65f1234567890abcdef12345?page=1&limit=20&status=shortlisted
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "applications": [
+      {
+        "_id": "65f1234567890abcdef12400",
+        "jobSeekerId": {
+          "_id": "...",
+          "name": "Jane Candidate",
+          "email": "jane@example.com"
+        },
+        "coverLetter": "I am very interested in this position...",
+        "status": "shortlisted",
+        "appliedAt": "2026-01-28T14:00:00.000Z",
+        "rating": 4.5,
+        "recruiterNotes": [
+          {
+            "note": "Strong candidate, technical skills match well",
+            "createdAt": "2026-01-29T10:00:00.000Z"
+          }
+        ]
+      }
+      // ... more applications
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 42,
+      "pages": 3
+    },
+    "jobStats": {
+      "total": 42,
+      "byStatus": {
+        "submitted": 15,
+        "reviewed": 10,
+        "shortlisted": 8,
+        "interviewing": 5,
+        "rejected": 3,
+        "offered": 1
+      }
+    }
+  }
+}
+```
+
+---
+
+#### 4.3.2 Update Application Status
+
+```http
+PATCH /api/v1/applications/:id/status
+```
+
+**Description:** Update the status of a job application.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `status` | String | Yes | `reviewed`, `shortlisted`, `interviewing`, `rejected`, `offered` |
+| `notes` | String | No | Status update notes |
+
+**Request Example:**
+```json
+{
+  "status": "shortlisted",
+  "notes": "Candidate has excellent technical background and communication skills"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Application status updated successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12400",
+    "status": "shortlisted",
+    "updatedAt": "2026-01-29T19:30:00.000Z"
+  }
+}
+```
+
+---
+
+#### 4.3.3 Add Recruiter Notes
+
+```http
+POST /api/v1/applications/:id/notes
+```
+
+**Description:** Add private notes to an application.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `note` | String | Yes | Note content (max 1000 chars) |
+
+**Request Example:**
+```json
+{
+  "note": "Candidate demonstrated strong problem-solving skills during phone screen. Schedule technical interview."
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Note added successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12400",
+    "recruiterNotes": [
+      {
+        "note": "Candidate demonstrated strong problem-solving skills...",
+        "createdAt": "2026-01-29T19:45:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### 4.3.4 Rate Candidate
+
+```http
+PATCH /api/v1/applications/:id/rating
+```
+
+**Description:** Assign a rating to a candidate (1-5 stars).
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `rating` | Number | Yes | Rating value (1-5) |
+
+**Request Example:**
+```json
+{
+  "rating": 4.5
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Candidate rated successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12400",
+    "rating": 4.5
+  }
+}
+```
+
+---
+
+#### 4.3.5 Schedule Interview
+
+```http
+POST /api/v1/applications/:id/schedule-interview
+```
+
+**Description:** Schedule an interview for a candidate.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `scheduledAt` | String | Yes | ISO datetime for interview |
+| `meetingLink` | String | No | Video call or meeting URL |
+| `notes` | String | No | Interview notes (max 1000 chars) |
+
+**Request Example:**
+```json
+{
+  "scheduledAt": "2026-02-05T14:00:00.000Z",
+  "meetingLink": "https://zoom.us/j/1234567890",
+  "notes": "Technical interview - 1 hour. Focus on system design and coding challenges."
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Interview scheduled successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12400",
+    "interview": {
+      "scheduledAt": "2026-02-05T14:00:00.000Z",
+      "meetingLink": "https://zoom.us/j/1234567890",
+      "notes": "Technical interview - 1 hour..."
+    },
+    "status": "interviewing"
+  }
+}
+```
+
+---
+
+### **4.4 Recruiter Analytics**
+
+#### 4.4.1 Get Dashboard Analytics
+
+```http
+GET /api/v1/analytics/recruiter/dashboard
+```
+
+**Description:** Get comprehensive dashboard analytics for the recruiter.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `period` | String | No | `30d` | Time period: `7d`, `30d`, `90d`, `1y` |
+
+**Request Example:**
+```http
+GET /api/v1/analytics/recruiter/dashboard?period=30d
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "totalJobs": 45,
+      "activeJobs": 12,
+      "totalViews": 15234,
+      "totalApplications": 456
+    },
+    "jobs": [
+      {
+        "_id": "65f1234567890abcdef12345",
+        "title": "Senior Full Stack Developer",
+        "status": "active",
+        "views": 234,
+        "applicationCount": 42,
+        "postedAt": "2026-01-20T10:00:00.000Z"
+      }
+      // ... top 5 recent jobs
+    ],
+    "recentApplications": [
+      {
+        "_id": "65f1234567890abcdef12400",
+        "jobId": {
+          "_id": "...",
+          "title": "Senior Full Stack Developer"
+        },
+        "jobSeekerId": {
+          "_id": "...",
+          "firstName": "Jane",
+          "lastName": "Candidate"
+        },
+        "appliedAt": "2026-01-29T15:00:00.000Z"
+      }
+      // ... 5 most recent applications
+    ]
+  }
+}
+```
+
+---
+
+#### 4.4.2 Get Job Performance Metrics
+
+```http
+GET /api/v1/analytics/recruiter/job/:jobId
+```
+
+**Description:** Get detailed performance metrics for a specific job.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `period` | String | No | `30d` | Time period for analytics |
+
+**Request Example:**
+```http
+GET /api/v1/analytics/recruiter/job/65f1234567890abcdef12345?period=30d
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "jobSummary": {
+      "title": "Senior Full Stack Developer",
+      "status": "active",
+      "postedAt": "2026-01-20T10:00:00.000Z",
+      "daysActive": 9
+    },
+    "traffic": {
+      "daily": [
+        { "date": "2026-01-20", "views": 45 },
+        { "date": "2026-01-21", "views": 67 },
+        { "date": "2026-01-22", "views": 89 }
+      ],
+      "summary": {
+        "totalViews": 234,
+        "uniqueVisitors": 189,
+        "avgViewsPerDay": 26
+      },
+      "trends": {
+        "currentPeriodViews": 234,
+        "previousPeriodViews": 145,
+        "percentageChange": 61.4
+      }
+    },
+    "applications": {
+      "total": 42,
+      "funnel": {
+        "submitted": 42,
+        "reviewed": 35,
+        "shortlisted": 15,
+        "interviewing": 8,
+        "offered": 2,
+        "hired": 1,
+        "rejected": 10
+      }
+    }
+  }
+}
+```
+
+---
+
+### **4.5 Candidate Communication**
+
+#### 4.5.1 Contact Candidate
+
+```http
+POST /api/v1/emails/contact-candidate
+```
+
+**Description:** Send an email directly to a job candidate.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `candidateId` | String | Yes | User ID of the candidate |
+| `subject` | String | Yes | Email subject (max 200 chars) |
+| `message` | String | Yes | Email message (max 5000 chars) |
+| `applicationId` | String | No | Application ID for context |
+| `ccEmails` | Array | No | CC email addresses |
+
+**Request Example:**
+```json
+{
+  "candidateId": "65f1234567890abcdef12450",
+  "subject": "Interview Invitation - Senior Full Stack Developer",
+  "message": "Dear Jane,\n\nWe were impressed with your application and would like to invite you for an interview...",
+  "applicationId": "65f1234567890abcdef12400",
+  "ccEmails": ["hr@techcorp.com"]
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Email sent successfully",
+  "data": {
+    "emailId": "65f1234567890abcdef12500",
+    "sentAt": "2026-01-29T20:00:00.000Z"
+  }
+}
+```
+
+**Error Response (429):**
+```json
+{
+  "success": false,
+  "message": "Rate limit exceeded"
+}
+```
+
+---
+
+### **4.6 Job Seeker Discovery**
+
+#### 4.6.1 Search Job Seekers
+
+```http
+GET /api/v1/jobseekers/search
+```
+
+**Description:** Search and filter job seeker profiles.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `skills` | String | No | - | Comma-separated skill IDs |
+| `experienceYears` | Number | No | - | Minimum years of experience |
+| `location` | String | No | - | Location search |
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Results per page |
+
+**Request Example:**
+```http
+GET /api/v1/jobseekers/search?skills=65f123,65f124&experienceYears=3&location=San Francisco&page=1&limit=20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "jobSeekers": [
+      {
+        "_id": "65f1234567890abcdef12450",
+        "userId": {
+          "_id": "...",
+          "name": "Jane Candidate",
+          "email": "jane@example.com"
+        },
+        "headline": "Full Stack Developer | React & Node.js Expert",
+        "experienceYears": 5,
+        "location": {
+          "city": "San Francisco",
+          "state": "CA"
+        },
+        "skills": [
+          { "_id": "...", "name": "JavaScript" },
+          { "_id": "...", "name": "React" }
+        ],
+        "resume": "/uploads/resumes/jane-resume.pdf"
+      }
+      // ... more job seekers
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 45,
+      "pages": 3
+    }
+  }
+}
+```
+
+---
+
+#### 4.6.2 View Job Seeker Profile
+
+```http
+GET /api/v1/jobseekers/:id/profile
+```
+
+**Description:** View detailed profile of a specific job seeker.
+
+**Request Example:**
+```http
+GET /api/v1/jobseekers/65f1234567890abcdef12450/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12450",
+    "userId": {
+      "_id": "...",
+      "name": "Jane Candidate",
+      "email": "jane@example.com"
+    },
+    "headline": "Full Stack Developer | React & Node.js Expert",
+    "bio": "Passionate developer with 5 years of experience...",
+    "experienceYears": 5,
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA"
+    },
+    "skills": [
+      { "_id": "...", "name": "JavaScript" },
+      { "_id": "...", "name": "React" },
+      { "_id": "...", "name": "Node.js" }
+    ],
+    "resume": "/uploads/resumes/jane-resume.pdf",
+    "portfolio": [
+      {
+        "title": "E-commerce Platform",
+        "description": "Built a full-stack e-commerce platform...",
+        "url": "https://project.com",
+        "image": "/uploads/portfolio/project1.png"
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor of Science in Computer Science",
+        "institution": "Stanford University",
+        "graduationYear": 2019
+      }
+    ],
+    "workExperience": [
+      {
+        "title": "Senior Developer",
+        "company": "Tech Startup",
+        "startDate": "2021-01-01",
+        "endDate": null,
+        "current": true,
+        "description": "Lead development of core platform features..."
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Recruiter Routes Summary
+
+### **Access Requirements**
+- All recruiter routes require `Authorization: Bearer <recruiter_access_token>`
+- Users must have `role: "recruiter"`
+- Profile must be created before posting jobs
+- Account must be verified by admin to post jobs
+
+### **Key Workflows**
+
+1. **Getting Started**:
+   - Create company profile → Upload logo/banner → Wait for admin verification → Start posting jobs
+
+2. **Job Posting**:
+   - Create job → Job goes to pending-approval → Admin approves → Job becomes active
+
+3. **Application Management**:
+   - View applications → Update status → Add notes → Rate candidates → Schedule interviews → Contact candidates
+
+4. **Analytics**:
+   - Monitor dashboard → Track job performance → Analyze application trends
+
+### **Status Codes**
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid token |
+| `403` | Forbidden / Not verified / Not owner |
+| `404` | Resource not found |
+| `429` | Rate limit exceeded |
+| `500` | Server error |
+
+---
+
+*Continue to [Job Seeker Routes](#5-job-seeker-routes) →*
+
+
+## 5. Job Seeker Routes
+
+All job seeker routes require authentication with a job seeker role. Include the access token in the Authorization header.
+
+**Required Headers:**
+```
+Authorization: Bearer <jobseeker_access_token>
+Content-Type: application/json (for JSON requests)
+Content-Type: multipart/form-data (for file uploads)
+```
+
+---
+
+### **5.1 Profile Management**
+
+#### 5.1.1 Get My Profile
+
+```http
+GET /api/v1/jobseekers/profile
+```
+
+**Description:** Retrieve the current job seeker's profile.
+
+**Request Example:**
+```http
+GET /api/v1/jobseekers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "userId": "65f1234567890abcdef12346",
+    "firstName": "Jane",
+    "lastName": "Candidate",
+    "phone": "+1234567890",
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA",
+      "zipCode": "94105"
+    },
+    "profilePicture": "/uploads/profiles/jane.jpg",
+    "headline": "Full Stack Developer | React & Node.js Expert",
+    "summary": "Passionate developer with 5 years of experience...",
+    "workExperience": [
+      {
+        "title": "Senior Developer",
+        "company": "Tech Startup",
+        "location": "San Francisco, CA",
+        "startDate": "2021-01-01",
+        "endDate": null,
+        "current": true,
+        "description": "Lead development of core platform features..."
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor of Science in Computer Science",
+        "institution": "Stanford University",
+        "fieldOfStudy": "Computer Science",
+        "graduationYear": 2019,
+        "grade": "3.8 GPA"
+      }
+    ],
+    "skills": [
+      { "_id": "...", "name": "JavaScript", "category": "Programming Languages" },
+      { "_id": "...", "name": "React", "category": "Frontend Frameworks" }
+    ],
+    "certifications": [
+      {
+        "name": "AWS Certified Developer",
+        "issuingOrganization": "Amazon Web Services",
+        "issueDate": "2023-06-01",
+        "credentialId": "AWS-12345"
+      }
+    ],
+    "resume": {
+      "fileName": "jane_resume.pdf",
+      "fileUrl": "/uploads/resumes/jane_resume.pdf",
+      "uploadedAt": "2026-01-15T10:00:00.000Z"
+    },
+    "portfolio": [
+      {
+        "title": "E-commerce Platform",
+        "description": "Built a full-stack e-commerce platform...",
+        "projectUrl": "https://project.com",
+        "fileUrl": "/uploads/portfolio/project1.png"
+      }
+    ],
+    "preferences": {
+      "jobType": ["Full-Time", "Contract"],
+      "remoteWorkPreference": "Remote",
+      "desiredSalaryMin": 100000,
+      "desiredSalaryMax": 150000
+    },
+    "profileCompleteness": 85,
+    "createdAt": "2026-01-15T08:00:00.000Z",
+    "updatedAt": "2026-01-29T12:00:00.000Z"
+  }
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "Profile not found. Please create your profile first."
+}
+```
+
+---
+
+#### 5.1.2 Create Profile
+
+```http
+POST /api/v1/jobseekers/profile
+```
+
+**Description:** Create a new job seeker profile.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `firstName` | String | Yes | First name |
+| `lastName` | String | Yes | Last name |
+| `phone` | String | No | Phone number |
+| `location` | Object | Yes | Location details |
+| `headline` | String | Yes | Professional headline (max 200 chars) |
+| `summary` | String | No | Professional summary (max 2000 chars) |
+| `workExperience` | Array | No | Work experience entries |
+| `education` | Array | No | Education entries |
+| `skills` | Array | No | Array of skill IDs |
+| `certifications` | Array | No | Certification entries |
+| `socialLinks` | Object | No | LinkedIn, GitHub, etc. |
+| `preferences` | Object | No | Job preferences |
+
+**Request Example:**
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Candidate",
+  "phone": "+1234567890",
+  "location": {
+    "city": "San Francisco",
+    "state": "CA",
+    "country": "USA",
+    "zipCode": "94105"
+  },
+  "headline": "Full Stack Developer | React & Node.js Expert",
+  "summary": "Passionate developer with 5 years of experience in building scalable web applications...",
+  "skills": [
+    "65f1234567890abcdef12301",
+    "65f1234567890abcdef12302"
+  ],
+  "preferences": {
+    "jobType": ["Full-Time", "Contract"],
+    "remoteWorkPreference": "Remote",
+    "desiredSalaryMin": 100000,
+    "desiredSalaryMax": 150000,
+    "willingToRelocate": true
+  },
+  "socialLinks": {
+    "linkedin": "https://linkedin.com/in/jane-candidate",
+    "github": "https://github.com/janecandidate",
+    "portfolio": "https://janecandidate.com"
+  }
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Profile created successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "userId": "65f1234567890abcdef12346",
+    "firstName": "Jane",
+    "lastName": "Candidate",
+    "headline": "Full Stack Developer | React & Node.js Expert",
+    "profileCompleteness": 45,
+    "createdAt": "2026-01-29T20:00:00.000Z"
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Profile already exists. Use PUT to update."
+}
+```
+
+---
+
+#### 5.1.3 Update Profile
+
+```http
+PUT /api/v1/jobseekers/profile
+```
+
+**Description:** Update existing job seeker profile.
+
+**Request Body:** (Same fields as Create, all optional)
+```json
+{
+  "headline": "Senior Full Stack Developer | 5+ Years Experience",
+  "summary": "Updated professional summary with recent achievements...",
+  "workExperience": [
+    {
+      "title": "Senior Developer",
+      "company": "Tech Startup",
+      "location": "San Francisco, CA",
+      "startDate": "2021-01-01",
+      "endDate": null,
+      "current": true,
+      "description": "Lead development of core platform features, mentored junior developers..."
+    },
+    {
+      "title": "Full Stack Developer",
+      "company": "Previous Company",
+      "location": "New York, NY",
+      "startDate": "2019-06-01",
+      "endDate": "2020-12-31",
+      "current": false,
+      "description": "Developed and maintained multiple web applications..."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "Stanford University",
+      "fieldOfStudy": "Computer Science",
+      "graduationYear": 2019,
+      "grade": "3.8 GPA"
     }
   ]
 }
 ```
 
-#### Get My Applications
-
-- **Endpoint:** `GET /applications/my-applications`
-- **Access:** Job Seeker only
-- **Description:** Get current user's job applications
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `status` (string, optional filter)
-
-#### Withdraw Application
-
-- **Endpoint:** `PATCH /applications/:id/withdraw`
-- **Access:** Job Seeker (Owner)
-- **Description:** Withdraw a job application
-
-### Recruiter Routes
-
-#### Get Applications for Job
-
-- **Endpoint:** `GET /applications/job/:jobId`
-- **Access:** Recruiter (Job Owner)
-- **Description:** Get all applications for a specific job
-
-#### Update Application Status
-
-- **Endpoint:** `PATCH /applications/:id/status`
-- **Access:** Recruiter only
-- **Description:** Update application status
-
-**Request Body:**
-
+**Success Response (200):**
 ```json
 {
-  "status": "shortlisted", // reviewed, shortlisted, interviewing, rejected, offered
-  "notes": "Candidate looks promising"
-}
-```
-
-#### Add Recruiter Note
-
-- **Endpoint:** `POST /applications/:id/notes`
-- **Access:** Recruiter only
-- **Description:** Add private notes to an application
-
-**Request Body:**
-
-```json
-{
-  "note": "Strong technical skills, good cultural fit"
-}
-```
-
-#### Rate Candidate
-
-- **Endpoint:** `PATCH /applications/:id/rating`
-- **Access:** Recruiter only
-- **Description:** Rate a candidate (1-5 stars)
-
-**Request Body:**
-
-```json
-{
-  "rating": 4
-}
-```
-
-#### Schedule Interview
-
-- **Endpoint:** `POST /applications/:id/schedule-interview`
-- **Access:** Recruiter only
-- **Description:** Schedule an interview for a candidate
-
-**Request Body:**
-
-```json
-{
-  "scheduledAt": "2024-01-15T14:00:00Z",
-  "meetingLink": "https://zoom.us/j/123456789",
-  "notes": "Technical interview round"
-}
-```
-
-### Shared Routes
-
-#### Get Application by ID
-
-- **Endpoint:** `GET /applications/:id`
-- **Access:** Recruiter or Job Seeker (Own application)
-- **Description:** Get specific application details
-
----
-
-## 🔖 Saved Jobs Routes
-
-### Get Saved Jobs
-
-- **Endpoint:** `GET /saved-jobs`
-- **Access:** Job Seeker only
-- **Description:** Get all saved jobs for the current user
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `sortBy` (string, optional: datePosted, salary, title)
-- `sortOrder` (string, optional: asc, desc)
-
-### Save Job
-
-- **Endpoint:** `POST /saved-jobs`
-- **Access:** Job Seeker only
-- **Description:** Save a job to user's saved jobs list
-
-**Request Body:**
-
-```json
-{
-  "jobId": "job_id"
-}
-```
-
-### Unsave Job
-
-- **Endpoint:** `DELETE /saved-jobs/:jobId`
-- **Access:** Job Seeker only
-- **Description:** Remove a job from user's saved jobs list
-
----
-
-## 🛠️ Skills Routes
-
-### Public Routes
-
-#### Get All Skills
-
-- **Endpoint:** `GET /skills`
-- **Access:** Public
-- **Description:** Get all available skills with pagination
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 50)
-- `search` (string, optional)
-- `category` (string, optional)
-
-#### Search Skills
-
-- **Endpoint:** `GET /skills/search`
-- **Access:** Public
-- **Description:** Search skills by name or partial match
-
-**Query Parameters:**
-
-- `q` (string, required) - Search term
-- `limit` (number, default: 10, max: 50)
-
-### Admin Routes
-
-#### Create Skill
-
-- **Endpoint:** `POST /skills`
-- **Access:** Admin only
-- **Description:** Create a new skill
-
-**Request Body:**
-
-```json
-{
-  "name": "JavaScript",
-  "category": "Programming",
-  "description": "Programming language for web development"
-}
-```
-
-#### Update Skill
-
-- **Endpoint:** `PUT /skills/:id`
-- **Access:** Admin only
-- **Description:** Update an existing skill
-
-#### Delete Skill
-
-- **Endpoint:** `DELETE /skills/:id`
-- **Access:** Admin only
-- **Description:** Delete a skill
-
----
-
-## 📂 Job Categories Routes
-
-### Public Routes
-
-#### Get All Categories
-
-- **Endpoint:** `GET /categories`
-- **Access:** Public
-- **Description:** Get all job categories with hierarchical structure
-
-**Query Parameters:**
-
-- `view` (string, optional: tree, flat, default: flat)
-- `parentId` (string, optional)
-- `q` (string, optional search)
-- `page` (number, default: 1)
-- `limit` (number, default: 50)
-
-### Admin Routes
-
-#### Create Category
-
-- **Endpoint:** `POST /categories`
-- **Access:** Admin only
-- **Description:** Create a new job category
-
-**Request Body:**
-
-```json
-{
-  "name": "Software Development",
-  "description": "Jobs related to software development",
-  "parentId": null, // for subcategories
-  "icon": "code-icon"
-}
-```
-
-#### Update Category
-
-- **Endpoint:** `PUT /categories/:id`
-- **Access:** Admin only
-- **Description:** Update an existing job category
-
-#### Delete Category
-
-- **Endpoint:** `DELETE /categories/:id`
-- **Access:** Admin only
-- **Description:** Delete a job category
-
----
-
-## 📊 Analytics Routes
-
-### Recruiter Routes
-
-#### Get Recruiter Dashboard
-
-- **Endpoint:** `GET /analytics/recruiter/dashboard`
-- **Access:** Recruiter only
-- **Description:** Get recruiter overview analytics and dashboard metrics
-
-**Query Parameters:**
-
-- `period` (string, optional: 7d, 30d, 90d, 1y, default: 30d)
-
-#### Get Job Performance Metrics
-
-- **Endpoint:** `GET /analytics/recruiter/job/:jobId`
-- **Access:** Recruiter (Job Owner)
-- **Description:** Get specific job performance metrics and analytics
-
-**Query Parameters:**
-
-- `period` (string, optional: 7d, 30d, 90d, default: 30d)
-
-### Admin Routes
-
-#### Get Admin Dashboard
-
-- **Endpoint:** `GET /analytics/admin/dashboard`
-- **Access:** Admin only
-- **Description:** Get platform-wide dashboard analytics for administrators
-
-**Query Parameters:**
-
-- `period` (string, optional: 7d, 30d, 90d, 1y, default: 30d)
-
-#### Get User Analytics
-
-- **Endpoint:** `GET /analytics/admin/users`
-- **Access:** Admin only
-- **Description:** Get user growth statistics and demographics analytics
-
-**Query Parameters:**
-
-- `period` (string, optional: 7d, 30d, 90d, 1y, default: 30d)
-- `groupBy` (string, optional: day, week, month, default: day)
-
-#### Get Job Analytics
-
-- **Endpoint:** `GET /analytics/admin/jobs`
-- **Access:** Admin only
-- **Description:** Get job statistics and marketplace health analytics
-
-**Query Parameters:**
-
-- `period` (string, optional: 7d, 30d, 90d, 1y, default: 30d)
-- `status` (string, optional filter by job status)
-
----
-
-## 📧 Email Routes
-
-### Recruiter Routes
-
-#### Contact Candidate
-
-- **Endpoint:** `POST /emails/contact-candidate`
-- **Access:** Recruiter only
-- **Description:** Send email directly to a job candidate
-
-**Request Body:**
-
-```json
-{
-  "candidateId": "user_id",
-  "subject": "Interview Invitation",
-  "message": "We would like to invite you for an interview...",
-  "applicationId": "application_id", // optional
-  "ccEmails": ["manager@company.com"] // optional
-}
-```
-
-### Admin Routes
-
-#### Send Broadcast Email
-
-- **Endpoint:** `POST /emails/admin/broadcast`
-- **Access:** Admin only
-- **Description:** Send broadcast email to multiple users
-
-**Request Body:**
-
-```json
-{
-  "subject": "Platform Update",
-  "message": "We are excited to announce new features...",
-  "targetAudience": "all", // all, recruiters, jobseekers, active, inactive
-  "filters": {
-    "role": ["jobseeker"],
-    "location": ["USA", "Canada"],
-    "registrationDate": {
-      "start": "2024-01-01",
-      "end": "2024-12-31"
-    }
-  },
-  "scheduleAt": "2024-01-15T10:00:00Z", // optional
-  "testMode": false // optional
-}
-```
-
----
-
-## 👤 Job Seeker Profile Routes
-
-### Profile Management
-
-#### Get My Profile
-
-- **Endpoint:** `GET /jobseekers/profile`
-- **Access:** Job Seeker only
-- **Description:** Get current job seeker's profile
-
-#### Create Profile
-
-- **Endpoint:** `POST /jobseekers/profile`
-- **Access:** Job Seeker only
-- **Description:** Create job seeker profile
-
-**Request Body:**
-
-```json
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "phone": "+1234567890",
-  "location": {
-    "city": "New York",
-    "state": "NY",
-    "country": "USA",
-    "zipCode": "10001"
-  },
-  "headline": "Senior Frontend Developer",
-  "summary": "Experienced frontend developer with 5+ years...",
-  "workExperience": [
-    {
-      "company": "Tech Company",
-      "title": "Senior Frontend Developer",
-      "startDate": "2020-01-01",
-      "endDate": null,
-      "isCurrentRole": true,
-      "description": "Developed responsive web applications..."
-    }
-  ],
-  "education": [
-    {
-      "institution": "University Name",
-      "degree": "Bachelor of Science",
-      "fieldOfStudy": "Computer Science",
-      "startDate": "2016-01-01",
-      "endDate": "2020-01-01"
-    }
-  ],
-  "skills": ["skill_id_1", "skill_id_2"],
-  "preferences": {
-    "jobType": ["full-time"],
-    "desiredSalaryMin": 80000,
-    "desiredSalaryMax": 120000,
-    "willingToRelocate": true,
-    "remoteWorkPreference": "remote"
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12345",
+    "headline": "Senior Full Stack Developer | 5+ Years Experience",
+    "profileCompleteness": 75,
+    "updatedAt": "2026-01-29T20:30:00.000Z"
   }
 }
 ```
 
-#### Update Profile
+---
 
-- **Endpoint:** `PUT /jobseekers/profile`
-- **Access:** Job Seeker only
-- **Description:** Update job seeker profile
+### **5.2 Resume & Portfolio Management**
 
-### Resume Management
+#### 5.2.1 Upload Resume
 
-#### Upload Resume
+```http
+POST /api/v1/jobseekers/profile/resume
+```
 
-- **Endpoint:** `POST /jobseekers/profile/resume`
-- **Access:** Job Seeker only
-- **Description:** Upload resume file
-- **Content-Type:** `multipart/form-data`
-- **Body:** `resume` (file)
+**Description:** Upload resume file (PDF, DOC, DOCX).
 
-#### Delete Resume
+**Headers:**
+```
+Authorization: Bearer <jobseeker_access_token>
+Content-Type: multipart/form-data
+```
 
-- **Endpoint:** `DELETE /jobseekers/profile/resume`
-- **Access:** Job Seeker only
-- **Description:** Delete resume file
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | File | Yes | Resume file (PDF/DOC/DOCX, max 5MB) |
 
-### Video Resume Management
+**Request Example:**
+```http
+POST /api/v1/jobseekers/profile/resume
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: multipart/form-data
 
-#### Upload Video Resume
+[multipart form data with resume file]
+```
 
-- **Endpoint:** `POST /jobseekers/profile/video-resume`
-- **Access:** Job Seeker only
-- **Description:** Upload video resume file
-- **Content-Type:** `multipart/form-data`
-- **Body:** `video` (file)
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Resume uploaded successfully",
+  "data": {
+    "fileName": "jane_resume.pdf",
+    "fileUrl": "/uploads/resumes/1738175400000-jane_resume.pdf",
+    "uploadedAt": "2026-01-29T20:43:20.000Z"
+  }
+}
+```
 
-#### Delete Video Resume
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Please upload a resume file"
+}
+```
 
-- **Endpoint:** `DELETE /jobseekers/profile/video-resume`
-- **Access:** Job Seeker only
-- **Description:** Delete video resume file
+---
 
-### Portfolio Management
+#### 5.2.2 Delete Resume
 
-#### Add Portfolio Item
+```http
+DELETE /api/v1/jobseekers/profile/resume
+```
 
-- **Endpoint:** `POST /jobseekers/profile/portfolio`
-- **Access:** Job Seeker only
-- **Description:** Add portfolio item
-- **Content-Type:** `multipart/form-data`
-- **Body:**
-  - `portfolioFile` (file, optional)
-  - `title` (string, required)
-  - `description` (string, optional)
-  - `projectUrl` (string, optional)
+**Description:** Delete the uploaded resume file.
 
-#### Delete Portfolio Item
+**Request Example:**
+```http
+DELETE /api/v1/jobseekers/profile/resume
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-- **Endpoint:** `DELETE /jobseekers/profile/portfolio/:itemId`
-- **Access:** Job Seeker only
-- **Description:** Delete portfolio item
-- **Headers:** `Authorization: Bearer <access_token>`
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Resume deleted successfully"
+}
+```
 
-**Response (200):**
+---
 
+#### 5.2.3 Upload Video Resume
+
+```http
+POST /api/v1/jobseekers/profile/video-resume
+```
+
+**Description:** Upload video resume (MP4, AVI, MOV).
+
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | File | Yes | Video file (MP4/AVI/MOV, max 50MB) |
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Video resume uploaded successfully",
+  "data": {
+    "fileName": "jane_video_resume.mp4",
+    "fileUrl": "/uploads/videos/1738175500000-jane_video_resume.mp4",
+    "uploadedAt": "2026-01-29T20:45:00.000Z"
+  }
+}
+```
+
+---
+
+#### 5.2.4 Delete Video Resume
+
+```http
+DELETE /api/v1/jobseekers/profile/video-resume
+```
+
+**Description:** Delete the uploaded video resume.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Video resume deleted successfully"
+}
+```
+
+---
+
+#### 5.2.5 Add Portfolio Item
+
+```http
+POST /api/v1/jobseekers/profile/portfolio
+```
+
+**Description:** Add a portfolio project with optional image/file.
+
+**Headers:**
+```
+Authorization: Bearer <jobseeker_access_token>
+Content-Type: multipart/form-data
+```
+
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | String | Yes | Project title |
+| `description` | String | No | Project description (max 1000 chars) |
+| `projectUrl` | String | No | Live project URL |
+| `file` | File | No | Project image/screenshot |
+
+**Request Example:**
+```http
+POST /api/v1/jobseekers/profile/portfolio
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: multipart/form-data
+
+title=E-commerce Platform
+description=Built a full-stack e-commerce platform with React, Node.js, and MongoDB
+projectUrl=https://myproject.com
+file=[binary image data]
+```
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Portfolio item added successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12400",
+    "title": "E-commerce Platform",
+    "description": "Built a full-stack e-commerce platform...",
+    "projectUrl": "https://myproject.com",
+    "fileUrl": "/uploads/portfolio/1738175600000-project.png"
+  }
+}
+```
+
+---
+
+#### 5.2.6 Delete Portfolio Item
+
+```http
+DELETE /api/v1/jobseekers/profile/portfolio/:itemId
+```
+
+**Description:** Delete a specific portfolio item.
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `itemId` | String | Yes | Portfolio item ID |
+
+**Request Example:**
+```http
+DELETE /api/v1/jobseekers/profile/portfolio/65f1234567890abcdef12400
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
@@ -1514,590 +4059,493 @@ All API responses follow this format:
 }
 ```
 
-**Error Responses:**
+---
 
+### **5.3 Job Applications**
+
+#### 5.3.1 Apply to Job
+
+```http
+POST /api/v1/applications
+```
+
+**Description:** Submit a job application.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `jobId` | String | Yes | Job ID to apply to |
+| `coverLetter` | String | No | Cover letter (max 2000 chars) |
+| `screeningAnswers` | Array | No | Answers to screening questions |
+| `resumeUsed` | Object | No | Specific resume to use (defaults to profile resume) |
+
+**Request Example:**
 ```json
 {
-  "success": false,
-  "message": "Portfolio item not found"
+  "jobId": "65f1234567890abcdef12345",
+  "coverLetter": "Dear Hiring Manager,\n\nI am very interested in the Senior Full Stack Developer position...",
+  "screeningAnswers": [
+    {
+      "question": "Do you have 5+ years of experience with React?",
+      "answer": "Yes, I have 6 years of professional experience with React..."
+    },
+    {
+      "question": "What is your expected salary range?",
+      "answer": "$120,000 - $150,000"
+    }
+  ]
 }
 ```
 
-### Recruiter Routes
-
-#### Search Job Seekers
-
-- **Endpoint:** `GET /jobseekers/search`
-- **Access:** Recruiter only
-- **Description:** Search job seekers by skills, location, etc.
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Query Parameters:**
-
-- `q` (string, optional search)
-- `skills` (string, optional, comma-separated skill IDs)
-- `location` (string, optional)
-- `experienceLevel` (string, optional)
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-
-**Response (200):**
-
+**Success Response (201):**
 ```json
 {
   "success": true,
+  "message": "Application submitted successfully",
   "data": {
-    "jobSeekers": [
-      {
-        "id": "user_id",
-        "name": "John Doe",
-        "headline": "Senior Frontend Developer",
-        "location": "New York, NY",
-        "experience": "5+ years",
-        "skills": [
-          {
-            "id": "skill_id",
-            "name": "JavaScript",
-            "category": "Programming"
-          }
-        ],
-        "profileCompleteness": 85,
-        "lastActive": "2024-01-01T00:00:00.000Z"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 50,
-      "pages": 5
+    "_id": "65f1234567890abcdef12500",
+    "jobId": "65f1234567890abcdef12345",
+    "jobSeekerId": "65f1234567890abcdef12346",
+    "recruiterId": "65f1234567890abcdef12347",
+    "status": "submitted",
+    "appliedAt": "2026-01-29T21:00:00.000Z",
+    "coverLetter": "Dear Hiring Manager...",
+    "resumeUsed": {
+      "fileName": "jane_resume.pdf",
+      "fileUrl": "/uploads/resumes/jane_resume.pdf"
     }
   }
 }
 ```
 
-#### Get Job Seeker Profile
-
-- **Endpoint:** `GET /jobseekers/:id/profile`
-- **Access:** Recruiter only
-- **Description:** Get job seeker profile by ID
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "profile_id",
-    "userId": "user_id",
-    "name": "John Doe",
-    "headline": "Senior Frontend Developer",
-    "location": {
-      "city": "New York",
-      "state": "NY",
-      "country": "USA"
-    },
-    "summary": "Experienced frontend developer with 5+ years...",
-    "skills": [
-      {
-        "id": "skill_id",
-        "name": "JavaScript",
-        "category": "Programming"
-      }
-    ],
-    "workExperience": [
-      {
-        "company": "Tech Company",
-        "title": "Senior Frontend Developer",
-        "startDate": "2020-01-01",
-        "endDate": null,
-        "isCurrentRole": true,
-        "description": "Developed responsive web applications..."
-      }
-    ],
-    "education": [
-      {
-        "institution": "University Name",
-        "degree": "Bachelor of Science",
-        "fieldOfStudy": "Computer Science",
-        "startDate": "2016-01-01",
-        "endDate": "2020-01-01"
-      }
-    ],
-    "resumeUrl": "resume_url",
-    "profileCompleteness": 85
-  }
-}
-```
-
-**Error Responses:**
-
+**Error Response (400):**
 ```json
 {
   "success": false,
-  "message": "Job seeker profile not found"
+  "message": "You have already applied to this job"
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "Please complete your job seeker profile before applying"
 }
 ```
 
 ---
 
-## 🏢 Recruiter Profile Routes
+#### 5.3.2 Get My Applications
 
-### Public Routes
+```http
+GET /api/v1/applications/my-applications
+```
 
-#### Get Public Company Profile
+**Description:** Get all applications submitted by the job seeker.
 
-- **Endpoint:** `GET /recruiters/:id/profile`
-- **Access:** Public
-- **Description:** Get public company profile
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `status` | String | No | - | Filter by status |
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Applications per page |
 
-**Response (200):**
+**Request Example:**
+```http
+GET /api/v1/applications/my-applications?status=interviewing&page=1&limit=20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "count": 12,
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12500",
+      "jobId": {
+        "_id": "65f1234567890abcdef12345",
+        "title": "Senior Full Stack Developer",
+        "company": "Tech Corp",
+        "location": {
+          "city": "San Francisco",
+          "state": "CA"
+        },
+        "employmentType": "Full-Time",
+        "salary": {
+          "min": 120000,
+          "max": 180000,
+          "currency": "USD"
+        }
+      },
+      "status": "interviewing",
+      "appliedAt": "2026-01-29T21:00:00.000Z",
+      "lastUpdated": "2026-01-30T10:00:00.000Z",
+      "interviewDetails": {
+        "scheduledAt": "2026-02-05T14:00:00.000Z",
+        "meetingLink": "https://zoom.us/j/1234567890",
+        "notes": "Technical interview - 1 hour"
+      }
+    }
+    // ... more applications
+  ]
+}
+```
+
+---
+
+#### 5.3.3 Get Application Details
+
+```http
+GET /api/v1/applications/:id
+```
+
+**Description:** Get details of a specific application.
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | String | Yes | Application ID |
+
+**Request Example:**
+```http
+GET /api/v1/applications/65f1234567890abcdef12500
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": "profile_id",
-    "companyName": "Tech Company Inc.",
-    "industry": "Technology",
-    "companySize": "51-200",
-    "companyDescription": "Leading technology company...",
-    "location": {
-      "city": "San Francisco",
-      "state": "CA",
-      "country": "USA"
+    "_id": "65f1234567890abcdef12500",
+    "jobId": {
+      "_id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "company": "Tech Corp",
+      "location": { "city": "San Francisco", "state": "CA" },
+      "employmentType": "Full-Time",
+      "salary": { "min": 120000, "max": 180000, "currency": "USD" }
     },
-    "website": "https://techcompany.com",
-    "companyLogo": "logo_url",
-    "companyBanner": "banner_url",
-    "isVerified": true,
-    "verificationStatus": "approved",
-    "profileCompleteness": 90
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Company profile not found"
-}
-```
-
-### Private Routes
-
-#### Get My Company Profile
-
-- **Endpoint:** `GET /recruiters/profile`
-- **Access:** Recruiter only
-- **Description:** Get current recruiter's company profile
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "profile_id",
-    "userId": "user_id",
-    "companyName": "Tech Company Inc.",
-    "industry": "Technology",
-    "companySize": "51-200",
-    "companyDescription": "Leading technology company...",
-    "companyCulture": "Innovative and collaborative environment...",
-    "location": {
-      "city": "San Francisco",
-      "state": "CA",
-      "country": "USA",
-      "address": "123 Tech Street"
-    },
-    "contactPerson": {
+    "jobSeekerId": {
+      "_id": "...",
       "firstName": "Jane",
-      "lastName": "Smith",
-      "designation": "HR Manager",
-      "email": "hr@techcompany.com",
-      "phone": "+1234567890"
+      "lastName": "Candidate",
+      "email": "jane@example.com"
     },
-    "website": "https://techcompany.com",
-    "socialLinks": {
-      "linkedin": "https://linkedin.com/company/techcompany",
-      "twitter": "https://twitter.com/techcompany"
+    "recruiterId": {
+      "_id": "...",
+      "firstName": "John",
+      "lastName": "Recruiter",
+      "email": "john@techcorp.com"
     },
-    "companyLogo": "logo_url",
-    "companyBanner": "banner_url",
-    "isVerified": true,
-    "verificationStatus": "approved",
-    "verificationNotes": null,
-    "profileCompleteness": 90,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-02T00:00:00.000Z"
+    "status": "interviewing",
+    "appliedAt": "2026-01-29T21:00:00.000Z",
+    "lastUpdated": "2026-01-30T10:00:00.000Z",
+    "coverLetter": "Dear Hiring Manager...",
+    "screeningAnswers": [...],
+    "statusHistory": [
+      { "status": "submitted", "timestamp": "2026-01-29T21:00:00.000Z" },
+      { "status": "reviewed", "timestamp": "2026-01-30T09:00:00.000Z" },
+      { "status": "interviewing", "timestamp": "2026-01-30T10:00:00.000Z" }
+    ],
+    "interviewDetails": {
+      "scheduledAt": "2026-02-05T14:00:00.000Z",
+      "meetingLink": "https://zoom.us/j/1234567890",
+      "notes": "Technical interview - 1 hour"
+    },
+    "rating": 4.5
   }
 }
 ```
 
-**Error Responses:**
+---
 
+#### 5.3.4 Withdraw Application
+
+```http
+PATCH /api/v1/applications/:id/withdraw
+```
+
+**Description:** Withdraw a submitted application.
+
+**Request Example:**
+```http
+PATCH /api/v1/applications/65f1234567890abcdef12500/withdraw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
-  "success": false,
-  "message": "Company profile not found"
+  "success": true,
+  "message": "Application withdrawn successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12500",
+    "status": "withdrawn",
+    "withdrawnAt": "2026-01-29T21:30:00.000Z"
+  }
 }
 ```
 
-#### Create Company Profile
-
-- **Endpoint:** `POST /recruiters/profile`
-- **Access:** Recruiter only
-- **Description:** Create company profile
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Request Body:**
-
+**Error Response (400):**
 ```json
 {
-  "companyName": "Tech Company Inc.",
-  "industry": "Technology",
-  "companySize": "51-200",
-  "companyDescription": "Leading technology company...",
-  "companyCulture": "Innovative and collaborative environment...",
-  "location": {
-    "city": "San Francisco",
-    "state": "CA",
-    "country": "USA",
-    "address": "123 Tech Street"
+  "success": false,
+  "message": "Cannot withdraw application in current status"
+}
+```
+
+---
+
+### **5.4 Saved Jobs**
+
+#### 5.4.1 Get Saved Jobs
+
+```http
+GET /api/v1/saved-jobs
+```
+
+**Description:** Retrieve all jobs saved by the job seeker.
+
+**Request Example:**
+```http
+GET /api/v1/saved-jobs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "count": 8,
+  "stats": {
+    "totalSaved": 8,
+    "savedThisWeek": 3,
+    "savedThisMonth": 5
   },
-  "contactPerson": {
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "designation": "HR Manager",
-    "email": "hr@techcompany.com",
-    "phone": "+1234567890"
-  },
-  "website": "https://techcompany.com",
-  "socialLinks": {
-    "linkedin": "https://linkedin.com/company/techcompany",
-    "twitter": "https://twitter.com/techcompany"
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12600",
+      "jobId": {
+        "_id": "65f1234567890abcdef12345",
+        "title": "Senior Full Stack Developer",
+        "company": "Tech Corp",
+        "location": {
+          "city": "San Francisco",
+          "state": "CA",
+          "isRemote": true
+        },
+        "salary": {
+          "min": 120000,
+          "max": 180000,
+          "currency": "USD"
+        },
+        "employmentType": "Full-Time",
+        "postedAt": "2026-01-20T10:00:00.000Z"
+      },
+      "savedAt": "2026-01-28T15:00:00.000Z"
+    }
+    // ... more saved jobs
+  ]
+}
+```
+
+---
+
+#### 5.4.2 Save Job
+
+```http
+POST /api/v1/saved-jobs
+```
+
+**Description:** Save a job for later viewing.
+
+**Request Body:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `jobId` | String | Yes | Job ID to save |
+
+**Request Example:**
+```json
+{
+  "jobId": "65f1234567890abcdef12345"
+}
+```
+
+**Success Response (201):**
+``` json
+{
+  "success": true,
+  "message": "Job saved successfully",
+  "data": {
+    "_id": "65f1234567890abcdef12600",
+    "jobSeekerId": "65f1234567890abcdef12346",
+    "jobId": "65f1234567890abcdef12345",
+    "savedAt": "2026-01-29T21: 45:00.000Z"
   }
 }
 ```
 
-**Response (201):**
+**Error Response (400):**
+```json
+{
+  "success": false,
+  "message": "You have already saved this job"
+}
+```
 
+---
+
+#### 5.4.3 Unsave Job
+
+```http
+DELETE /api/v1/saved-jobs/:jobId
+```
+
+**Description:** Remove a job from saved list.
+
+**URL Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `jobId` | String | Yes | Job ID to unsave |
+
+**Request Example:**
+```http
+DELETE /api/v1/saved-jobs/65f1234567890abcdef12345
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Company profile created successfully",
-  "data": {
-    "id": "profile_id",
-    "userId": "user_id",
-    "companyName": "Tech Company Inc.",
-    "isVerified": false,
-    "verificationStatus": "pending",
-    "profileCompleteness": 85,
-    "createdAt": "2024-01-01T00:00:00.000Z"
-  }
+  "message": "Job removed from saved list"
 }
 ```
 
-**Error Responses:**
+---
 
-```json
-{
-  "success": false,
-  "message": "Company profile already exists"
-}
+### **5.5 Job Search & Recommendations**
+
+> **Note:** Job search functionality is available through Public Routes (Section 1). This section covers job seeker-specific features.
+
+#### 5.5.1 Get Recommended Jobs
+
+```http
+GET /api/v1/jobs/recommendations
 ```
 
-```json
-{
-  "success": false,
-  "message": "Please provide all required fields"
-}
+**Description:** Get personalized job recommendations based on profile and preferences.
+
+**Query Parameters:**
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | Number | No | `1` | Page number |
+| `limit` | Number | No | `10` | Jobs per page |
+
+**Request Example:**
+```http
+GET /api/v1/jobs/recommendations?page=1&limit=20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-#### Update Company Profile
-
-- **Endpoint:** `PUT /recruiters/profile`
-- **Access:** Recruiter only
-- **Description:** Update company profile
-- **Headers:** `Authorization: Bearer <access_token>`
-
-**Request Body:** Same as Create Company Profile (all fields optional)
-
-**Response (200):**
-
+**Success Response (200):**
 ```json
 {
   "success": true,
-  "message": "Company profile updated successfully",
-  "data": {
-    "id": "profile_id",
-    "updatedAt": "2024-01-02T00:00:00.000Z"
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Company profile not found"
-}
-```
-
-### Media Upload Routes
-
-#### Upload Company Logo
-
-- **Endpoint:** `POST /recruiters/profile/logo`
-- **Access:** Recruiter only
-- **Description:** Upload company logo
-- **Headers:** `Authorization: Bearer <access_token>`
-- **Content-Type:** `multipart/form-data`
-- **Body:** `image` (file)
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "message": "Company logo uploaded successfully",
-  "data": {
-    "companyLogo": "uploads/logos/user_id_logo.jpg",
-    "uploadedAt": "2024-01-01T00:00:00.000Z"
-  }
-}
-```
-
-**Error Responses:**
-
-```json
-{
-  "success": false,
-  "message": "Please upload an image file"
-}
-```
-
-#### Upload Company Banner
-
-- **Endpoint:** `POST /recruiters/profile/banner`
-- **Access:** Recruiter only
-- **Description:** Upload company banner
-- **Content-Type:** `multipart/form-data`
-- **Body:** `image` (file)
-
-#### Get Verification Status
-
-- **Endpoint:** `GET /recruiters/verification-status`
-- **Access:** Recruiter only
-- **Description:** Get company verification status
-
----
-
-## 🛡️ Admin Job Management Routes
-
-All admin job routes require admin authentication.
-
-### Get Pending Job Approvals
-
-- **Endpoint:** `GET /admin/jobs/pending`
-- **Access:** Admin only
-- **Description:** Get all pending job approvals with pagination
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-
-### Get Job Statistics
-
-- **Endpoint:** `GET /admin/jobs/statistics`
-- **Access:** Admin only
-- **Description:** Get job statistics for admin dashboard
-
-### Get All Jobs (Admin)
-
-- **Endpoint:** `GET /admin/jobs`
-- **Access:** Admin only
-- **Description:** Get all jobs with filters (for admin dashboard)
-
-**Query Parameters:**
-
-- `page` (number, default: 1)
-- `limit` (number, default: 10)
-- `status` (string, optional filter)
-- `recruiterId` (string, optional filter)
-
-### Approve Job
-
-- **Endpoint:** `PATCH /admin/jobs/:id/approve`
-- **Access:** Admin only
-- **Description:** Approve a job posting
-
-### Reject Job
-
-- **Endpoint:** `PATCH /admin/jobs/:id/reject`
-- **Access:** Admin only
-- **Description:** Reject a job posting with notes
-
-**Request Body:**
-
-```json
-{
-  "notes": "Job posting needs more details about responsibilities"
-}
-```
-
-### Feature Job
-
-- **Endpoint:** `PATCH /admin/jobs/:id/feature`
-- **Access:** Admin only
-- **Description:** Toggle or set featured status of a job
-
-**Request Body:**
-
-```json
-{
-  "isFeatured": true
-}
-```
-
-### Delete Job (Admin)
-
-- **Endpoint:** `DELETE /admin/jobs/:id`
-- **Access:** Admin only
-- **Description:** Delete or close a job posting
-
-**Query Parameters:**
-
-- `permanent` (boolean, optional) - Set to 'true' for permanent deletion
-
-### Bulk Approve Jobs
-
-- **Endpoint:** `PATCH /admin/jobs/bulk/approve`
-- **Access:** Admin only
-- **Description:** Bulk approve multiple jobs
-
-**Request Body:**
-
-```json
-{
-  "jobIds": ["job_id_1", "job_id_2", "job_id_3"]
+  "message": "Recommendations generated based on your profile and preferences",
+  "count": 15,
+  "matchScore": "Based on skills, location, and job type preferences",
+  "data": [
+    {
+      "_id": "65f1234567890abcdef12345",
+      "title": "Senior Full Stack Developer",
+      "company": "Tech Corp",
+      "matchPercentage": 95,
+      "matchReasons": [
+        "Skills match: JavaScript, React, Node.js",
+        "Location preference: Remote",
+        "Salary range matches your expectations"
+      ],
+      "location": {
+        "city": "San Francisco",
+        "state": "CA",
+        "isRemote": true
+      },
+      "salary": {
+        "min": 120000,
+        "max": 180000,
+        "currency": "USD"
+      },
+      "employmentType": "Full-Time",
+      "postedAt": "2026-01-20T10:00:00.000Z"
+    }
+    // ... more recommended jobs
+  ]
 }
 ```
 
 ---
 
-## 🏅 Admin Recruiter Management Routes
+## Job Seeker Routes Summary
 
-All admin recruiter routes require admin authentication.
+### **Access Requirements**
+- All job seeker routes require `Authorization: Bearer <jobseeker_access_token>`
+- Users must have `role: "jobseeker"`
+- Profile must be created before applying to jobs
+- Resume upload recommended for better application success
 
-### Get Pending Verifications
+### **Key Workflows**
 
-- **Endpoint:** `GET /admin/recruiters/pending`
-- **Access:** Admin only
-- **Description:** Get all pending recruiter verifications
+1. **Getting Started**:
+   - Create profile → Upload resume/portfolio → Set preferences → Start applying to jobs
 
-### Verify Recruiter
+2. **Job Application Process**:
+   - Search/browse jobs → Save interesting jobs → Apply with cover letter → Track application status → Attend interviews
 
-- **Endpoint:** `PATCH /admin/recruiters/:id/verify`
-- **Access:** Admin only
-- **Description:** Approve/verify a recruiter
+3. **Profile Management**:
+   - Keep profile updated → Add new skills/experience → Upload portfolio projects → Maintain resume
 
-### Reject Recruiter
+### **File Upload Limits**
+| File Type | Max Size | Allowed Formats |
+|-----------|----------|-----------------|
+| Resume | 5 MB | PDF, DOC, DOCX |
+| Video Resume | 50 MB | MP4, AVI, MOV |
+| Portfolio Images | 10 MB | PNG, JPG, JPEG |
+| Profile Picture | 5 MB | PNG, JPG, JPEG |
 
-- **Endpoint:** `PATCH /admin/recruiters/:id/reject`
-- **Access:** Admin only
-- **Description:** Reject a recruiter verification with notes
-
-**Request Body:**
-
-```json
-{
-  "notes": "Company information could not be verified"
-}
+### **Application Status Flow**
+```
+submitted → reviewed → shortlisted → interviewing → offered/hired
+                                                   ↓
+                                              rejected
+                                                   ↑
+                                              withdrawn
 ```
 
----
+### **Privacy Settings**
+Job seekers can control:
+- Profile visibility (public/private)
+- Email visibility to recruiters
+- Phone number visibility
+- Resume download permissions
 
-## 🔧 Error Codes
-
-| Status Code | Description                              |
-| ----------- | ---------------------------------------- |
-| 200         | Success                                  |
-| 201         | Created                                  |
-| 400         | Bad Request - Validation error           |
-| 401         | Unauthorized - Authentication required   |
-| 403         | Forbidden - Insufficient permissions     |
-| 404         | Not Found                                |
-| 409         | Conflict - Resource already exists       |
-| 422         | Unprocessable Entity - Validation failed |
-| 429         | Too Many Requests - Rate limit exceeded  |
-| 500         | Internal Server Error                    |
-
----
-
-## 📝 Environment Variables
-
-Create a `.env` file with the following variables:
-
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# Database Connection
-MONGO_URI=mongodb://127.0.0.1:27017/smartHire
-
-# JWT Configuration
-JWT_ACCESS_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-
-# Frontend URL
-FRONTEND_URL=http://localhost:5173
-
-# Email Configuration
-EMAIL_HOST=smtp.gmail.com
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-```
+### **Status Codes**
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
+| `400` | Bad request / Validation error / Already applied |
+| `401` | Unauthorized / Invalid token |
+| `403` | Forbidden / Not authorized |
+| `404` | Resource not found |
+| `413` | File too large |
+| `500` | Server error |
 
 ---
 
-## 🐛 Known Issues
+*This completes the API documentation for all routes. Continue to [Database Models](#-database-models) →*
 
-Please refer to the `bugs.txt` file for a comprehensive list of known issues categorized by severity:
-
-- **Critical Bugs:** Issues that will make the program fail
-- **Intermediate Bugs:** Issues that can be fixed but can be left for now
-- **Feature Improvements:** Essential enhancements for the platform
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
----
-
-## 📄 License
-
-This project is licensed under the ISC License.
-
----
-
-## 📞 Support
-
-For support and questions, please contact the development team or create an issue in the repository.
-
----
-
-_Last updated: January 2026_
