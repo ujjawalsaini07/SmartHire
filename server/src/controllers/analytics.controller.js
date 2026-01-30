@@ -156,7 +156,6 @@ export const getAdminDashboardAnalytics = async (req, res) => {
       Job.countDocuments({ status: "active" }),
       Application.countDocuments(),
     ]);
-
     res.status(200).json({
       success: true,
       data: {

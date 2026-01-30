@@ -3,6 +3,7 @@ import {
   getPendingVerification,
   verifyRecruiter,
   rejectRecruiter,
+  getallprofiles,
 } from "../controllers/adminRecruiter.controller.js";
 import { protect, authorize } from "../middlewares/auth/auth.middleware.js";
 
@@ -15,6 +16,12 @@ const adminRecruiterRouter = express.Router();
 adminRecruiterRouter.use(protect);
 adminRecruiterRouter.use(authorize("admin"));
 
+/**
+ * @route   GET /api/v1/admin/recruiters/
+ * @desc    Get all  recruiter profiles
+ * @access  Admin only
+ */
+adminRecruiterRouter.get("/", getallprofiles);
 /**
  * @route   GET /api/v1/admin/recruiters/pending
  * @desc    Get all pending recruiter verifications

@@ -179,3 +179,67 @@ export const rejectRecruiter = async (req, res) => {
     });
   }
 };
+
+/**
+ * @route   GET /api/v1/admin/recruiters/
+ * @desc    Get all recruiter profiles
+ * @access  Admin only
+ */
+export const getallprofiles = async (req, res) => {
+  try {
+    // Get pagination parameters from query string
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Get filter parameters (optional)
+    const { verificationStatus, isVerified, industry, companySize } = req.query;
+
+    // Build filter object
+    const filter = {};
+    if (verificationStatus) filter.verificationStatus = verificationStatus;
+    if (isVerified !== undefined) filter.isVerified = isVerified === 'true';
+    if (industry) filter.industry = industry;
+    if (companySize) filter.companySize = companySize;
+
+    // Get total count for pagination
+    const totalProfiles = await RecruiterProfile.countDocuments(filter);
+
+    // Fetch recruiter profiles with pagination and sorting
+    const profiles = await RecruiterProfile.find(filter)
+      .populate('userId', 'name email role') // Populate user details
+      .populate('verifiedBy', 'name email') // Populate admin who verified
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .skip(skip)
+      .limit(limit)
+      .lean(); // Use lean for better performance
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalProfiles / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Recruiter profiles retrieved successfully',
+      data: {
+        profiles,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalProfiles,
+          limit,
+          hasNextPage,
+          hasPrevPage,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching recruiter profiles:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching recruiter profiles',
+      error: error.message,
+    });
+  }
+};
