@@ -5,12 +5,12 @@ import fs from "fs";
 // Ensure upload directories exist
 const createUploadDirs = () => {
   const dirs = [
-    "./uploads/resumes", 
-    "./uploads/videos", 
+    "./uploads/resumes",
+    "./uploads/videos",
     "./uploads/portfolio",
-    "./uploads/company-images" // Added company images directory here
+    "./uploads/company-images", // Added company images directory here
   ];
-  
+
   dirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -31,7 +31,10 @@ const resumeStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = `${req.user.id}_${Date.now()}`;
     const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(file.originalname, ext);
+    const nameWithoutExt = path.basename(
+      file.originalname.replaceAll(" ", ""),
+      ext,
+    );
     cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
   },
 });
@@ -44,7 +47,10 @@ const videoStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = `${req.user.id}_${Date.now()}`;
     const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(file.originalname, ext);
+    const nameWithoutExt = path.basename(
+      file.originalname.replaceAll(" ", ""),
+      ext,
+    );
     cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
   },
 });
@@ -57,7 +63,10 @@ const portfolioStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = `${req.user.id}_${Date.now()}`;
     const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(file.originalname, ext);
+    const nameWithoutExt = path.basename(
+      file.originalname.replaceAll(" ", ""),
+      ext,
+    );
     cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
   },
 });
@@ -71,7 +80,10 @@ const companyImageStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = `${req.user.id}_${Date.now()}`;
     const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(file.originalname, ext);
+    const nameWithoutExt = path.basename(
+      file.originalname.replaceAll(" ", ""),
+      ext,
+    );
     cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
   },
 });
@@ -87,7 +99,10 @@ const resumeFileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only PDF, DOC, and DOCX are allowed."), false);
+    cb(
+      new Error("Invalid file type. Only PDF, DOC, and DOCX are allowed."),
+      false,
+    );
   }
 };
 
@@ -101,7 +116,10 @@ const videoFileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only MP4, AVI, MOV, and WebM are allowed."), false);
+    cb(
+      new Error("Invalid file type. Only MP4, AVI, MOV, and WebM are allowed."),
+      false,
+    );
   }
 };
 
@@ -118,7 +136,12 @@ const portfolioFileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only images, PDFs, and videos are allowed."), false);
+    cb(
+      new Error(
+        "Invalid file type. Only images, PDFs, and videos are allowed.",
+      ),
+      false,
+    );
   }
 };
 
@@ -127,7 +150,10 @@ const imageFileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only JPG, PNG, GIF, and WEBP allowed."), false);
+    cb(
+      new Error("Invalid file type. Only JPG, PNG, GIF, and WEBP allowed."),
+      false,
+    );
   }
 };
 

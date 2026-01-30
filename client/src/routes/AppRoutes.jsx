@@ -17,8 +17,7 @@ import VerifyEmail from '@pages/public/VerifyEmail';
 
 // Job Pages
 import JobListings from '@pages/jobs/JobListings';
-import JobDetailsPage from '@pages/jobs/JobDetailsPage';
-import SearchResults from '@pages/jobs/SearchResults';
+
 
 // Job Seeker Pages
 import JobSeekerDashboard from '@pages/jobseeker/Dashboard';
@@ -89,8 +88,7 @@ const AppRoutes = () => {
       
       {/* Job Browsing Routes (Public + Authenticated) */}
       <Route path="/jobs" element={<JobListings />} />
-      <Route path="/jobs/:id" element={<JobDetailsPage />} />
-      <Route path="/search" element={<SearchResults />} />
+
       
       {/* Job Seeker Protected Routes - Nested with Layout */}
       <Route element={<ProtectedRoute allowedRoles={['jobseeker']} />}>
@@ -125,7 +123,7 @@ const AppRoutes = () => {
         <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/admin/recruiters/verify" element={<RecruiterVerification />} />
+          <Route path="/admin/recruiters" element={<RecruiterVerification />} />
           <Route path="/admin/jobs/moderate" element={<JobModeration />} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
           <Route path="/admin/skills" element={<SkillManagement />} />

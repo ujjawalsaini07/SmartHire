@@ -33,6 +33,11 @@ export const adminApi = {
   },
   
   // Recruiter Verification
+  getAllRecruiters: async (params) => {
+    const response = await api.get('/admin/recruiters', { params });
+    return response.data;
+  },
+  
   getPendingRecruiters: async () => {
     const response = await api.get('/admin/recruiters/pending');
     return response.data;
@@ -49,6 +54,11 @@ export const adminApi = {
   },
   
   // Job Moderation
+  getAllJobs: async (params) => {
+    const response = await api.get('/admin/jobs/pending', { params });
+    return response.data;
+  },
+  
   getPendingJobs: async () => {
     const response = await api.get('/admin/jobs/pending');
     return response.data;
@@ -74,9 +84,14 @@ export const adminApi = {
     return response.data;
   },
   
+  getJobStatistics: async () => {
+    const response = await api.get('/admin/jobs/statistics');
+    return response.data;
+  },
+  
   // Skills & Categories
-  getAllSkills: async () => {
-    const response = await api.get('/skills');
+  getAllSkills: async (params) => {
+    const response = await api.get('/skills', { params });
     return response.data;
   },
   
@@ -95,8 +110,8 @@ export const adminApi = {
     return response.data;
   },
   
-  getAllCategories: async () => {
-    const response = await api.get('/categories');
+  getAllCategories: async (params) => {
+    const response = await api.get('/categories', { params });
     return response.data;
   },
   
@@ -110,8 +125,8 @@ export const adminApi = {
     return response.data;
   },
   
-  deleteCategory: async (categoryId) => {
-    const response = await api.delete(`/categories/${categoryId}`);
+  deleteCategory: async (categoryId, force = false) => {
+    const response = await api.delete(`/categories/${categoryId}`, { params: { force } });
     return response.data;
   },
   

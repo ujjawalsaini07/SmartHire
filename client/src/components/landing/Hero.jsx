@@ -1,20 +1,11 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Briefcase, TrendingUp } from 'lucide-react';
+import { Briefcase, TrendingUp } from 'lucide-react';
 import Button from '@components/common/Button';
+import JobSearchBar from '@components/common/JobSearchBar';
 
 const Hero = () => {
   const navigate = useNavigate();
-  const [searchData, setSearchData] = useState({
-    keyword: '',
-    location: '',
-  });
-  
-  const handleSearch = (e) => {
-    e.preventDefault();
-    navigate(`/jobs?keyword=${searchData.keyword}&location=${searchData.location}`);
-  };
   
   const popularSearches = [
     'Frontend Developer',
@@ -91,53 +82,14 @@ const Hero = () => {
             Connect with top employers and discover opportunities that match your skills and aspirations. Start your journey now.
           </motion.p>
           
-          {/* Search Bar */}
-          <motion.form
+          {/* Search Bar - Using Extracted Component */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            onSubmit={handleSearch}
-            className="relative max-w-4xl mx-auto mb-6"
           >
-            <div className="flex flex-col md:flex-row gap-3 p-3 rounded-2xl bg-white dark:bg-dark-bg-secondary shadow-xl border border-gray-100 dark:border-dark-border">
-              {/* Job Title Input */}
-              <div className="flex-1 flex items-center space-x-3 px-5 py-3 rounded-xl bg-gray-50 dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors group">
-                <Search className="w-5 h-5 text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Job title, keywords, or company"
-                  value={searchData.keyword}
-                  onChange={(e) => setSearchData({ ...searchData, keyword: e.target.value })}
-                  className="flex-1 bg-transparent border-none focus:outline-none text-light-text dark:text-dark-text placeholder-gray-400 text-base"
-                />
-              </div>
-              
-              {/* Location Input */}
-              <div className="flex-1 flex items-center space-x-3 px-5 py-3 rounded-xl bg-gray-50 dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors group">
-                <MapPin className="w-5 h-5 text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="City, state, or remote"
-                  value={searchData.location}
-                  onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
-                  className="flex-1 bg-transparent border-none focus:outline-none text-light-text dark:text-dark-text placeholder-gray-400 text-base"
-                />
-              </div>
-              
-              {/* Search Button */}
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="md:w-auto w-full px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <Search className="w-5 h-5 mr-2" />
-                Search Jobs
-              </Button>
-            </div>
-            
-            {/* Decorative gradient border effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-accent-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity -z-10" />
-          </motion.form>
+            <JobSearchBar className="max-w-4xl mx-auto mb-6" variant="default" />
+          </motion.div>
           
           {/* Popular Searches */}
           <motion.div

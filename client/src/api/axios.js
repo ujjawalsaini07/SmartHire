@@ -4,9 +4,6 @@ import useAuthStore from '@store/authStore';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1',
   withCredentials: true, // Important for httpOnly cookies
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Request interceptor
@@ -16,6 +13,12 @@ api.interceptors.request.use(
     
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    
+    // Set Content-Type to application/json for non-FormData requests
+    // For FormData, axios will automatically set multipart/form-data with boundary
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
     }
     
     return config;

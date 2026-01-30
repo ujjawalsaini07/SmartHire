@@ -19,19 +19,6 @@ const Navbar = () => {
     navigate('/login');
   };
   
-  const getDashboardLink = () => {
-    switch (user?.role) {
-      case 'jobseeker':
-        return '/jobseeker/dashboard';
-      case 'recruiter':
-        return '/recruiter/dashboard';
-      case 'admin':
-        return '/admin/dashboard';
-      default:
-        return '/';
-    }
-  };
-  
 const navLinks = [
         { to: '/jobs', label: 'Browse Jobs' },
         { to: '/pagenotfound', label: 'About' },

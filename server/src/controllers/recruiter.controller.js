@@ -49,10 +49,18 @@ export const createCompanyProfile = async (req, res) => {
         message: "Profile already exists for this user",
       });
     }
+    // Ssanitization of the request body
+    const sanitizedBody = { ...req.body };
+    delete sanitizedBody.isVerified;
+    delete sanitizedBody.verificationStatus;
+    delete sanitizedBody.verifiedAt;
+    delete sanitizedBody.verifiedBy;
+    delete sanitizedBody.userId;
+
 
     // Create new profile linked to the logged-in user
     const profile = await RecruiterProfile.create({
-      ...req.body,
+      ...sanitizedBody,
       userId: req.user.id,
     });
 
@@ -92,7 +100,22 @@ export const createCompanyProfile = async (req, res) => {
  */
 export const updateCompanyProfile = async (req, res) => {
   try {
-    let profile = await RecruiterProfile.findOne({ userId: req.user.id });
+    // Remove sensitive fields
+    const sanitizedBody = { ...req.body };
+    delete sanitizedBody.isVerified;
+    delete sanitizedBody.verificationStatus;
+    delete sanitizedBody.verifiedAt;
+    delete sanitizedBody.verifiedBy;
+    delete sanitizedBody.userId;
+
+    const profile = await RecruiterProfile.findOneAndUpdate(
+      { userId: req.user.id },
+      sanitizedBody,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     if (!profile) {
       return res.status(404).json({
@@ -101,24 +124,20 @@ export const updateCompanyProfile = async (req, res) => {
       });
     }
 
-    // Prevent updating sensitive fields directly via this route if necessary
-    // e.g., delete req.body.isVerified; delete req.body.verificationStatus;
-
-    profile = await RecruiterProfile.findOneAndUpdate(
-      { userId: req.user.id },
-      req.body,
-      {
-        new: true, // Return the updated document
-        runValidators: true, // Run model validators on update
-      },
-    );
-
     res.status(200).json({
       success: true,
       message: "Company profile updated successfully",
       data: profile,
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join(", "),
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Server Error",

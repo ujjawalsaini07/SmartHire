@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const RecruiterProfileSchema = new mongoose.Schema(
   {
@@ -75,7 +76,11 @@ const RecruiterProfileSchema = new mongoose.Schema(
         maxlength: [300, "Address cannot exceed 300 characters"],
       },
     },
-
+    foundedYear: {
+      type: Number,
+      min: [1800, "Founded year must be after 1800"],
+      max: [new Date().getFullYear(), "Founded year cannot be in the future"],
+    },
     contactPerson: {
       firstName: {
         type: String,

@@ -43,11 +43,23 @@ app.use("/api", limiter); // limiter
 
 app.use(requestLogger);
 
-app.use(helmet()); // helmet middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+})); // helmet middleware
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    // origin: process.env.FRONTEND_URL,
+    origin: "*",
     credentials: true,
   }),
 );
@@ -66,7 +78,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/v1/auth", authRoutes); // auth routes
 

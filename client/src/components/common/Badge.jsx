@@ -8,6 +8,7 @@ const Badge = ({
   
   const variants = {
     primary: 'badge-primary',
+    secondary: 'badge-gray',
     success: 'badge-success',
     warning: 'badge-warning',
     error: 'badge-error',

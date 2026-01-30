@@ -26,20 +26,16 @@ export const recruiterApi = {
   // Upload company logo
   uploadLogo: async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    const response = await api.post('/recruiters/profile/logo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    formData.append('image', file);
+    const response = await api.post('/recruiters/profile/logo', formData);
     return response.data;
   },
 
   // Upload company banner
   uploadBanner: async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    const response = await api.post('/recruiters/profile/banner', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    formData.append('image', file);
+    const response = await api.post('/recruiters/profile/banner', formData);
     return response.data;
   },
 

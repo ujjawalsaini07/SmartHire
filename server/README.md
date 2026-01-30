@@ -29,7 +29,6 @@ This is a comprehensive **Job Portal Backend** built with **Node.js**, **Express
 ## ✨ Key Features
 
 ### **Core Functionality**
-
 - ✅ **Role-Based Access Control (RBAC)** - Admin, Recruiter, and Job Seeker roles
 - ✅ **JWT Authentication** - Access and refresh token mechanism
 - ✅ **Email Verification** - Secure email verification workflow
@@ -42,7 +41,6 @@ This is a comprehensive **Job Portal Backend** built with **Node.js**, **Express
 - ✅ **Recruiter Verification** - Admin approval workflow for recruiters
 
 ### **Security Features**
-
 - 🔒 **Helmet.js** - Security headers
 - 🔒 **Rate Limiting** - API rate limiting (100 requests per 15 minutes)
 - 🔒 **CORS Configuration** - Controlled cross-origin requests
@@ -51,7 +49,6 @@ This is a comprehensive **Job Portal Backend** built with **Node.js**, **Express
 - 🔒 **Input Validation** - express-validator for request validation
 
 ### **Advanced Features**
-
 - 📊 **Job Analytics** - View tracking, application metrics
 - 📧 **Email Service** - Nodemailer integration for transactional emails
 - 🔍 **Full-Text Search** - MongoDB text search for jobs
@@ -64,41 +61,37 @@ This is a comprehensive **Job Portal Backend** built with **Node.js**, **Express
 ## 🛠 Technical Stack
 
 ### **Core Technologies**
-
-| Technology     | Version           | Purpose            |
-| -------------- | ----------------- | ------------------ |
-| **Node.js**    | Latest            | JavaScript runtime |
-| **Express.js** | ^5.2.1            | Web framework      |
-| **MongoDB**    | ^9.1.5 (Mongoose) | NoSQL database     |
-| **JWT**        | ^9.0.3            | Authentication     |
-| **bcryptjs**   | ^3.0.3            | Password hashing   |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Node.js** | Latest | JavaScript runtime |
+| **Express.js** | ^5.2.1 | Web framework |
+| **MongoDB** | ^9.1.5 (Mongoose) | NoSQL database |
+| **JWT** | ^9.0.3 | Authentication |
+| **bcryptjs** | ^3.0.3 | Password hashing |
 
 ### **Security & Middleware**
-
-| Package                | Version | Purpose                       |
-| ---------------------- | ------- | ----------------------------- |
-| **helmet**             | ^8.1.0  | Security headers              |
-| **cors**               | ^2.8.5  | Cross-origin resource sharing |
-| **express-rate-limit** | ^8.2.1  | Rate limiting                 |
-| **express-validator**  | ^7.3.1  | Input validation              |
-| **cookie-parser**      | ^1.4.7  | Cookie parsing                |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **helmet** | ^8.1.0 | Security headers |
+| **cors** | ^2.8.5 | Cross-origin resource sharing |
+| **express-rate-limit** | ^8.2.1 | Rate limiting |
+| **express-validator** | ^7.3.1 | Input validation |
+| **cookie-parser** | ^1.4.7 | Cookie parsing |
 
 ### **Utilities**
-
-| Package        | Version | Purpose               |
-| -------------- | ------- | --------------------- |
-| **nodemailer** | ^7.0.12 | Email service         |
-| **multer**     | ^2.0.2  | File uploads          |
-| **winston**    | ^3.19.0 | Logging               |
-| **morgan**     | ^1.10.1 | HTTP request logging  |
-| **dotenv**     | ^17.2.3 | Environment variables |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **nodemailer** | ^7.0.12 | Email service |
+| **multer** | ^2.0.2 | File uploads |
+| **winston** | ^3.19.0 | Logging |
+| **morgan** | ^1.10.1 | HTTP request logging |
+| **dotenv** | ^17.2.3 | Environment variables |
 
 ---
 
 ## 🏗 Architecture & Design
 
 ### **Project Structure**
-
 ```
 server/
 ├── src/
@@ -117,7 +110,6 @@ server/
 ```
 
 ### **Design Patterns**
-
 - **MVC Architecture** - Separation of concerns
 - **Repository Pattern** - Data access abstraction through Mongoose models
 - **Middleware Chain** - Modular request processing
@@ -129,7 +121,6 @@ server/
 ## 🚀 Getting Started
 
 ### **Prerequisites**
-
 - Node.js (v16 or higher)
 - MongoDB (Local or Atlas)
 - npm or yarn
@@ -137,20 +128,17 @@ server/
 ### **Installation**
 
 1. **Clone the repository**
-
 ```bash
 git clone <repository-url>
 cd backend/server
 ```
 
 2. **Install dependencies**
-
 ```bash
 npm install
 ```
 
 3. **Configure environment variables**
-
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
@@ -159,13 +147,11 @@ cp .env.example .env
 4. **Start the server**
 
 **Development mode:**
-
 ```bash
 npm run dev
 ```
 
 **Production mode:**
-
 ```bash
 npm start
 ```
@@ -212,7 +198,6 @@ EMAIL_PASS=your_app_password
 ## 📚 API Documentation
 
 ### **Base URL**
-
 ```
 http://localhost:5000/api/v1
 ```
@@ -220,7 +205,6 @@ http://localhost:5000/api/v1
 ### **Common Response Format**
 
 **Success Response:**
-
 ```json
 {
   "success": true,
@@ -230,7 +214,6 @@ http://localhost:5000/api/v1
 ```
 
 **Error Response:**
-
 ```json
 {
   "success": false,
@@ -254,7 +237,6 @@ GET /health
 **Description:** Check if the server is running and healthy.
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -289,13 +271,11 @@ GET /api/v1/jobs
 | `order` | String | No | `desc` | Sort order (`asc` or `desc`) |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobs?page=1&limit=10&isRemote=true&sortBy=postedAt&order=desc
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -381,13 +361,11 @@ GET /api/v1/jobs/search
 | `sortBy` | String | No | `relevance` | Sort by (`relevance`, `date`, `salary`) |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobs/search?q=javascript developer&location=San Francisco&salaryMin=100000&isRemote=true&sortBy=relevance
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -418,13 +396,11 @@ GET /api/v1/jobs/:id
 | `id` | String | Yes | Job ID (MongoDB ObjectId) |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobs/65f1234567890abcdef12345
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -500,7 +476,6 @@ GET /api/v1/jobs/65f1234567890abcdef12345
 ```
 
 **Error Response (Job Not Found):**
-
 ```json
 {
   "success": false,
@@ -524,13 +499,11 @@ POST /api/v1/jobs/:id/view
 | `id` | String | Yes | Job ID (MongoDB ObjectId) |
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
 
 **Request Body:**
-
 ```json
 {
   "ipAddress": "192.168.1.1",
@@ -539,7 +512,6 @@ Content-Type: application/json
 ```
 
 **Request Example:**
-
 ```http
 POST /api/v1/jobs/65f1234567890abcdef12345/view
 
@@ -550,7 +522,6 @@ POST /api/v1/jobs/65f1234567890abcdef12345/view
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -579,13 +550,11 @@ GET /api/v1/skills
 | `category` | String | No | - | Filter by category |
 
 **Request Example:**
-
 ```http
 GET /api/v1/skills?page=1&limit=50&search=javascript
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -632,13 +601,11 @@ GET /api/v1/skills/search
 | `limit` | Number | No | `10` | Max results (max: 50) |
 
 **Request Example:**
-
 ```http
 GET /api/v1/skills/search?q=java&limit=10
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -660,7 +627,6 @@ GET /api/v1/skills/search?q=java&limit=10
 ```
 
 **Error Response (Missing Query):**
-
 ```json
 {
   "success": false,
@@ -690,13 +656,11 @@ GET /api/v1/categories
 | `limit` | Number | No | `50` | Categories per page |
 
 **Request Example (Flat View):**
-
 ```http
 GET /api/v1/categories?view=flat&page=1&limit=50
 ```
 
 **Response Example (Flat View):**
-
 ```json
 {
   "success": true,
@@ -729,13 +693,11 @@ GET /api/v1/categories?view=flat&page=1&limit=50
 ```
 
 **Request Example (Tree View):**
-
 ```http
 GET /api/v1/categories?view=tree
 ```
 
 **Response Example (Tree View):**
-
 ```json
 {
   "success": true,
@@ -784,13 +746,11 @@ GET /api/v1/recruiters/:id/profile
 | `id` | String | Yes | Recruiter Profile ID |
 
 **Request Example:**
-
 ```http
 GET /api/v1/recruiters/65f1234567890abcdef12345/profile
 ```
 
 **Response Example:**
-
 ```json
 {
   "success": true,
@@ -836,7 +796,7 @@ GET /api/v1/recruiters/65f1234567890abcdef12345/profile
 
 ---
 
-_Continue to [Authentication Routes](#2-authentication-routes) →_
+*Continue to [Authentication Routes](#2-authentication-routes) →*
 
 ## 2. Authentication Routes
 
@@ -862,7 +822,6 @@ POST /api/v1/auth/register
 **Description:** Register a new user account. Sends a verification email to the provided email address.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
@@ -876,7 +835,6 @@ Content-Type: application/json
 | `role` | String | No | User role: `jobseeker`, `recruiter` (default: `jobseeker`) |
 
 **Request Example:**
-
 ```json
 {
   "name": "John Doe",
@@ -887,7 +845,6 @@ Content-Type: application/json
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -901,7 +858,6 @@ Content-Type: application/json
 ```
 
 **Error Response - User Already Exists (400):**
-
 ```json
 {
   "success": false,
@@ -910,16 +866,12 @@ Content-Type: application/json
 ```
 
 **Error Response - Validation Error (400):**
-
 ```json
 {
   "success": false,
   "errors": [
     { "msg": "Name is required", "param": "name" },
-    {
-      "msg": "Password must be at least 8 characters long",
-      "param": "password"
-    },
+    { "msg": "Password must be at least 8 characters long", "param": "password" },
     { "msg": "Password must contain a number", "param": "password" }
   ]
 }
@@ -936,7 +888,6 @@ POST /api/v1/auth/login
 **Description:** Authenticate user and receive access token + refresh token.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
@@ -948,7 +899,6 @@ Content-Type: application/json
 | `password` | String | Yes | User's password |
 
 **Request Example:**
-
 ```json
 {
   "email": "john.doe@example.com",
@@ -957,7 +907,6 @@ Content-Type: application/json
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -976,13 +925,11 @@ Content-Type: application/json
 ```
 
 **Cookies Set:**
-
 ```
 refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict; Max-Age=604800
 ```
 
 **Error Response - Invalid Credentials (401):**
-
 ```json
 {
   "success": false,
@@ -991,7 +938,6 @@ refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite
 ```
 
 **Error Response - Email Not Verified (403):**
-
 ```json
 {
   "success": false,
@@ -1000,7 +946,6 @@ refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite
 ```
 
 **Error Response - Account Deactivated (403):**
-
 ```json
 {
   "success": false,
@@ -1019,21 +964,18 @@ POST /api/v1/auth/logout
 **Description:** Logout user and invalidate refresh token.
 
 **Headers:**
-
 ```
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
 
 **Request Example:**
-
 ```http
 POST /api/v1/auth/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1042,7 +984,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response - Not Authorized (401):**
-
 ```json
 {
   "success": false,
@@ -1061,7 +1002,6 @@ POST /api/v1/auth/verify-email
 **Description:** Verify user's email address using the verification token sent via email.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
@@ -1072,7 +1012,6 @@ Content-Type: application/json
 | `token` | String | Yes | Email verification token |
 
 **Request Example:**
-
 ```json
 {
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
@@ -1080,7 +1019,6 @@ Content-Type: application/json
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1089,7 +1027,6 @@ Content-Type: application/json
 ```
 
 **Error Response - Invalid/Expired Token (400):**
-
 ```json
 {
   "success": false,
@@ -1108,7 +1045,6 @@ POST /api/v1/auth/forgot-password
 **Description:** Request a password reset link. Sends email with reset token if account exists.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
@@ -1119,7 +1055,6 @@ Content-Type: application/json
 | `email` | String | Yes | User's registered email |
 
 **Request Example:**
-
 ```json
 {
   "email": "john.doe@example.com"
@@ -1127,7 +1062,6 @@ Content-Type: application/json
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1148,7 +1082,6 @@ POST /api/v1/auth/reset-password
 **Description:** Reset user password using the reset token received via email.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
@@ -1160,7 +1093,6 @@ Content-Type: application/json
 | `newPassword` | String | Yes | New password (min 6 characters) |
 
 **Request Example:**
-
 ```json
 {
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
@@ -1169,7 +1101,6 @@ Content-Type: application/json
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1178,7 +1109,6 @@ Content-Type: application/json
 ```
 
 **Error Response - Invalid/Expired Token (400):**
-
 ```json
 {
   "success": false,
@@ -1187,7 +1117,6 @@ Content-Type: application/json
 ```
 
 **Error Response - Weak Password (400):**
-
 ```json
 {
   "success": false,
@@ -1206,26 +1135,22 @@ POST /api/v1/auth/refresh-token
 **Description:** Get a new access token using the refresh token from cookies.
 
 **Headers:**
-
 ```
 Content-Type: application/json
 ```
 
 **Cookies Required:**
-
 ```
 refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Request Example:**
-
 ```http
 POST /api/v1/auth/refresh-token
 Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1237,13 +1162,11 @@ Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **New Cookie Set:**
-
 ```
 refreshToken=<new_refresh_token>; HttpOnly; Secure; SameSite=Strict; Max-Age=604800
 ```
 
 **Error Response - No Refresh Token (401):**
-
 ```json
 {
   "success": false,
@@ -1252,7 +1175,6 @@ refreshToken=<new_refresh_token>; HttpOnly; Secure; SameSite=Strict; Max-Age=604
 ```
 
 **Error Response - Invalid Refresh Token (401):**
-
 ```json
 {
   "success": false,
@@ -1271,20 +1193,17 @@ GET /api/v1/auth/me
 **Description:** Get information about the currently authenticated user.
 
 **Headers:**
-
 ```
 Authorization: Bearer <access_token>
 ```
 
 **Request Example:**
-
 ```http
 GET /api/v1/auth/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1302,7 +1221,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response - Not Authorized (401):**
-
 ```json
 {
   "success": false,
@@ -1311,7 +1229,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response - User Not Found (404):**
-
 ```json
 {
   "success": false,
@@ -1325,13 +1242,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### **Token Management**
 
-1. **Access Token**:
+1. **Access Token**: 
    - Expires in 15 minutes
    - Sent in response body
    - Use in `Authorization: Bearer <token>` header for protected routes
    - Claims: `{ id, role, iat, exp }`
 
-2. **Refresh Token**:
+2. **Refresh Token**: 
    - Expires in 7 days
    - Stored as httpOnly cookie
    - Used to get new access tokens
@@ -1357,26 +1274,26 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### **Error Codes Summary**
 
-| Status Code | Meaning                                              |
-| ----------- | ---------------------------------------------------- |
-| `200`       | Success                                              |
-| `201`       | Resource created successfully                        |
-| `400`       | Bad request / Validation error                       |
-| `401`       | Unauthorized / Invalid credentials                   |
-| `403`       | Forbidden / Email not verified / Account deactivated |
-| `404`       | User/Resource not found                              |
-| `500`       | Server error                                         |
+| Status Code | Meaning |
+|-------------|---------|
+| `200` | Success |
+| `201` | Resource created successfully |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid credentials |
+| `403` | Forbidden / Email not verified / Account deactivated |
+| `404` | User/Resource not found |
+| `500` | Server error |
 
 ---
 
-_Continue to [Admin Routes](#3-admin-routes) →_
+*Continue to [Admin Routes](#3-admin-routes) →*
+
 
 ## 3. Admin Routes
 
 All admin routes require authentication with an admin role. Include the access token in the Authorization header.
 
 **Required Headers:**
-
 ```
 Authorization: Bearer <admin_access_token>
 Content-Type: application/json
@@ -1395,7 +1312,6 @@ GET /api/v1/users
 **Description:** Retrieve all users with pagination and filtering options.
 
 **Headers:**
-
 ```
 Authorization: Bearer <admin_access_token>
 ```
@@ -1411,14 +1327,12 @@ Authorization: Bearer <admin_access_token>
 | `search` | String | No | - | Search by name or email |
 
 **Request Example:**
-
 ```http
 GET /api/v1/users?page=1&limit=20&role=recruiter&isActive=true&search=john
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1461,14 +1375,12 @@ GET /api/v1/users/:id
 | `id` | String | Yes | User ID |
 
 **Request Example:**
-
 ```http
 GET /api/v1/users/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1487,7 +1399,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (404):**
-
 ```json
 {
   "success": false,
@@ -1506,14 +1417,12 @@ PATCH /api/v1/users/:id/activate
 **Description:** Activate a deactivated user account.
 
 **Request Example:**
-
 ```http
 PATCH /api/v1/users/65f1234567890abcdef12345/activate
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1528,7 +1437,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -1547,14 +1455,12 @@ PATCH /api/v1/users/:id/deactivate
 **Description:** Deactivate a user account (prevents login).
 
 **Request Example:**
-
 ```http
 PATCH /api/v1/users/65f1234567890abcdef12345/deactivate
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1569,7 +1475,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -1588,14 +1493,12 @@ DELETE /api/v1/users/:id
 **Description:** Permanently delete a user account.
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/users/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1609,7 +1512,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -1622,7 +1524,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### **3.2 Recruiter Verification Management**
 
 #### 3.2.1 Get All Recruiter Profiles
-
 ```http
 GET /api/v1/admin/recruiters/
 ```
@@ -1640,14 +1541,12 @@ GET /api/v1/admin/recruiters/
 | `companySize` | String | No | - | Filter by company size |
 
 **Request Example:**
-
 ```http
 GET /api/v1/admin/recruiters/?page=1&limit=10&verificationStatus=pending
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1695,7 +1594,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 #### 3.2.2 Get Pending Recruiter Verifications
-
 ```http
 GET /api/v1/admin/recruiters/pending
 ```
@@ -1703,14 +1601,12 @@ GET /api/v1/admin/recruiters/pending
 **Description:** Retrieve all recruiters awaiting verification.
 
 **Request Example:**
-
 ```http
 GET /api/v1/admin/recruiters/pending
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1738,7 +1634,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 #### 3.2.3 Verify Recruiter
-
 ```http
 PATCH /api/v1/admin/recruiters/:id/verify
 ```
@@ -1751,14 +1646,12 @@ PATCH /api/v1/admin/recruiters/:id/verify
 | `id` | String | Yes | Recruiter Profile ID |
 
 **Request Example:**
-
 ```http
 PATCH /api/v1/admin/recruiters/65f1234567890abcdef12345/verify
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1776,7 +1669,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 #### 3.2.4 Reject Recruiter
-
 ```http
 PATCH /api/v1/admin/recruiters/:id/reject
 ```
@@ -1789,7 +1681,6 @@ PATCH /api/v1/admin/recruiters/:id/reject
 | `notes` | String | Yes | Rejection reason (max 1000 chars) |
 
 **Request Example:**
-
 ```json
 {
   "notes": "Company website is not accessible. Please provide valid company documentation."
@@ -1797,7 +1688,6 @@ PATCH /api/v1/admin/recruiters/:id/reject
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1812,6 +1702,7 @@ PATCH /api/v1/admin/recruiters/:id/reject
 ```
 
 ---
+
 
 ### **3.3 Job Management**
 
@@ -1832,14 +1723,12 @@ GET /api/v1/admin/jobs/pending
 | `order` | String | No | `desc` | Sort order |
 
 **Request Example:**
-
 ```http
 GET /api/v1/admin/jobs/pending?page=1&limit=20
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1904,14 +1793,12 @@ PATCH /api/v1/admin/jobs/:id/approve
 | `id` | String | Yes | Job ID |
 
 **Request Example:**
-
 ```http
 PATCH /api/v1/admin/jobs/65f1234567890abcdef12345/approve
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1930,7 +1817,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -1955,7 +1841,6 @@ PATCH /api/v1/admin/jobs/:id/reject
 | `reason` | String | No | Category of rejection |
 
 **Request Example:**
-
 ```json
 {
   "reason": "Content Guidelines Violation",
@@ -1964,7 +1849,6 @@ PATCH /api/v1/admin/jobs/:id/reject
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -1983,7 +1867,6 @@ PATCH /api/v1/admin/jobs/:id/reject
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2007,7 +1890,6 @@ PATCH /api/v1/admin/jobs/:id/feature
 | `isFeatured` | Boolean | No | Set featured status (if omitted, toggles) |
 
 **Request Example:**
-
 ```json
 {
   "isFeatured": true
@@ -2015,7 +1897,6 @@ PATCH /api/v1/admin/jobs/:id/feature
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2032,7 +1913,6 @@ PATCH /api/v1/admin/jobs/:id/feature
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2056,14 +1936,12 @@ DELETE /api/v1/admin/jobs/:id
 | `permanent` | Boolean | No | `false` | Permanent deletion if `true` |
 
 **Request Example (Soft Delete):**
-
 ```http
 DELETE /api/v1/admin/jobs/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2080,14 +1958,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Request Example (Permanent Delete):**
-
 ```http
 DELETE /api/v1/admin/jobs/65f1234567890abcdef12345?permanent=true
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2120,14 +1996,12 @@ GET /api/v1/admin/jobs
 | `order` | String | No | `desc` | Sort order |
 
 **Request Example:**
-
 ```http
 GET /api/v1/admin/jobs?status=active&isFeatured=true&page=1&limit=20
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2165,14 +2039,12 @@ GET /api/v1/admin/jobs/statistics
 **Description:** Get comprehensive job statistics for admin dashboard.
 
 **Request Example:**
-
 ```http
 GET /api/v1/admin/jobs/statistics
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2236,7 +2108,6 @@ PATCH /api/v1/admin/jobs/bulk/approve
 | `jobIds` | Array | Yes | Array of job IDs to approve |
 
 **Request Example:**
-
 ```json
 {
   "jobIds": [
@@ -2248,13 +2119,15 @@ PATCH /api/v1/admin/jobs/bulk/approve
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
   "message": "Bulk approval completed. 2 approved, 1 failed",
   "data": {
-    "approved": ["65f1234567890abcdef12345", "65f1234567890abcdef12346"],
+    "approved": [
+      "65f1234567890abcdef12345",
+      "65f1234567890abcdef12346"
+    ],
     "failed": [
       {
         "jobId": "65f1234567890abcdef12347",
@@ -2285,7 +2158,6 @@ POST /api/v1/skills
 | `description` | String | No | Skill description (max 500 chars) |
 
 **Request Example:**
-
 ```json
 {
   "name": "TypeScript",
@@ -2295,7 +2167,6 @@ POST /api/v1/skills
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -2313,7 +2184,6 @@ POST /api/v1/skills
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2332,7 +2202,6 @@ PUT /api/v1/skills/:id
 **Description:** Update an existing skill.
 
 **Request Body:**
-
 ```json
 {
   "name": "TypeScript Advanced",
@@ -2342,7 +2211,6 @@ PUT /api/v1/skills/:id
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2369,14 +2237,12 @@ DELETE /api/v1/skills/:id
 **Description:** Delete a skill from the platform.
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/skills/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2385,7 +2251,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (409):**
-
 ```json
 {
   "success": false,
@@ -2414,7 +2279,6 @@ POST /api/v1/categories
 | `icon` | String | No | Icon name or URL |
 
 **Request Example:**
-
 ```json
 {
   "name": "Machine Learning",
@@ -2425,7 +2289,6 @@ POST /api/v1/categories
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -2454,7 +2317,6 @@ PUT /api/v1/categories/:id
 **Description:** Update an existing category.
 
 **Request Example:**
-
 ```json
 {
   "name": "Machine Learning & AI",
@@ -2463,7 +2325,6 @@ PUT /api/v1/categories/:id
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2494,14 +2355,12 @@ DELETE /api/v1/categories/:id
 | `force` | Boolean | No | `false` | Force delete even if category has jobs |
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/categories/65f1234567890abcdef12345?force=false
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2510,7 +2369,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (409):**
-
 ```json
 {
   "success": false,
@@ -2541,7 +2399,6 @@ POST /api/v1/emails/admin/broadcast
 | `testMode` | Boolean | No | Test mode (default: false) |
 
 **Request Example:**
-
 ```json
 {
   "subject": "Platform Update: New Features Available",
@@ -2559,7 +2416,6 @@ POST /api/v1/emails/admin/broadcast
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2574,7 +2430,6 @@ POST /api/v1/emails/admin/broadcast
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2587,13 +2442,11 @@ POST /api/v1/emails/admin/broadcast
 ## Admin Routes Summary
 
 ### **Access Control**
-
 - All admin routes require `Authorization: Bearer <admin_access_token>`
 - Only users with `role: "admin"` can access these endpoints
 - Admins cannot deactivate or delete their own accounts
 
 ### **Key Capabilities**
-
 1. **User Management** - View, activate, deactivate, and delete user accounts
 2. **Recruiter Verification** - Approve or reject recruiter verification requests
 3. **Job Moderation** - Approve, reject, feature, or delete job postings
@@ -2602,28 +2455,27 @@ POST /api/v1/emails/admin/broadcast
 6. **Communication** - Send broadcast emails to users
 
 ### **Status Codes**
-
-| Code  | Meaning                              |
-| ----- | ------------------------------------ |
-| `200` | Success                              |
-| `201` | Resource created                     |
-| `400` | Bad request / Validation error       |
-| `401` | Unauthorized / Invalid token         |
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid token |
 | `403` | Forbidden / Insufficient permissions |
-| `404` | Resource not found                   |
-| `409` | Conflict (e.g., skill in use)        |
-| `500` | Server error                         |
+| `404` | Resource not found |
+| `409` | Conflict (e.g., skill in use) |
+| `500` | Server error |
 
 ---
 
-_Continue to [Recruiter Routes](#4-recruiter-routes) →_
+*Continue to [Recruiter Routes](#4-recruiter-routes) →*
+
 
 ## 4. Recruiter Routes
 
 All recruiter routes require authentication with a recruiter role. Include the access token in the Authorization header.
 
 **Required Headers:**
-
 ```
 Authorization: Bearer <recruiter_access_token>
 Content-Type: application/json (for JSON requests)
@@ -2643,20 +2495,17 @@ GET /api/v1/recruiters/profile
 **Description:** Retrieve the current recruiter's company profile.
 
 **Headers:**
-
 ```
 Authorization: Bearer <recruiter_access_token>
 ```
 
 **Request Example:**
-
 ```http
 GET /api/v1/recruiters/profile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2680,7 +2529,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "linkedin": "https://linkedin.com/company/techcorp",
       "twitter": "https://twitter.com/techcorp"
     },
-    "foundedYear": 2015,
     "isVerified": true,
     "verificationStatus": "verified",
     "createdAt": "2026-01-15T10:00:00.000Z",
@@ -2690,7 +2538,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (404):**
-
 ```json
 {
   "success": false,
@@ -2701,7 +2548,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 #### 4.1.2 Create Company Profile
-
 ```http
 POST /api/v1/recruiters/profile
 ```
@@ -2711,40 +2557,67 @@ POST /api/v1/recruiters/profile
 **Request Body:**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `companyName` | String | Yes | Company name |
-| `companyDescription` | String | Yes | Company description |
+| `companyName` | String | Yes | Company name (max 200 characters) |
+| `companyLogo` | String | No | URL to company logo |
+| `companyBanner` | String | No | URL to company banner image |
 | `industry` | String | Yes | Industry type |
-| `companySize` | String | Yes | Company size range |
+| `companySize` | String | No | Company size range (1-10, 11-50, 51-200, 201-500, 501-1000, 1000+) |
+| `companyDescription` | String | No | Company description (max 2000 characters) |
+| `companyCulture` | String | No | Company culture description (max 1000 characters) |
+| `foundedYear` | Number | No | Year the company was founded |
 | `website` | String | No | Company website URL |
-| `location` | Object | Yes | Company location details |
+| `location` | Object | No | Company location details |
+| `location.city` | String | No | City |
+| `location.state` | String | No | State/Province |
+| `location.country` | String | No | Country |
+| `location.zipCode` | String | No | ZIP/Postal code |
+| `location.address` | String | No | Full address (max 300 characters) |
+| `contactPerson` | Object | No | Contact person details |
+| `contactPerson.firstName` | String | No | Contact person's first name |
+| `contactPerson.lastName` | String | No | Contact person's last name |
+| `contactPerson.designation` | String | No | Contact person's job title |
+| `contactPerson.email` | String | No | Contact person's email address |
+| `contactPerson.phone` | String | No | Contact person's phone number |
 | `socialLinks` | Object | No | Social media links |
-| `foundedYear` | Number | No | Year company was founded |
+| `socialLinks.linkedin` | String | No | LinkedIn profile URL |
+| `socialLinks.twitter` | String | No | Twitter profile URL |
+| `socialLinks.facebook` | String | No | Facebook profile URL |
 
 **Request Example:**
-
 ```json
 {
   "companyName": "Tech Corp",
+  "companyLogo": "https://example.com/logo.png",
+  "companyBanner": "https://example.com/banner.jpg",
   "companyDescription": "We are a leading technology company specializing in innovative software solutions...",
+  "companyCulture": "We foster a culture of innovation, collaboration, and continuous learning...",
   "industry": "Technology",
-  "companySize": "100-500",
+  "companySize": "201-500",
+  "foundedYear": 2015,
   "website": "https://techcorp.com",
   "location": {
     "city": "San Francisco",
     "state": "CA",
     "country": "USA",
-    "zipCode": "94105"
+    "zipCode": "94105",
+    "address": "123 Tech Street, San Francisco, CA 94105"
+  },
+  "contactPerson": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "designation": "HR Manager",
+    "email": "john.doe@techcorp.com",
+    "phone": "+1-555-123-4567"
   },
   "socialLinks": {
     "linkedin": "https://linkedin.com/company/techcorp",
-    "twitter": "https://twitter.com/techcorp"
-  },
-  "foundedYear": 2015
+    "twitter": "https://twitter.com/techcorp",
+    "facebook": "https://facebook.com/techcorp"
+  }
 }
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -2753,19 +2626,42 @@ POST /api/v1/recruiters/profile
     "_id": "65f1234567890abcdef12345",
     "userId": "65f1234567890abcdef12346",
     "companyName": "Tech Corp",
-    "companyDescription": "We are a leading technology company...",
+    "companyLogo": "https://example.com/logo.png",
+    "companyBanner": "https://example.com/banner.jpg",
     "industry": "Technology",
-    "companySize": "100-500",
+    "companySize": "201-500",
+    "companyDescription": "We are a leading technology company specializing in innovative software solutions...",
+    "companyCulture": "We foster a culture of innovation, collaboration, and continuous learning...",
+    "foundedYear": 2015,
+    "location": {
+      "city": "San Francisco",
+      "state": "CA",
+      "country": "USA",
+      "zipCode": "94105",
+      "address": "123 Tech Street, San Francisco, CA 94105"
+    },
+    "contactPerson": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "designation": "HR Manager",
+      "email": "john.doe@techcorp.com",
+      "phone": "+1-555-123-4567"
+    },
     "website": "https://techcorp.com",
-    "verificationStatus": "pending",
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/techcorp",
+      "twitter": "https://twitter.com/techcorp",
+      "facebook": "https://facebook.com/techcorp"
+    },
     "isVerified": false,
-    "createdAt": "2026-01-29T18:00:00.000Z"
+    "verificationStatus": "pending",
+    "createdAt": "2026-01-29T18:00:00.000Z",
+    "updatedAt": "2026-01-29T18:00:00.000Z"
   }
 }
 ```
 
-**Error Response (400):**
-
+**Error Response (400 - Profile Already Exists):**
 ```json
 {
   "success": false,
@@ -2773,42 +2669,125 @@ POST /api/v1/recruiters/profile
 }
 ```
 
+**Error Response (400 - Validation Error):**
+```json
+{
+  "success": false,
+  "message": "Company name is required, Industry is required"
+}
+```
+
+**Error Response (400 - Duplicate Entry):**
+```json
+{
+  "success": false,
+  "message": "Duplicate field value entered"
+}
+```
+
 ---
 
 #### 4.1.3 Update Company Profile
-
 ```http
 PUT /api/v1/recruiters/profile
 ```
 
-**Description:** Update the existing company profile.
+**Description:** Update the existing company profile. All fields are optional. Protected fields like `isVerified`, `verificationStatus`, `verifiedAt`, and `verifiedBy` cannot be modified through this endpoint.
 
-**Request Body:** (Same fields as Create, all optional)
-
+**Request Body:** (All fields optional, same as Create endpoint)
 ```json
 {
-  "companyDescription": "Updated company description...",
-  "companySize": "500-1000",
-  "website": "https://newtechcorp.com"
+  "companyDescription": "Updated company description with more details about our services...",
+  "companySize": "501-1000",
+  "companyCulture": "Updated culture statement emphasizing work-life balance...",
+  "website": "https://newtechcorp.com",
+  "location": {
+    "city": "New York",
+    "state": "NY",
+    "country": "USA",
+    "zipCode": "10001"
+  },
+  "contactPerson": {
+    "phone": "+1-555-987-6543"
+  }
 }
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
   "message": "Company profile updated successfully",
   "data": {
     "_id": "65f1234567890abcdef12345",
+    "userId": "65f1234567890abcdef12346",
     "companyName": "Tech Corp",
-    "companyDescription": "Updated company description...",
-    "companySize": "500-1000",
+    "companyLogo": "https://example.com/logo.png",
+    "companyDescription": "Updated company description with more details about our services...",
+    "companyCulture": "Updated culture statement emphasizing work-life balance...",
+    "companySize": "501-1000",
+    "industry": "Technology",
+    "foundedYear": 2015,
+    "location": {
+      "city": "New York",
+      "state": "NY",
+      "country": "USA",
+      "zipCode": "10001",
+      "address": "123 Tech Street, San Francisco, CA 94105"
+    },
+    "contactPerson": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "designation": "HR Manager",
+      "email": "john.doe@techcorp.com",
+      "phone": "+1-555-987-6543"
+    },
     "website": "https://newtechcorp.com",
+    "socialLinks": {
+      "linkedin": "https://linkedin.com/company/techcorp",
+      "twitter": "https://twitter.com/techcorp"
+    },
+    "isVerified": false,
+    "verificationStatus": "pending",
+    "createdAt": "2026-01-29T18:00:00.000Z",
     "updatedAt": "2026-01-29T18:15:00.000Z"
   }
 }
 ```
+
+**Error Response (404):**
+```json
+{
+  "success": false,
+  "message": "Recruiter profile not found"
+}
+```
+
+**Error Response (400 - Validation Error):**
+```json
+{
+  "success": false,
+  "message": "Please provide a valid email address"
+}
+```
+
+**Error Response (500):**
+```json
+{
+  "success": false,
+  "message": "Server Error",
+  "error": "Error details here"
+}
+```
+
+**Notes:**
+- The following fields are protected and cannot be modified through this endpoint:
+  - `isVerified`
+  - `verificationStatus`
+  - `verifiedAt`
+  - `verifiedBy`
+  - `userId`
+- These fields can only be modified through admin verification endpoints.
 
 ---
 
@@ -2821,7 +2800,6 @@ POST /api/v1/recruiters/profile/logo
 **Description:** Upload or update company logo image.
 
 **Headers:**
-
 ```
 Authorization: Bearer <recruiter_access_token>
 Content-Type: multipart/form-data
@@ -2830,10 +2808,9 @@ Content-Type: multipart/form-data
 **Form Data:**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `file` | File | Yes | Image file (PNG, JPG, JPEG) |
+| `image` | File | Yes | Image file (PNG, JPG, JPEG) |
 
 **Request Example:**
-
 ```http
 POST /api/v1/recruiters/profile/logo
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -2848,7 +2825,6 @@ Content-Type: image/png
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2860,7 +2836,6 @@ Content-Type: image/png
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -2879,7 +2854,6 @@ POST /api/v1/recruiters/profile/banner
 **Description:** Upload or update company banner image.
 
 **Headers:**
-
 ```
 Authorization: Bearer <recruiter_access_token>
 Content-Type: multipart/form-data
@@ -2888,10 +2862,9 @@ Content-Type: multipart/form-data
 **Form Data:**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `file` | File | Yes | Image file (PNG, JPG, JPEG) |
+| `image` | File | Yes | Image file (PNG, JPG, JPEG) |
 
 **Request Example:**
-
 ```http
 POST /api/v1/recruiters/profile/banner
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -2901,7 +2874,6 @@ Content-Type: multipart/form-data
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2923,14 +2895,12 @@ GET /api/v1/recruiters/verification-status
 **Description:** Check the current verification status of recruiter account.
 
 **Request Example:**
-
 ```http
 GET /api/v1/recruiters/verification-status
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -2944,7 +2914,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Response (Pending):**
-
 ```json
 {
   "success": true,
@@ -2958,7 +2927,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Response (Rejected):**
-
 ```json
 {
   "success": true,
@@ -3000,7 +2968,6 @@ POST /api/v1/jobs
 | `applicationDeadline` | String | No | ISO date string |
 
 **Request Example:**
-
 ```json
 {
   "title": "Senior Full Stack Developer",
@@ -3045,7 +3012,6 @@ POST /api/v1/jobs
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -3071,7 +3037,6 @@ POST /api/v1/jobs
 ```
 
 **Error Response (403):**
-
 ```json
 {
   "success": false,
@@ -3080,7 +3045,6 @@ POST /api/v1/jobs
 ```
 
 **Error Response (404):**
-
 ```json
 {
   "success": false,
@@ -3108,14 +3072,12 @@ GET /api/v1/jobs/my-jobs
 | `order` | String | No | `desc` | Sort order |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobs/my-jobs?page=1&limit=20&status=active&sortBy=postedAt&order=desc
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3163,7 +3125,6 @@ PUT /api/v1/jobs/:id
 **Description:** Update a job posting (must be owner).
 
 **Request Body:** (Same fields as Create, all optional)
-
 ```json
 {
   "title": "Senior Full Stack Developer (Updated)",
@@ -3177,7 +3138,6 @@ PUT /api/v1/jobs/:id
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3192,7 +3152,6 @@ PUT /api/v1/jobs/:id
 ```
 
 **Error Response (403):**
-
 ```json
 {
   "success": false,
@@ -3211,14 +3170,12 @@ DELETE /api/v1/jobs/:id
 **Description:** Delete a job posting (must be owner).
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/jobs/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3242,7 +3199,6 @@ PATCH /api/v1/jobs/:id/close
 | `reason` | String | No | `filled` or `closed` (default: `closed`) |
 
 **Request Example:**
-
 ```json
 {
   "reason": "filled"
@@ -3250,7 +3206,6 @@ PATCH /api/v1/jobs/:id/close
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3284,14 +3239,12 @@ GET /api/v1/applications/job/:jobId
 | `status` | String | No | - | Filter by application status |
 
 **Request Example:**
-
 ```http
 GET /api/v1/applications/job/65f1234567890abcdef12345?page=1&limit=20&status=shortlisted
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3355,7 +3308,6 @@ PATCH /api/v1/applications/:id/status
 | `notes` | String | No | Status update notes |
 
 **Request Example:**
-
 ```json
 {
   "status": "shortlisted",
@@ -3364,7 +3316,6 @@ PATCH /api/v1/applications/:id/status
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3393,7 +3344,6 @@ POST /api/v1/applications/:id/notes
 | `note` | String | Yes | Note content (max 1000 chars) |
 
 **Request Example:**
-
 ```json
 {
   "note": "Candidate demonstrated strong problem-solving skills during phone screen. Schedule technical interview."
@@ -3401,7 +3351,6 @@ POST /api/v1/applications/:id/notes
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -3434,7 +3383,6 @@ PATCH /api/v1/applications/:id/rating
 | `rating` | Number | Yes | Rating value (1-5) |
 
 **Request Example:**
-
 ```json
 {
   "rating": 4.5
@@ -3442,7 +3390,6 @@ PATCH /api/v1/applications/:id/rating
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3472,7 +3419,6 @@ POST /api/v1/applications/:id/schedule-interview
 | `notes` | String | No | Interview notes (max 1000 chars) |
 
 **Request Example:**
-
 ```json
 {
   "scheduledAt": "2026-02-05T14:00:00.000Z",
@@ -3482,7 +3428,6 @@ POST /api/v1/applications/:id/schedule-interview
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3517,14 +3462,12 @@ GET /api/v1/analytics/recruiter/dashboard
 | `period` | String | No | `30d` | Time period: `7d`, `30d`, `90d`, `1y` |
 
 **Request Example:**
-
 ```http
 GET /api/v1/analytics/recruiter/dashboard?period=30d
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3582,14 +3525,12 @@ GET /api/v1/analytics/recruiter/job/:jobId
 | `period` | String | No | `30d` | Time period for analytics |
 
 **Request Example:**
-
 ```http
 GET /api/v1/analytics/recruiter/job/65f1234567890abcdef12345?period=30d
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3655,7 +3596,6 @@ POST /api/v1/emails/contact-candidate
 | `ccEmails` | Array | No | CC email addresses |
 
 **Request Example:**
-
 ```json
 {
   "candidateId": "65f1234567890abcdef12450",
@@ -3667,7 +3607,6 @@ POST /api/v1/emails/contact-candidate
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3680,7 +3619,6 @@ POST /api/v1/emails/contact-candidate
 ```
 
 **Error Response (429):**
-
 ```json
 {
   "success": false,
@@ -3710,14 +3648,12 @@ GET /api/v1/jobseekers/search
 | `limit` | Number | No | `10` | Results per page |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobseekers/search?skills=65f123,65f124&experienceYears=3&location=San Francisco&page=1&limit=20
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3765,14 +3701,12 @@ GET /api/v1/jobseekers/:id/profile
 **Description:** View detailed profile of a specific job seeker.
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobseekers/65f1234567890abcdef12450/profile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3831,7 +3765,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## Recruiter Routes Summary
 
 ### **Access Requirements**
-
 - All recruiter routes require `Authorization: Bearer <recruiter_access_token>`
 - Users must have `role: "recruiter"`
 - Profile must be created before posting jobs
@@ -3852,28 +3785,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    - Monitor dashboard → Track job performance → Analyze application trends
 
 ### **Status Codes**
-
-| Code  | Meaning                              |
-| ----- | ------------------------------------ |
-| `200` | Success                              |
-| `201` | Resource created                     |
-| `400` | Bad request / Validation error       |
-| `401` | Unauthorized / Invalid token         |
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
+| `400` | Bad request / Validation error |
+| `401` | Unauthorized / Invalid token |
 | `403` | Forbidden / Not verified / Not owner |
-| `404` | Resource not found                   |
-| `429` | Rate limit exceeded                  |
-| `500` | Server error                         |
+| `404` | Resource not found |
+| `429` | Rate limit exceeded |
+| `500` | Server error |
 
 ---
 
-_Continue to [Job Seeker Routes](#5-job-seeker-routes) →_
+*Continue to [Job Seeker Routes](#5-job-seeker-routes) →*
+
 
 ## 5. Job Seeker Routes
 
 All job seeker routes require authentication with a job seeker role. Include the access token in the Authorization header.
 
 **Required Headers:**
-
 ```
 Authorization: Bearer <jobseeker_access_token>
 Content-Type: application/json (for JSON requests)
@@ -3893,14 +3825,12 @@ GET /api/v1/jobseekers/profile
 **Description:** Retrieve the current job seeker's profile.
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobseekers/profile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -3940,11 +3870,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       }
     ],
     "skills": [
-      {
-        "_id": "...",
-        "name": "JavaScript",
-        "category": "Programming Languages"
-      },
+      { "_id": "...", "name": "JavaScript", "category": "Programming Languages" },
       { "_id": "...", "name": "React", "category": "Frontend Frameworks" }
     ],
     "certifications": [
@@ -3982,7 +3908,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (404):**
-
 ```json
 {
   "success": false,
@@ -4017,7 +3942,6 @@ POST /api/v1/jobseekers/profile
 | `preferences` | Object | No | Job preferences |
 
 **Request Example:**
-
 ```json
 {
   "firstName": "Jane",
@@ -4031,7 +3955,10 @@ POST /api/v1/jobseekers/profile
   },
   "headline": "Full Stack Developer | React & Node.js Expert",
   "summary": "Passionate developer with 5 years of experience in building scalable web applications...",
-  "skills": ["65f1234567890abcdef12301", "65f1234567890abcdef12302"],
+  "skills": [
+    "65f1234567890abcdef12301",
+    "65f1234567890abcdef12302"
+  ],
   "preferences": {
     "jobType": ["Full-Time", "Contract"],
     "remoteWorkPreference": "Remote",
@@ -4048,7 +3975,6 @@ POST /api/v1/jobseekers/profile
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -4066,7 +3992,6 @@ POST /api/v1/jobseekers/profile
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4085,7 +4010,6 @@ PUT /api/v1/jobseekers/profile
 **Description:** Update existing job seeker profile.
 
 **Request Body:** (Same fields as Create, all optional)
-
 ```json
 {
   "headline": "Senior Full Stack Developer | 5+ Years Experience",
@@ -4123,7 +4047,6 @@ PUT /api/v1/jobseekers/profile
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4150,7 +4073,6 @@ POST /api/v1/jobseekers/profile/resume
 **Description:** Upload resume file (PDF, DOC, DOCX).
 
 **Headers:**
-
 ```
 Authorization: Bearer <jobseeker_access_token>
 Content-Type: multipart/form-data
@@ -4162,7 +4084,6 @@ Content-Type: multipart/form-data
 | `file` | File | Yes | Resume file (PDF/DOC/DOCX, max 5MB) |
 
 **Request Example:**
-
 ```http
 POST /api/v1/jobseekers/profile/resume
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -4172,7 +4093,6 @@ Content-Type: multipart/form-data
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4186,7 +4106,6 @@ Content-Type: multipart/form-data
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4205,14 +4124,12 @@ DELETE /api/v1/jobseekers/profile/resume
 **Description:** Delete the uploaded resume file.
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/jobseekers/profile/resume
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4236,7 +4153,6 @@ POST /api/v1/jobseekers/profile/video-resume
 | `file` | File | Yes | Video file (MP4/AVI/MOV, max 50MB) |
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4260,7 +4176,6 @@ DELETE /api/v1/jobseekers/profile/video-resume
 **Description:** Delete the uploaded video resume.
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4279,7 +4194,6 @@ POST /api/v1/jobseekers/profile/portfolio
 **Description:** Add a portfolio project with optional image/file.
 
 **Headers:**
-
 ```
 Authorization: Bearer <jobseeker_access_token>
 Content-Type: multipart/form-data
@@ -4294,7 +4208,6 @@ Content-Type: multipart/form-data
 | `file` | File | No | Project image/screenshot |
 
 **Request Example:**
-
 ```http
 POST /api/v1/jobseekers/profile/portfolio
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -4307,7 +4220,6 @@ file=[binary image data]
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -4338,14 +4250,12 @@ DELETE /api/v1/jobseekers/profile/portfolio/:itemId
 | `itemId` | String | Yes | Portfolio item ID |
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/jobseekers/profile/portfolio/65f1234567890abcdef12400
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4374,7 +4284,6 @@ POST /api/v1/applications
 | `resumeUsed` | Object | No | Specific resume to use (defaults to profile resume) |
 
 **Request Example:**
-
 ```json
 {
   "jobId": "65f1234567890abcdef12345",
@@ -4393,7 +4302,6 @@ POST /api/v1/applications
 ```
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -4415,7 +4323,6 @@ POST /api/v1/applications
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4424,7 +4331,6 @@ POST /api/v1/applications
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4450,14 +4356,12 @@ GET /api/v1/applications/my-applications
 | `limit` | Number | No | `10` | Applications per page |
 
 **Request Example:**
-
 ```http
 GET /api/v1/applications/my-applications?status=interviewing&page=1&limit=20
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4510,14 +4414,12 @@ GET /api/v1/applications/:id
 | `id` | String | Yes | Application ID |
 
 **Request Example:**
-
 ```http
 GET /api/v1/applications/65f1234567890abcdef12500
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4574,14 +4476,12 @@ PATCH /api/v1/applications/:id/withdraw
 **Description:** Withdraw a submitted application.
 
 **Request Example:**
-
 ```http
 PATCH /api/v1/applications/65f1234567890abcdef12500/withdraw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4595,7 +4495,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4616,14 +4515,12 @@ GET /api/v1/saved-jobs
 **Description:** Retrieve all jobs saved by the job seeker.
 
 **Request Example:**
-
 ```http
 GET /api/v1/saved-jobs
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4676,7 +4573,6 @@ POST /api/v1/saved-jobs
 | `jobId` | String | Yes | Job ID to save |
 
 **Request Example:**
-
 ```json
 {
   "jobId": "65f1234567890abcdef12345"
@@ -4684,8 +4580,7 @@ POST /api/v1/saved-jobs
 ```
 
 **Success Response (201):**
-
-```json
+``` json
 {
   "success": true,
   "message": "Job saved successfully",
@@ -4699,7 +4594,6 @@ POST /api/v1/saved-jobs
 ```
 
 **Error Response (400):**
-
 ```json
 {
   "success": false,
@@ -4723,14 +4617,12 @@ DELETE /api/v1/saved-jobs/:jobId
 | `jobId` | String | Yes | Job ID to unsave |
 
 **Request Example:**
-
 ```http
 DELETE /api/v1/saved-jobs/65f1234567890abcdef12345
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4759,14 +4651,12 @@ GET /api/v1/jobs/recommendations
 | `limit` | Number | No | `10` | Jobs per page |
 
 **Request Example:**
-
 ```http
 GET /api/v1/jobs/recommendations?page=1&limit=20
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -4807,7 +4697,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## Job Seeker Routes Summary
 
 ### **Access Requirements**
-
 - All job seeker routes require `Authorization: Bearer <jobseeker_access_token>`
 - Users must have `role: "jobseeker"`
 - Profile must be created before applying to jobs
@@ -4825,16 +4714,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    - Keep profile updated → Add new skills/experience → Upload portfolio projects → Maintain resume
 
 ### **File Upload Limits**
-
-| File Type        | Max Size | Allowed Formats |
-| ---------------- | -------- | --------------- |
-| Resume           | 5 MB     | PDF, DOC, DOCX  |
-| Video Resume     | 50 MB    | MP4, AVI, MOV   |
-| Portfolio Images | 10 MB    | PNG, JPG, JPEG  |
-| Profile Picture  | 5 MB     | PNG, JPG, JPEG  |
+| File Type | Max Size | Allowed Formats |
+|-----------|----------|-----------------|
+| Resume | 5 MB | PDF, DOC, DOCX |
+| Video Resume | 50 MB | MP4, AVI, MOV |
+| Portfolio Images | 10 MB | PNG, JPG, JPEG |
+| Profile Picture | 5 MB | PNG, JPG, JPEG |
 
 ### **Application Status Flow**
-
 ```
 submitted → reviewed → shortlisted → interviewing → offered/hired
                                                    ↓
@@ -4844,27 +4731,25 @@ submitted → reviewed → shortlisted → interviewing → offered/hired
 ```
 
 ### **Privacy Settings**
-
 Job seekers can control:
-
 - Profile visibility (public/private)
 - Email visibility to recruiters
 - Phone number visibility
 - Resume download permissions
 
 ### **Status Codes**
-
-| Code  | Meaning                                          |
-| ----- | ------------------------------------------------ |
-| `200` | Success                                          |
-| `201` | Resource created                                 |
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `201` | Resource created |
 | `400` | Bad request / Validation error / Already applied |
-| `401` | Unauthorized / Invalid token                     |
-| `403` | Forbidden / Not authorized                       |
-| `404` | Resource not found                               |
-| `413` | File too large                                   |
-| `500` | Server error                                     |
+| `401` | Unauthorized / Invalid token |
+| `403` | Forbidden / Not authorized |
+| `404` | Resource not found |
+| `413` | File too large |
+| `500` | Server error |
 
 ---
 
-_This completes the API documentation for all routes. Continue to [Database Models](#-database-models) →_
+*This completes the API documentation for all routes. Continue to [Database Models](#-database-models) →*
+

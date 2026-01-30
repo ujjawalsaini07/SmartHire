@@ -14,7 +14,7 @@ const AdminLayout = () => {
   const sidebarLinks = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/admin/users', label: 'User Management', icon: Users },
-    { to: '/admin/recruiters/verify', label: 'Recruiter Verification', icon: ShieldCheck },
+    { to: '/admin/recruiters', label: 'Recruiter Verification', icon: ShieldCheck },
     { to: '/admin/jobs/moderate', label: 'Job Moderation', icon: Briefcase },
     { to: '/admin/categories', label: 'Categories', icon: Tag },
     { to: '/admin/skills', label: 'Skills', icon: Award },
