@@ -29,11 +29,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Serve static files from uploads directory
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  limit: 100, // Limit each IP to 100 requests per `window` ( per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: "Too many requests from this IP, please try again after 15 minutes.",
@@ -78,6 +77,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/v1/auth", authRoutes); // auth routes
@@ -108,7 +108,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message: message,
-    // Only show stack trace in development mode for safety
     stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 });
