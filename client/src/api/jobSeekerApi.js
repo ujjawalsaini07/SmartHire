@@ -93,7 +93,7 @@ export const jobSeekerApi = {
   },
 
   // ============================================
-  // Portfolio Management  (local disk)
+  // Portfolio Management  (Cloudinary → SmartHire/portfolio)
   // ============================================
 
   // Add portfolio item (with optional file)

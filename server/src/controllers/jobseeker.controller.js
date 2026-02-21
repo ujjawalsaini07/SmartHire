@@ -3,7 +3,6 @@ import User from "../models/User.model.js";
 import Skill from "../models/Skills.model.js";
 import {
   deleteFromCloudinary,
-  deleteFile,
 } from "../middlewares/upload/upload.middleware.js";
 
 // ─────────────────────────────────────────────
@@ -321,7 +320,7 @@ export const deleteVideoResume = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-// PORTFOLIO  (local disk — unchanged)
+// PORTFOLIO  (Cloudinary → SmartHire/portfolio)
 // ─────────────────────────────────────────────
 
 /**
@@ -334,18 +333,27 @@ export const addPortfolioItem = async (req, res) => {
     const { title, description, projectUrl } = req.body;
 
     if (!title) {
-      if (req.file) await deleteFile(req.file.path);
+      if (req.file) {
+        await deleteFromCloudinary(req.file.filename, "image");
+        await deleteFromCloudinary(req.file.filename, "raw");
+      }
       return res.status(400).json({ success: false, message: "Title is required" });
     }
 
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
     if (!profile) {
-      if (req.file) await deleteFile(req.file.path);
+      if (req.file) {
+        await deleteFromCloudinary(req.file.filename, "image");
+        await deleteFromCloudinary(req.file.filename, "raw");
+      }
       return res.status(404).json({ success: false, message: "Profile not found" });
     }
 
     const portfolioItem = { title, description, projectUrl };
-    if (req.file) portfolioItem.fileUrl = `/uploads/portfolio/${req.file.filename}`;
+    if (req.file) {
+      portfolioItem.fileUrl = req.file.path; // Cloudinary secure URL
+      portfolioItem.publicId = req.file.filename; // Cloudinary public_id
+    }
 
     profile.portfolio.push(portfolioItem);
     await profile.save();
@@ -357,7 +365,8 @@ export const addPortfolioItem = async (req, res) => {
     });
   } catch (error) {
     if (req.file) {
-      await deleteFile(req.file.path).catch((err) => console.error("Error deleting file:", err));
+      await deleteFromCloudinary(req.file.filename, "image").catch(() => {});
+      await deleteFromCloudinary(req.file.filename, "raw").catch(() => {});
     }
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
@@ -381,9 +390,9 @@ export const deletePortfolioItem = async (req, res) => {
     const item = profile.portfolio.find((i) => i._id.toString() === itemId);
     if (!item) return res.status(404).json({ success: false, message: "Portfolio item not found" });
 
-    if (item.fileUrl) {
-      const filePath = item.fileUrl;
-      await deleteFile(filePath).catch((err) => console.error("Error deleting portfolio file:", err));
+    if (item.publicId) {
+      await deleteFromCloudinary(item.publicId, "image");
+      await deleteFromCloudinary(item.publicId, "raw");
     }
 
     profile.portfolio = profile.portfolio.filter((i) => i._id.toString() !== itemId);
