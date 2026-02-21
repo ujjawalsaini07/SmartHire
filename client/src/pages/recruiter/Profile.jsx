@@ -13,16 +13,14 @@ import Spinner from '@components/common/Spinner';
 import Modal from '@components/common/Modal';
 import toast from 'react-hot-toast';
 
-// Helper function to get full image URL
-// Images will be loaded through the Vite proxy to avoid CORS issues
+// Returns the URL for an image. Cloudinary URLs are full https:// URLs and
+// are returned as-is. Legacy relative paths get a leading slash for the proxy.
 const getImageUrl = (path) => {
   if (!path) return null;
-  
-  // Ensure path starts with / for proxy to work
-  const imagePath = path.startsWith('/') ? path : `/${path}`;
-  
-  // Vite proxy will forward it to backend automatically
-  return imagePath;
+  // Already an absolute URL (Cloudinary)
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // Relative path — prepend / for Vite proxy
+  return path.startsWith('/') ? path : `/${path}`;
 };
 
 const RecruiterProfile = () => {

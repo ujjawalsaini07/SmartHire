@@ -1,42 +1,48 @@
 import express from "express";
-import { protect, authorize } from "../middlewares/auth/auth.middleware.js"; // Import your auth
-import { uploadCompanyImage, handleMulterError } from "../middlewares/upload/upload.middleware.js"; // Import new multer config
+import { protect, authorize } from "../middlewares/auth/auth.middleware.js";
+import {
+  uploadCompanyLogo,
+  uploadCompanyBanner,
+  handleMulterError,
+} from "../middlewares/upload/upload.middleware.js";
 import {
   getMyCompanyProfile,
   createCompanyProfile,
   updateCompanyProfile,
-  uploadCompanyLogo,
-  uploadCompanyBanner,
+  uploadCompanyLogo as uploadCompanyLogoController,
+  uploadCompanyBanner as uploadCompanyBannerController,
   getVerificationStatus,
-  getPublicCompanyProfile
+  getPublicCompanyProfile,
 } from "../controllers/recruiter.controller.js";
 
 const recruiterRouter = express.Router();
 
-
+// Public route (no auth needed)
 recruiterRouter.get("/:id/profile", getPublicCompanyProfile);
-// Apply protection to all routes
+
+// All routes below require authentication
 recruiterRouter.use(protect);
-recruiterRouter.use(authorize('recruiter')); // Optional: Ensure only recruiters access
+recruiterRouter.use(authorize("recruiter"));
 
 // Profile Routes
 recruiterRouter.get("/profile", getMyCompanyProfile);
 recruiterRouter.post("/profile", createCompanyProfile);
 recruiterRouter.put("/profile", updateCompanyProfile);
 
-// Media Upload Routes (Inject Middleware Here)
+// Company Logo  (Cloudinary → SmartHire/companylogo)
 recruiterRouter.post(
-  "/profile/logo", 
-  uploadCompanyImage, 
-  handleMulterError, 
-  uploadCompanyLogo
+  "/profile/logo",
+  uploadCompanyLogo,
+  handleMulterError,
+  uploadCompanyLogoController
 );
 
+// Company Banner  (Cloudinary → SmartHire/companybanner)
 recruiterRouter.post(
-  "/profile/banner", 
-  uploadCompanyImage, 
-  handleMulterError, 
-  uploadCompanyBanner
+  "/profile/banner",
+  uploadCompanyBanner,
+  handleMulterError,
+  uploadCompanyBannerController
 );
 
 recruiterRouter.get("/verification-status", getVerificationStatus);

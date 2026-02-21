@@ -1,8 +1,14 @@
 import JobSeekerProfile from "../models/JobSeekerProfile.model.js";
 import User from "../models/User.model.js";
 import Skill from "../models/Skills.model.js";
-import { deleteFile } from "../middlewares/upload/upload.middleware.js";
-import path from "path";
+import {
+  deleteFromCloudinary,
+  deleteFile,
+} from "../middlewares/upload/upload.middleware.js";
+
+// ─────────────────────────────────────────────
+// PROFILE CRUD
+// ─────────────────────────────────────────────
 
 /**
  * @desc    Get current user's job seeker profile
@@ -21,10 +27,7 @@ export const getMyProfile = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      success: true,
-      data: profile,
-    });
+    res.status(200).json({ success: true, data: profile });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -41,11 +44,7 @@ export const getMyProfile = async (req, res) => {
  */
 export const createProfile = async (req, res) => {
   try {
-    // Check if profile already exists
-    const existingProfile = await JobSeekerProfile.findOne({
-      userId: req.user.id,
-    });
-
+    const existingProfile = await JobSeekerProfile.findOne({ userId: req.user.id });
     if (existingProfile) {
       return res.status(400).json({
         success: false,
@@ -53,11 +52,7 @@ export const createProfile = async (req, res) => {
       });
     }
 
-    // Create new profile
-    const profile = await JobSeekerProfile.create({
-      userId: req.user.id,
-      ...req.body,
-    });
+    const profile = await JobSeekerProfile.create({ userId: req.user.id, ...req.body });
 
     res.status(201).json({
       success: true,
@@ -65,21 +60,11 @@ export const createProfile = async (req, res) => {
       data: profile,
     });
   } catch (error) {
-    // Handle validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: messages,
-      });
+      return res.status(400).json({ success: false, message: "Validation error", errors: messages });
     }
-
-    res.status(500).json({
-      success: false,
-      message: "Error creating profile",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error creating profile", error: error.message });
   }
 };
 
@@ -91,100 +76,137 @@ export const createProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
-
     if (!profile) {
+      return res.status(404).json({ success: false, message: "Profile not found. Please create a profile first." });
+    }
+
+    const allowedUpdates = [
+      "firstName", "lastName", "phone", "location", "profilePicture",
+      "headline", "summary", "workExperience", "education", "skills",
+      "certifications", "portfolio", "socialLinks", "preferences", "privacy",
+    ];
+
+    allowedUpdates.forEach((field) => {
+      if (req.body[field] !== undefined) profile[field] = req.body[field];
+    });
+
+    await profile.save();
+    res.status(200).json({ success: true, message: "Profile updated successfully", data: profile });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ success: false, message: "Validation error", errors: messages });
+    }
+    res.status(500).json({ success: false, message: "Error updating profile", error: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────
+// PROFILE PICTURE  (Cloudinary → SmartHire/profile)
+// ─────────────────────────────────────────────
+
+/**
+ * @desc    Upload / replace profile picture
+ * @route   POST /api/v1/jobseekers/profile/profile-picture
+ * @access  Private (Job Seeker only)
+ */
+export const uploadProfilePicture = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Please upload an image file." });
+    }
+
+    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
+    if (!profile) {
+      // Remove the just-uploaded Cloudinary asset to avoid orphans
+      await deleteFromCloudinary(req.file.filename, "image");
       return res.status(404).json({
         success: false,
         message: "Profile not found. Please create a profile first.",
       });
     }
 
-    // Update fields
-    const allowedUpdates = [
-      "firstName",
-      "lastName",
-      "phone",
-      "location",
-      "profilePicture",
-      "headline",
-      "summary",
-      "workExperience",
-      "education",
-      "skills",
-      "certifications",
-      "portfolio",
-      "socialLinks",
-      "preferences",
-      "privacy",
-    ];
+    // Delete old profile picture from Cloudinary if it exists
+    if (profile.profilePicturePublicId) {
+      await deleteFromCloudinary(profile.profilePicturePublicId, "image");
+    }
 
-    allowedUpdates.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        profile[field] = req.body[field];
-      }
-    });
+    // req.file.path  = secure Cloudinary URL  (e.g. https://res.cloudinary.com/...)
+    // req.file.filename = Cloudinary public_id
+    profile.profilePicture = req.file.path;
+    profile.profilePicturePublicId = req.file.filename;
 
     await profile.save();
 
     res.status(200).json({
       success: true,
-      message: "Profile updated successfully",
-      data: profile,
+      message: "Profile picture uploaded successfully",
+      data: { profilePicture: profile.profilePicture },
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: messages,
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      message: "Error updating profile",
-      error: error.message,
-    });
+    if (req.file) await deleteFromCloudinary(req.file.filename, "image");
+    res.status(500).json({ success: false, message: "Error uploading profile picture", error: error.message });
   }
 };
 
 /**
- * @desc    Upload resume (PDF/DOC/DOCX)
+ * @desc    Delete profile picture
+ * @route   DELETE /api/v1/jobseekers/profile/profile-picture
+ * @access  Private (Job Seeker only)
+ */
+export const deleteProfilePicture = async (req, res) => {
+  try {
+    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
+    if (!profile.profilePicture) {
+      return res.status(404).json({ success: false, message: "No profile picture to delete" });
+    }
+
+    await deleteFromCloudinary(profile.profilePicturePublicId, "image");
+
+    profile.profilePicture = null;
+    profile.profilePicturePublicId = null;
+    await profile.save();
+
+    res.status(200).json({ success: true, message: "Profile picture deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error deleting profile picture", error: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────
+// RESUME  (Cloudinary → SmartHire/resume)
+// ─────────────────────────────────────────────
+
+/**
+ * @desc    Upload resume (PDF/DOC/DOCX) to Cloudinary
  * @route   POST /api/v1/jobseekers/profile/resume
  * @access  Private (Job Seeker only)
  */
 export const uploadResumeFile = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Please upload a resume file",
-      });
+      return res.status(400).json({ success: false, message: "Please upload a resume file." });
     }
-    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
 
+    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      await deleteFile(req.file.path);
+      await deleteFromCloudinary(req.file.filename, "raw");
       return res.status(404).json({
         success: false,
         message: "Profile not found. Please create a profile first.",
       });
     }
 
-    // Delete old resume file if exists
-    if (profile.resume?.fileUrl) {
-      const oldFilePath = path.join(process.cwd(), profile.resume.fileUrl);
-      await deleteFile(oldFilePath).catch((err) =>
-        console.error("Error deleting old resume:", err)
-      );
+    // Remove old resume from Cloudinary
+    if (profile.resume?.publicId) {
+      await deleteFromCloudinary(profile.resume.publicId, "raw");
     }
 
-    // Save new resume info
     profile.resume = {
       fileName: req.file.originalname,
-      fileUrl: `/uploads/resumes/${req.file.filename}`,
+      fileUrl: req.file.path,       // Cloudinary secure URL
+      publicId: req.file.filename,  // Cloudinary public_id
       uploadedAt: new Date(),
     };
 
@@ -196,18 +218,8 @@ export const uploadResumeFile = async (req, res) => {
       data: profile.resume,
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
-    }
-
-    res.status(500).json({
-      success: false,
-      message: "Error uploading resume",
-      error: error.message,
-    });
+    if (req.file) await deleteFromCloudinary(req.file.filename, "raw");
+    res.status(500).json({ success: false, message: "Error uploading resume", error: error.message });
   }
 };
 
@@ -219,86 +231,55 @@ export const uploadResumeFile = async (req, res) => {
 export const deleteResume = async (req, res) => {
   try {
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
-
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
+    if (!profile.resume?.fileUrl) {
+      return res.status(404).json({ success: false, message: "No resume found to delete" });
     }
 
-    if (!profile.resume || !profile.resume.fileUrl) {
-      return res.status(404).json({
-        success: false,
-        message: "No resume found to delete",
-      });
-    }
+    await deleteFromCloudinary(profile.resume.publicId, "raw");
 
-    // Delete file from server
-    const filePath = path.join(process.cwd(), profile.resume.fileUrl);
-    await deleteFile(filePath).catch((err) =>
-      console.error("Error deleting resume file:", err)
-    );
-
-    // Clear resume data from database
-    profile.resume = {
-      fileName: null,
-      fileUrl: null,
-      uploadedAt: null,
-    };
-
+    profile.resume = { fileName: null, fileUrl: null, publicId: null, uploadedAt: null };
     await profile.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Resume deleted successfully",
-    });
+    res.status(200).json({ success: true, message: "Resume deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting resume",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error deleting resume", error: error.message });
   }
 };
 
+// ─────────────────────────────────────────────
+// VIDEO RESUME  (Cloudinary → SmartHire/video-resume)
+// ─────────────────────────────────────────────
+
 /**
- * @desc    Upload video resume
+ * @desc    Upload video resume to Cloudinary
  * @route   POST /api/v1/jobseekers/profile/video-resume
  * @access  Private (Job Seeker only)
  */
 export const uploadVideoResume = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Please upload a video file",
-      });
+      return res.status(400).json({ success: false, message: "Please upload a video file." });
     }
 
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
-
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      await deleteFile(req.file.path);
+      await deleteFromCloudinary(req.file.filename, "video");
       return res.status(404).json({
         success: false,
         message: "Profile not found. Please create a profile first.",
       });
     }
 
-    // Delete old video file if exists
-    if (profile.videoResume?.fileUrl) {
-      const oldFilePath = path.join(process.cwd(), profile.videoResume.fileUrl);
-      await deleteFile(oldFilePath).catch((err) =>
-        console.error("Error deleting old video:", err)
-      );
+    // Remove old video from Cloudinary
+    if (profile.videoResume?.publicId) {
+      await deleteFromCloudinary(profile.videoResume.publicId, "video");
     }
 
-    // Save new video info
     profile.videoResume = {
       fileName: req.file.originalname,
-      fileUrl: `/uploads/videos/${req.file.filename}`,
+      fileUrl: req.file.path,       // Cloudinary secure URL
+      publicId: req.file.filename,  // Cloudinary public_id
       uploadedAt: new Date(),
     };
 
@@ -310,18 +291,8 @@ export const uploadVideoResume = async (req, res) => {
       data: profile.videoResume,
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
-    }
-
-    res.status(500).json({
-      success: false,
-      message: "Error uploading video resume",
-      error: error.message,
-    });
+    if (req.file) await deleteFromCloudinary(req.file.filename, "video");
+    res.status(500).json({ success: false, message: "Error uploading video resume", error: error.message });
   }
 };
 
@@ -333,48 +304,25 @@ export const uploadVideoResume = async (req, res) => {
 export const deleteVideoResume = async (req, res) => {
   try {
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
-
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
+    if (!profile.videoResume?.fileUrl) {
+      return res.status(404).json({ success: false, message: "No video resume found to delete" });
     }
 
-    if (!profile.videoResume || !profile.videoResume.fileUrl) {
-      return res.status(404).json({
-        success: false,
-        message: "No video resume found to delete",
-      });
-    }
+    await deleteFromCloudinary(profile.videoResume.publicId, "video");
 
-    // Delete file from server
-    const filePath = path.join(process.cwd(), profile.videoResume.fileUrl);
-    await deleteFile(filePath).catch((err) =>
-      console.error("Error deleting video file:", err)
-    );
-
-    // Clear video data from database
-    profile.videoResume = {
-      fileName: null,
-      fileUrl: null,
-      uploadedAt: null,
-    };
-
+    profile.videoResume = { fileName: null, fileUrl: null, publicId: null, uploadedAt: null };
     await profile.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Video resume deleted successfully",
-    });
+    res.status(200).json({ success: true, message: "Video resume deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting video resume",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error deleting video resume", error: error.message });
   }
 };
+
+// ─────────────────────────────────────────────
+// PORTFOLIO  (local disk — unchanged)
+// ─────────────────────────────────────────────
 
 /**
  * @desc    Add portfolio item
@@ -386,39 +334,18 @@ export const addPortfolioItem = async (req, res) => {
     const { title, description, projectUrl } = req.body;
 
     if (!title) {
-      // Clean up uploaded file if validation fails
-      if (req.file) {
-        await deleteFile(req.file.path);
-      }
-      return res.status(400).json({
-        success: false,
-        message: "Title is required",
-      });
+      if (req.file) await deleteFile(req.file.path);
+      return res.status(400).json({ success: false, message: "Title is required" });
     }
 
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
-
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      if (req.file) {
-        await deleteFile(req.file.path);
-      }
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
+      if (req.file) await deleteFile(req.file.path);
+      return res.status(404).json({ success: false, message: "Profile not found" });
     }
 
-    const portfolioItem = {
-      title,
-      description,
-      projectUrl,
-    };
-
-    // Add file URL if file was uploaded
-    if (req.file) {
-      portfolioItem.fileUrl = `/uploads/portfolio/${req.file.filename}`;
-    }
+    const portfolioItem = { title, description, projectUrl };
+    if (req.file) portfolioItem.fileUrl = `/uploads/portfolio/${req.file.filename}`;
 
     profile.portfolio.push(portfolioItem);
     await profile.save();
@@ -429,27 +356,14 @@ export const addPortfolioItem = async (req, res) => {
       data: profile.portfolio[profile.portfolio.length - 1],
     });
   } catch (error) {
-    // Clean up uploaded file on error
     if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
+      await deleteFile(req.file.path).catch((err) => console.error("Error deleting file:", err));
     }
-
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: messages,
-      });
+      return res.status(400).json({ success: false, message: "Validation error", errors: messages });
     }
-
-    res.status(500).json({
-      success: false,
-      message: "Error adding portfolio item",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error adding portfolio item", error: error.message });
   }
 };
 
@@ -461,54 +375,29 @@ export const addPortfolioItem = async (req, res) => {
 export const deletePortfolioItem = async (req, res) => {
   try {
     const { itemId } = req.params;
-
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
 
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
-    }
+    const item = profile.portfolio.find((i) => i._id.toString() === itemId);
+    if (!item) return res.status(404).json({ success: false, message: "Portfolio item not found" });
 
-    const item = profile.portfolio.find(
-      (item) => item._id.toString() === itemId
-    );
-
-    if (!item) {
-      return res.status(404).json({
-        success: false,
-        message: "Portfolio item not found",
-      });
-    }
-
-    // Delete file from server if exists
     if (item.fileUrl) {
-      const filePath = path.join(process.cwd(), item.fileUrl);
-      await deleteFile(filePath).catch((err) =>
-        console.error("Error deleting portfolio file:", err)
-      );
+      const filePath = item.fileUrl;
+      await deleteFile(filePath).catch((err) => console.error("Error deleting portfolio file:", err));
     }
 
-    // Remove item from array
-    profile.portfolio = profile.portfolio.filter(
-      (item) => item._id.toString() !== itemId
-    );
-
+    profile.portfolio = profile.portfolio.filter((i) => i._id.toString() !== itemId);
     await profile.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Portfolio item deleted successfully",
-    });
+    res.status(200).json({ success: true, message: "Portfolio item deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting portfolio item",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error deleting portfolio item", error: error.message });
   }
 };
+
+// ─────────────────────────────────────────────
+// SEARCH & PUBLIC PROFILE
+// ─────────────────────────────────────────────
 
 /**
  * @desc    Search job seekers (for recruiters)
@@ -518,42 +407,24 @@ export const deletePortfolioItem = async (req, res) => {
 export const searchJobSeekers = async (req, res) => {
   try {
     const {
-      skills,
-      location,
-      jobType,
-      remoteWorkPreference,
-      minExperience,
-      page = 1,
-      limit = 10,
+      skills, location, jobType, remoteWorkPreference,
+      minExperience, page = 1, limit = 10,
     } = req.query;
 
-    const query = {
-      "privacy.profileVisibility": "public",
-    };
+    const query = { "privacy.profileVisibility": "public" };
 
-    // Search by skills
     if (skills) {
       const skillsArray = skills.split(",").map((s) => s.trim());
       query.skills = { $in: skillsArray };
     }
-
-    // Search by location
     if (location) {
       query.$or = [
         { "location.city": { $regex: location, $options: "i" } },
         { "location.country": { $regex: location, $options: "i" } },
       ];
     }
-
-    // Filter by job type preference
-    if (jobType) {
-      query["preferences.jobType"] = jobType;
-    }
-
-    // Filter by remote work preference
-    if (remoteWorkPreference) {
-      query["preferences.remoteWorkPreference"] = remoteWorkPreference;
-    }
+    if (jobType) query["preferences.jobType"] = jobType;
+    if (remoteWorkPreference) query["preferences.remoteWorkPreference"] = remoteWorkPreference;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
@@ -575,11 +446,7 @@ export const searchJobSeekers = async (req, res) => {
       data: profiles,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error searching job seekers",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error searching job seekers", error: error.message });
   }
 };
 
@@ -598,35 +465,17 @@ export const getJobSeekerProfileById = async (req, res) => {
     }).populate("skills", "name category level");
 
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found or not public",
-      });
+      return res.status(404).json({ success: false, message: "Profile not found or not public" });
     }
 
-    // Increment profile views
     await profile.incrementViews();
 
-    // Remove sensitive information based on privacy settings
     const profileData = profile.toObject();
-    
-    if (!profile.privacy.showEmail) {
-      delete profileData.email;
-    }
-    
-    if (!profile.privacy.showPhone) {
-      delete profileData.phone;
-    }
+    if (!profile.privacy.showEmail) delete profileData.email;
+    if (!profile.privacy.showPhone) delete profileData.phone;
 
-    res.status(200).json({
-      success: true,
-      data: profileData,
-    });
+    res.status(200).json({ success: true, data: profileData });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error retrieving profile",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error retrieving profile", error: error.message });
   }
 };

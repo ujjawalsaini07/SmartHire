@@ -23,19 +23,29 @@ export const recruiterApi = {
     return response.data;
   },
 
-  // Upload company logo
-  uploadLogo: async (file) => {
+  // Upload company logo — accepts optional progress callback (pct: 0-100)
+  uploadLogo: async (file, onProgress) => {
     const formData = new FormData();
     formData.append('image', file);
-    const response = await api.post('/recruiters/profile/logo', formData);
+    const response = await api.post('/recruiters/profile/logo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => onProgress(Math.round((e.loaded * 100) / e.total))
+        : undefined,
+    });
     return response.data;
   },
 
-  // Upload company banner
-  uploadBanner: async (file) => {
+  // Upload company banner — accepts optional progress callback (pct: 0-100)
+  uploadBanner: async (file, onProgress) => {
     const formData = new FormData();
     formData.append('image', file);
-    const response = await api.post('/recruiters/profile/banner', formData);
+    const response = await api.post('/recruiters/profile/banner', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => onProgress(Math.round((e.loaded * 100) / e.total))
+        : undefined,
+    });
     return response.data;
   },
 

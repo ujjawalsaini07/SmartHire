@@ -1,6 +1,5 @@
 import RecruiterProfile from "../models/RecruiterProfile.model.js";
-import { deleteFile } from "../middlewares/upload/upload.middleware.js"; // Adjust path if your middleware is in a different folder
-import fs from "fs";
+import { deleteFromCloudinary } from "../middlewares/upload/upload.middleware.js";
 
 /**
  * @desc    Get current recruiter's company profile
@@ -163,39 +162,32 @@ export const uploadCompanyLogo = async (req, res) => {
     const profile = await RecruiterProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      // If profile doesn't exist, we delete the uploaded file to save space
-      await deleteFile(req.file.path);
+      // Clean up the just-uploaded Cloudinary asset
+      await deleteFromCloudinary(req.file.filename, "image");
       return res.status(404).json({
         success: false,
         message: "Please create a company profile before uploading a logo",
       });
     }
 
-    // If there is an existing logo, delete the old file
-    if (profile.companyLogo) {
-      try {
-        await deleteFile(profile.companyLogo);
-      } catch (err) {
-        console.error("Failed to delete old logo:", err);
-        // Continue even if delete fails
-      }
+    // Delete old Cloudinary logo if present
+    if (profile.companyLogoPublicId) {
+      await deleteFromCloudinary(profile.companyLogoPublicId, "image");
     }
 
-    // Update profile with new logo path
+    // req.file.path  = Cloudinary secure URL
+    // req.file.filename = Cloudinary public_id
     profile.companyLogo = req.file.path;
+    profile.companyLogoPublicId = req.file.filename;
     await profile.save();
 
     res.status(200).json({
       success: true,
       message: "Company logo uploaded successfully",
-      data: {
-        companyLogo: profile.companyLogo,
-      },
+      data: { companyLogo: profile.companyLogo },
     });
   } catch (error) {
-    // If error occurs, attempt to clean up the file just uploaded
-    if (req.file) await deleteFile(req.file.path);
-
+    if (req.file) await deleteFromCloudinary(req.file.filename, "image");
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -221,35 +213,29 @@ export const uploadCompanyBanner = async (req, res) => {
     const profile = await RecruiterProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      await deleteFile(req.file.path);
+      await deleteFromCloudinary(req.file.filename, "image");
       return res.status(404).json({
         success: false,
         message: "Please create a company profile before uploading a banner",
       });
     }
 
-    // If there is an existing banner, delete the old file
-    if (profile.companyBanner) {
-      try {
-        await deleteFile(profile.companyBanner);
-      } catch (err) {
-        console.error("Failed to delete old banner:", err);
-      }
+    // Delete old Cloudinary banner if present
+    if (profile.companyBannerPublicId) {
+      await deleteFromCloudinary(profile.companyBannerPublicId, "image");
     }
 
     profile.companyBanner = req.file.path;
+    profile.companyBannerPublicId = req.file.filename;
     await profile.save();
 
     res.status(200).json({
       success: true,
       message: "Company banner uploaded successfully",
-      data: {
-        companyBanner: profile.companyBanner,
-      },
+      data: { companyBanner: profile.companyBanner },
     });
   } catch (error) {
-    if (req.file) await deleteFile(req.file.path);
-
+    if (req.file) await deleteFromCloudinary(req.file.filename, "image");
     res.status(500).json({
       success: false,
       message: "Server Error",

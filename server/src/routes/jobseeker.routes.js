@@ -1,6 +1,7 @@
 import express from "express";
 import { protect, authorize } from "../middlewares/auth/auth.middleware.js";
 import {
+  uploadProfilePicture,
   uploadResume,
   uploadVideo,
   uploadPortfolio,
@@ -10,6 +11,8 @@ import {
   getMyProfile,
   createProfile,
   updateProfile,
+  uploadProfilePicture as uploadProfilePictureController,
+  deleteProfilePicture,
   uploadResumeFile,
   deleteResume,
   uploadVideoResume,
@@ -22,12 +25,28 @@ import {
 
 const jobseekerRouter = express.Router();
 
-// Profile routes (Job Seeker only)
-jobseekerRouter.get("/profile", protect, authorize("jobseeker"), getMyProfile);
+// ─── Profile CRUD ────────────────────────────────────────────────────────────
+jobseekerRouter.get("/profile",  protect, authorize("jobseeker"), getMyProfile);
 jobseekerRouter.post("/profile", protect, authorize("jobseeker"), createProfile);
-jobseekerRouter.put("/profile", protect, authorize("jobseeker"), updateProfile);
+jobseekerRouter.put("/profile",  protect, authorize("jobseeker"), updateProfile);
 
-// Resume routes (Job Seeker only)
+// ─── Profile Picture (Cloudinary → SmartHire/profile) ────────────────────────
+jobseekerRouter.post(
+  "/profile/profile-picture",
+  protect,
+  authorize("jobseeker"),
+  uploadProfilePicture,
+  handleMulterError,
+  uploadProfilePictureController
+);
+jobseekerRouter.delete(
+  "/profile/profile-picture",
+  protect,
+  authorize("jobseeker"),
+  deleteProfilePicture
+);
+
+// ─── Resume (Cloudinary → SmartHire/resume) ──────────────────────────────────
 jobseekerRouter.post(
   "/profile/resume",
   protect,
@@ -43,7 +62,7 @@ jobseekerRouter.delete(
   deleteResume
 );
 
-// Video Resume routes (Job Seeker only)
+// ─── Video Resume (Cloudinary → SmartHire/video-resume) ──────────────────────
 jobseekerRouter.post(
   "/profile/video-resume",
   protect,
@@ -59,9 +78,7 @@ jobseekerRouter.delete(
   deleteVideoResume
 );
 
-
-
-// Portfolio routes (Job Seeker only)
+// ─── Portfolio (local disk) ───────────────────────────────────────────────────
 jobseekerRouter.post(
   "/profile/portfolio",
   protect,
@@ -77,17 +94,8 @@ jobseekerRouter.delete(
   deletePortfolioItem
 );
 
-// Search routes (Recruiter only)
-jobseekerRouter.get("/search", protect, authorize("recruiter"), searchJobSeekers);
-
-// Public profile view (Recruiter only)
-jobseekerRouter.get(
-  "/:id/profile",
-  protect,
-  authorize("recruiter"),
-  getJobSeekerProfileById
-);
-
-
+// ─── Search & Public view ────────────────────────────────────────────────────
+jobseekerRouter.get("/search",       protect, authorize("recruiter"), searchJobSeekers);
+jobseekerRouter.get("/:id/profile",  protect, authorize("recruiter"), getJobSeekerProfileById);
 
 export default jobseekerRouter;

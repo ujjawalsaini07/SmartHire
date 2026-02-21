@@ -4,7 +4,7 @@ export const jobSeekerApi = {
   // ============================================
   // Profile Management
   // ============================================
-  
+
   // Get my profile
   getMyProfile: async () => {
     const response = await api.get(`/jobseekers/profile?_t=${new Date().getTime()}`);
@@ -23,12 +23,19 @@ export const jobSeekerApi = {
     return response.data;
   },
 
+  // ============================================
+  // Profile Picture  (Cloudinary → SmartHire/profile)
+  // ============================================
+
   // Upload profile picture
-  uploadProfilePicture: async (file) => {
+  uploadProfilePicture: async (file, onProgress) => {
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('image', file); // field name must match middleware: "image"
     const response = await api.post('/jobseekers/profile/profile-picture', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => onProgress(Math.round((e.loaded * 100) / e.total))
+        : undefined,
     });
     return response.data;
   },
@@ -40,15 +47,18 @@ export const jobSeekerApi = {
   },
 
   // ============================================
-  // Resume & Portfolio Management
+  // Resume  (Cloudinary → SmartHire/resume)
   // ============================================
-  
-  // Upload resume
-  uploadResume: async (file) => {
+
+  // Upload resume — accepts optional progress callback (pct: 0-100)
+  uploadResume: async (file, onProgress) => {
     const formData = new FormData();
-    formData.append('resume', file);
+    formData.append('resume', file); // field name must match middleware: "resume"
     const response = await api.post('/jobseekers/profile/resume', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => onProgress(Math.round((e.loaded * 100) / e.total))
+        : undefined,
     });
     return response.data;
   },
@@ -59,12 +69,19 @@ export const jobSeekerApi = {
     return response.data;
   },
 
-  // Upload video resume
-  uploadVideoResume: async (file) => {
+  // ============================================
+  // Video Resume  (Cloudinary → SmartHire/video-resume)
+  // ============================================
+
+  // Upload video resume — accepts optional progress callback (pct: 0-100)
+  uploadVideoResume: async (file, onProgress) => {
     const formData = new FormData();
-    formData.append('video', file);
+    formData.append('video', file); // field name must match middleware: "video"
     const response = await api.post('/jobseekers/profile/video-resume', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
+        ? (e) => onProgress(Math.round((e.loaded * 100) / e.total))
+        : undefined,
     });
     return response.data;
   },
@@ -75,19 +92,23 @@ export const jobSeekerApi = {
     return response.data;
   },
 
-  // Add portfolio item
+  // ============================================
+  // Portfolio Management  (local disk)
+  // ============================================
+
+  // Add portfolio item (with optional file)
   addPortfolioItem: async (portfolioData) => {
-    const formData = new FormData();
-    formData.append('title', portfolioData.title);
-    if (portfolioData.description) {
-      formData.append('description', portfolioData.description);
-    }
-    if (portfolioData.projectUrl) {
-      formData.append('projectUrl', portfolioData.projectUrl);
-    }
-    if (portfolioData.portfolioFile) {
-      formData.append('portfolioFile', portfolioData.portfolioFile);
-    }
+    const formData = portfolioData instanceof FormData ? portfolioData : (() => {
+      const fd = new FormData();
+      Object.keys(portfolioData).forEach(key => {
+        if (Array.isArray(portfolioData[key])) {
+          portfolioData[key].forEach(val => fd.append(key, val));
+        } else {
+          fd.append(key, portfolioData[key]);
+        }
+      });
+      return fd;
+    })();
     const response = await api.post('/jobseekers/profile/portfolio', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -101,45 +122,9 @@ export const jobSeekerApi = {
   },
 
   // ============================================
-  // Portfolio Management
-  // ============================================
-
-  // Add portfolio item
-  addPortfolioItem: async (portfolioData) => {
-    // Check if it's FormData (has file) or JSON
-    if (portfolioData instanceof FormData) {
-      const response = await api.post('/jobseekers/profile/portfolio', portfolioData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      return response.data;
-    } else {
-      // If no file, we can ideally send JSON, but the endpoint might expect multipart
-      // Let's safe-guard by converting to FormData if it's not
-      const formData = new FormData();
-      Object.keys(portfolioData).forEach(key => {
-        if (Array.isArray(portfolioData[key])) {
-          portfolioData[key].forEach(val => formData.append(key, val));
-        } else {
-          formData.append(key, portfolioData[key]);
-        }
-      });
-      const response = await api.post('/jobseekers/profile/portfolio', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      return response.data;
-    }
-  },
-
-  // Delete portfolio item
-  deletePortfolioItem: async (itemId) => {
-    const response = await api.delete(`/jobseekers/profile/portfolio/${itemId}`);
-    return response.data;
-  },
-
-  // ============================================
   // Job Applications
   // ============================================
-  
+
   // Apply to job
   applyToJob: async (applicationData) => {
     const response = await api.post('/applications', applicationData);
@@ -167,7 +152,7 @@ export const jobSeekerApi = {
   // ============================================
   // Saved Jobs
   // ============================================
-  
+
   // Get saved jobs
   getSavedJobs: async () => {
     const response = await api.get('/saved-jobs');
@@ -189,7 +174,7 @@ export const jobSeekerApi = {
   // ============================================
   // Job Search & Recommendations
   // ============================================
-  
+
   // Get recommended jobs
   getRecommendedJobs: async (params) => {
     const response = await api.get('/jobs/recommendations', { params });

@@ -1,13 +1,8 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
-
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
-
-
 import authRoutes from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import jobseekerRoutes from "./routes/jobseeker.routes.js";
@@ -22,15 +17,7 @@ import categoriesRouter from "./routes/Jobcategories.routes.js";
 import analyticsRouter from "./routes/analytics.routes.js";
 import emailRouter from "./routes/email.routes.js";
 import { requestLogger } from "./config/logger.js";
-import { handleMulterError } from "./middlewares/upload/upload.middleware.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
-
-// Serve static files from uploads directory
-
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -78,8 +65,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-
 app.use("/api/v1/auth", authRoutes); // auth routes
 
 app.use("/api/v1/users", userRouter); // user routes
@@ -95,8 +80,7 @@ app.use("/api/v1/categories", categoriesRouter); // categories jobs routes
 app.use("/api/v1/analytics", analyticsRouter); // analytics jobs routes
 app.use("/api/v1/emails", emailRouter); // email routes
 
-// 2. Handle File Upload Errors
-app.use(handleMulterError);
+
 
 // 3. Global Error Handler (The Catch-All)
 app.use((err, req, res, next) => {

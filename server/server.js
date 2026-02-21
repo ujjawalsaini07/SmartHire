@@ -18,7 +18,8 @@ const checkEnv = () => {
   "EMAIL_HOST",
   "EMAIL_PORT",
   "EMAIL_USER",
-  "EMAIL_PASS"
+  "EMAIL_PASS",
+  "CLOUDINARY_URL"
 ];
 
   

@@ -22,7 +22,17 @@ const RecruiterProfileSchema = new mongoose.Schema(
       trim: true,
     },
 
+    companyLogoPublicId: {
+      type: String,
+      trim: true,
+    },
+
     companyBanner: {
+      type: String,
+      trim: true,
+    },
+
+    companyBannerPublicId: {
       type: String,
       trim: true,
     },

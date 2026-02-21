@@ -18,8 +18,11 @@ import { WorkExperienceForm, EducationForm, CertificationForm, PortfolioForm, Sk
 import toast from 'react-hot-toast';
 
 // Helper function to get full file URL
+// Cloudinary URLs are already full https:// URLs — return them as-is.
+// Legacy local paths (starting with /) are served from the backend base URL.
 const getFileUrl = (path) => {
   if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
   const filePath = path.startsWith('/') ? path : `/${path}`;
   return filePath;
 };
@@ -46,6 +49,8 @@ const JobSeekerProfile = () => {
   
   // File upload states
   const [uploadingFile, setUploadingFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0); // 0-100
+  const [showResumePreview, setShowResumePreview] = useState(false);
   const resumeInputRef = useRef(null);
   const videoResumeInputRef = useRef(null);
   const profilePictureInputRef = useRef(null);
@@ -334,7 +339,8 @@ const JobSeekerProfile = () => {
 
     try {
       setUploadingFile('resume');
-      const response = await jobSeekerApi.uploadResume(file);
+      setUploadProgress(0);
+      const response = await jobSeekerApi.uploadResume(file, (pct) => setUploadProgress(pct));
       setProfile(prev => ({ ...prev, resume: response.data }));
       toast.success('Resume uploaded successfully!');
     } catch (err) {
@@ -342,6 +348,7 @@ const JobSeekerProfile = () => {
       toast.error(err.response?.data?.message || 'Failed to upload resume');
     } finally {
       setUploadingFile(null);
+      setUploadProgress(0);
       if (resumeInputRef.current) resumeInputRef.current.value = '';
     }
   };
@@ -372,14 +379,15 @@ const JobSeekerProfile = () => {
       return;
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error('Video size should be less than 50MB');
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error('Video size should be less than 200MB');
       return;
     }
 
     try {
       setUploadingFile('video');
-      const response = await jobSeekerApi.uploadVideoResume(file);
+      setUploadProgress(0);
+      const response = await jobSeekerApi.uploadVideoResume(file, (pct) => setUploadProgress(pct));
       setProfile(prev => ({ ...prev, videoResume: response.data }));
       toast.success('Video resume uploaded successfully!');
     } catch (err) {
@@ -387,6 +395,7 @@ const JobSeekerProfile = () => {
       toast.error(err.response?.data?.message || 'Failed to upload video resume');
     } finally {
       setUploadingFile(null);
+      setUploadProgress(0);
       if (videoResumeInputRef.current) videoResumeInputRef.current.value = '';
     }
   };
@@ -921,26 +930,73 @@ const JobSeekerProfile = () => {
               >
                 {profile?.resume?.fileUrl ? (
                   <div className="space-y-3">
-                    <div className="p-3 bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg">
-                      <p className="text-sm font-medium text-light-text dark:text-dark-text truncate mb-1">
-                        {profile.resume.fileName}
-                      </p>
-                      <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                        Uploaded {new Date(profile.resume.uploadedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <a
-                        href={getFileUrl(profile.resume.fileUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
+                    {/* ── Resume Preview Overlay ── */}
+                    {showResumePreview && (
+                      <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+                        onClick={() => setShowResumePreview(false)}
                       >
-                        <Button size="sm" variant="outline" className="w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View
-                        </Button>
-                      </a>
+                        <div
+                          className="relative bg-white dark:bg-dark-bg-secondary rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Overlay header */}
+                          <div className="flex items-center justify-between px-5 py-3 border-b border-light-border dark:border-dark-border flex-shrink-0">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-5 h-5 text-primary-600" />
+                              <span className="font-semibold text-light-text dark:text-dark-text">Resume.pdf</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <a
+                                href={getFileUrl(profile.resume.fileUrl)}
+                                download
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-light-border dark:border-dark-border text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                              >
+                                <Download className="w-4 h-4" />
+                                Download
+                              </a>
+                              <button
+                                onClick={() => setShowResumePreview(false)}
+                                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                              >
+                                <X className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+                          {/* PDF iframe — uses Google Docs Viewer to avoid Cloudinary's
+                              Content-Disposition: attachment header triggering a download */}
+                          <iframe
+                            src={`https://docs.google.com/viewer?url=${encodeURIComponent(getFileUrl(profile.resume.fileUrl))}&embedded=true`}
+                            className="flex-1 w-full border-0"
+                            title="Resume Preview"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Resume info card ── */}
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg">
+                      <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-light-text dark:text-dark-text">Resume.pdf</p>
+                        <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                          Uploaded {new Date(profile.resume.uploadedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setShowResumePreview(true)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        View
+                      </Button>
                       <a
                         href={getFileUrl(profile.resume.fileUrl)}
                         download
@@ -964,35 +1020,43 @@ const JobSeekerProfile = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div>
-                    <input
-                      ref={resumeInputRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleResumeUpload}
-                      className="hidden"
-                    />
-                    <Button
-                      onClick={() => resumeInputRef.current?.click()}
-                      disabled={uploadingFile === 'resume'}
-                      className="w-full"
-                    >
-                      {uploadingFile === 'resume' ? (
-                        <>
-                          <Spinner size="sm" className="mr-2" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          Upload Resume
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
-                      PDF, DOC, DOCX (Max 5MB)
-                    </p>
-                  </div>
+                   <div>
+                     <input
+                       ref={resumeInputRef}
+                       type="file"
+                       accept=".pdf,.doc,.docx"
+                       onChange={handleResumeUpload}
+                       className="hidden"
+                     />
+                     <Button
+                       onClick={() => resumeInputRef.current?.click()}
+                       disabled={uploadingFile === 'resume'}
+                       className="w-full"
+                     >
+                       {uploadingFile === 'resume' ? (
+                         <>
+                           <Spinner size="sm" className="mr-2" />
+                           {uploadProgress > 0 ? `Uploading ${uploadProgress}%` : 'Uploading...'}
+                         </>
+                       ) : (
+                         <>
+                           <Upload className="w-4 h-4 mr-2" />
+                           Upload Resume
+                         </>
+                       )}
+                     </Button>
+                     {uploadingFile === 'resume' && uploadProgress > 0 && (
+                       <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                         <div
+                           className="bg-primary-600 h-1.5 rounded-full transition-all duration-300"
+                           style={{ width: `${uploadProgress}%` }}
+                         />
+                       </div>
+                     )}
+                     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
+                       PDF, DOC, DOCX (Max 5MB)
+                     </p>
+                   </div>
                 )}
               </SectionCard>
 
@@ -1027,35 +1091,43 @@ const JobSeekerProfile = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div>
-                    <input
-                      ref={videoResumeInputRef}
-                      type="file"
-                      accept="video/mp4,video/avi,video/quicktime"
-                      onChange={handleVideoResumeUpload}
-                      className="hidden"
-                    />
-                    <Button
-                      onClick={() => videoResumeInputRef.current?.click()}
-                      disabled={uploadingFile === 'video'}
-                      className="w-full"
-                    >
-                      {uploadingFile === 'video' ? (
-                        <>
-                          <Spinner size="sm" className="mr-2" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          Upload Video
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
-                      MP4, AVI, MOV (Max 50MB)
-                    </p>
-                  </div>
+                   <div>
+                     <input
+                       ref={videoResumeInputRef}
+                       type="file"
+                       accept="video/mp4,video/avi,video/quicktime,video/webm"
+                       onChange={handleVideoResumeUpload}
+                       className="hidden"
+                     />
+                     <Button
+                       onClick={() => videoResumeInputRef.current?.click()}
+                       disabled={uploadingFile === 'video'}
+                       className="w-full"
+                     >
+                       {uploadingFile === 'video' ? (
+                         <>
+                           <Spinner size="sm" className="mr-2" />
+                           {uploadProgress > 0 ? `Uploading ${uploadProgress}%` : 'Uploading...'}
+                         </>
+                       ) : (
+                         <>
+                           <Upload className="w-4 h-4 mr-2" />
+                           Upload Video
+                         </>
+                       )}
+                     </Button>
+                     {uploadingFile === 'video' && uploadProgress > 0 && (
+                       <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                         <div
+                           className="bg-primary-600 h-1.5 rounded-full transition-all duration-300"
+                           style={{ width: `${uploadProgress}%` }}
+                         />
+                       </div>
+                     )}
+                     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
+                       MP4, AVI, MOV, WebM (Max 200MB)
+                     </p>
+                   </div>
                 )}
               </SectionCard>
 
