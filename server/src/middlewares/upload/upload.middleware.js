@@ -40,6 +40,17 @@ const videoResumeStorage = new CloudinaryStorage({
   },
 });
 
+// 4. Portfolio Files  →  SmartHire/portfolio
+const portfolioStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "SmartHire/portfolio",
+    resource_type: "auto", // allow images, pdfs, etc.
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
+    public_id: (req) => `portfolio_${req.user.id}_${Date.now()}`,
+  },
+});
+
 // ─────────────────────────────────────────────
 // FILE FILTERS  (client-side MIME validation)
 // ─────────────────────────────────────────────
@@ -113,6 +124,12 @@ export const uploadVideo = multer({
   fileFilter: videoFileFilter,
   limits: { fileSize: 200 * 1024 * 1024 }, // 200 MB
 }).single("video");
+
+/** Upload a portfolio file (field name: "file") */
+export const uploadPortfolio = multer({
+  storage: portfolioStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+}).single("file");
 
 // ─────────────────────────────────────────────
 // CLOUDINARY DELETE HELPER
@@ -189,76 +206,3 @@ export const uploadCompanyBanner = multer({
 }).single("image");
 
 
-import multerDisk from "multer";
-import path from "path";
-import fs from "fs";
-
-const createUploadDirs = () => {
-  const dirs = ["./uploads/portfolio", "./uploads/company-images"];
-  dirs.forEach((dir) => {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  });
-};
-createUploadDirs();
-
-const portfolioStorage = multerDisk.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads/portfolio"),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname.replaceAll(" ", ""), ext);
-    cb(null, `${name}_${uniqueSuffix}${ext}`);
-  },
-});
-
-const companyImageStorage = multerDisk.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads/company-images"),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname.replaceAll(" ", ""), ext);
-    cb(null, `${name}_${uniqueSuffix}${ext}`);
-  },
-});
-
-const portfolioFileFilter = (req, file, cb) => {
-  const allowed = [
-    "image/jpeg", "image/png", "image/gif", "image/webp",
-    "application/pdf", "video/mp4", "video/webm",
-  ];
-  allowed.includes(file.mimetype)
-    ? cb(null, true)
-    : cb(new Error("Invalid file type. Only images, PDFs, and videos are allowed."), false);
-};
-
-const companyImageFileFilter = (req, file, cb) => {
-  const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-  allowed.includes(file.mimetype)
-    ? cb(null, true)
-    : cb(new Error("Invalid file type. Only JPG, PNG, GIF, and WEBP allowed."), false);
-};
-
-export const uploadPortfolio = multerDisk({
-  storage: portfolioStorage,
-  fileFilter: portfolioFileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
-}).single("portfolioFile");
-
-export const uploadCompanyImage = multerDisk({
-  storage: companyImageStorage,
-  fileFilter: companyImageFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
-}).single("image");
-
-/**
- * Delete a local file (used by portfolio & company image controllers).
- * Kept for backward compatibility with recruiter.controller.js
- */
-export const deleteFile = (filePath) => {
-  return new Promise((resolve, reject) => {
-    fs.unlink(filePath, (err) => {
-      if (err && err.code !== "ENOENT") reject(err);
-      else resolve();
-    });
-  });
-};

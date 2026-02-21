@@ -204,6 +204,10 @@ const JobSeekerProfileSchema = new mongoose.Schema(
           type: String,
           trim: true,
         },
+        publicId: {
+          type: String,
+          trim: true,
+        },
         projectUrl: {
           type: String,
           trim: true,
