@@ -3,7 +3,7 @@ import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
 import seedAdmin from "./src/utils/seedAdmin.js";
 
-// 1. ADD THIS FUNCTION
+// check env
 const checkEnv = () => {
   const required = [
   "PORT",
@@ -27,7 +27,7 @@ const checkEnv = () => {
   if (missing.length > 0) {
     console.error("CRITICAL ERROR: Missing environment variables:");
     console.error(missing.join(", "));
-    process.exit(1); // Kill the server
+    process.exit(1);
   }
 };
 
@@ -44,7 +44,7 @@ const startServer = async () => {
 
 startServer();
 
-// 2. ADD THIS GRACEFUL SHUTDOWN LOGIC AT THE END
+
 const exitHandler = () => {
   if (server) {
     server.close(() => {
@@ -61,17 +61,16 @@ const unexpectedErrorHandler = (error) => {
   exitHandler();
 };
 
-// Handle uncaught errors
+
 process.on("uncaughtException", unexpectedErrorHandler);
 process.on("unhandledRejection", unexpectedErrorHandler);
 
-// Handle kill signals (Ctrl+C or Docker stop)
+
 process.on("SIGTERM", () => {
   console.log("SIGTERM received");
   if (server) {
     server.close(() => {
       console.log("Server closed");
-      // Close MongoDB connection
       mongoose.connection.close(false, () => {
         console.log("MongoDB connection closed");
         process.exit(0);
