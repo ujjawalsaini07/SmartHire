@@ -45,8 +45,12 @@ app.use(helmet({
 
 app.use(
   cors({
-    // origin: process.env.FRONTEND_URL,
-    origin: "*",
+    origin: [
+      process.env.FRONTEND_URL,
+      "https://job-portal-eight-psi-69.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ].filter(Boolean),
     credentials: true,
   }),
 );
@@ -56,7 +60,14 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 
-// health check api 
+// health check and root api 
+app.get("/", (req, res) => {
+  res.status(200).json({ 
+    success: true, 
+    message: "Welcome to SmartHire API", 
+  });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({ 
     success: true, 
