@@ -48,6 +48,8 @@ app.use(
     origin: [
       process.env.FRONTEND_URL,
       "https://job-portal-eight-psi-69.vercel.app",
+      "https://smart-hire-ujjawal-sainis-projects.vercel.app",
+      "https://smart-hire-7xmp0hx2f-ujjawal-sainis-projects.vercel.app",
       "http://localhost:5173",
       "http://localhost:3000"
     ].filter(Boolean),
