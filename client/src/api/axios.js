@@ -2,10 +2,9 @@ import axios from 'axios';
 import useAuthStore from '@store/authStore';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 
-           (import.meta.env.PROD 
-              ? 'https://smarthire-one.vercel.app/api/v1' 
-              : 'http://localhost:5000/api/v1'),
+  baseURL: import.meta.env.PROD 
+    ? 'https://smarthire-one.vercel.app/api/v1' 
+    : 'http://localhost:5000/api/v1',
   withCredentials: true, // Important for httpOnly cookies
 });
 
