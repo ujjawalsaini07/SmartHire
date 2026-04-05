@@ -7,10 +7,7 @@ async function connectDB() {
   let retries = MAX_RETRIES;
   let currentDelay = INITIAL_RETRY_DELAY;
   console.log(process.env.NODE_ENV);
-  const mongoURI =
-    process.env.NODE_ENV === "production"
-      ? process.env.MONGO_URI
-      : process.env.MONGO_URI_DEV;
+  const mongoURI = process.env.MONGO_URI;
 
   if (!mongoURI) {
     console.error("Mongo URI is missing for this environment");

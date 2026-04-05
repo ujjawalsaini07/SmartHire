@@ -3,11 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
-
-
 import authRoutes from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import jobseekerRoutes from "./routes/jobseeker.routes.js";

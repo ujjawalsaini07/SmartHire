@@ -15,8 +15,6 @@ const checkEnv = () => {
     "ADMIN_NAME",
     "ADMIN_PASSWORD",
     "ADMIN_EMAIL",
-    "EMAIL_HOST",
-    "EMAIL_PORT",
     "EMAIL_USER",
     "EMAIL_PASS"
   ];
