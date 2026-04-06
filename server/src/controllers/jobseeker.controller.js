@@ -1,8 +1,16 @@
 import JobSeekerProfile from "../models/JobSeekerProfile.model.js";
 import User from "../models/User.model.js";
 import Skill from "../models/Skills.model.js";
-import { deleteFile } from "../middlewares/upload/upload.middleware.js";
 import path from "path";
+import cloudinary, {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "../config/cloudinary.js";
+
+/**
+ * Helper: extract file extension from original filename
+ */
+const getExt = (originalname) => path.extname(originalname).toLowerCase();
 
 /**
  * @desc    Get current user's job seeker profile
@@ -41,7 +49,6 @@ export const getMyProfile = async (req, res) => {
  */
 export const createProfile = async (req, res) => {
   try {
-    // Check if profile already exists
     const existingProfile = await JobSeekerProfile.findOne({
       userId: req.user.id,
     });
@@ -53,7 +60,6 @@ export const createProfile = async (req, res) => {
       });
     }
 
-    // Create new profile
     const profile = await JobSeekerProfile.create({
       userId: req.user.id,
       ...req.body,
@@ -65,7 +71,6 @@ export const createProfile = async (req, res) => {
       data: profile,
     });
   } catch (error) {
-    // Handle validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -99,7 +104,6 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // Update fields
     const allowedUpdates = [
       "firstName",
       "lastName",
@@ -150,7 +154,102 @@ export const updateProfile = async (req, res) => {
 };
 
 /**
- * @desc    Upload resume (PDF/DOC/DOCX)
+ * @desc    Upload profile picture to Cloudinary
+ * @route   POST /api/v1/jobseekers/profile/profile-picture
+ * @access  Private (Job Seeker only)
+ */
+export const uploadProfilePicture = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload an image file",
+      });
+    }
+
+    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found. Please create a profile first.",
+      });
+    }
+
+    // Upload to Cloudinary: SmartHire/profile/profile_<userId>.<ext>
+    const ext = getExt(req.file.originalname);
+    const publicId = `profile_${req.user.id}`;
+
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: "SmartHire/profile",
+      resourceType: "image",
+      publicId,
+    });
+
+    profile.profilePicture = result.secure_url;
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile picture uploaded successfully",
+      data: { profilePicture: profile.profilePicture },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error uploading profile picture",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Delete profile picture
+ * @route   DELETE /api/v1/jobseekers/profile/profile-picture
+ * @access  Private (Job Seeker only)
+ */
+export const deleteProfilePicture = async (req, res) => {
+  try {
+    const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
+
+    if (!profile.profilePicture) {
+      return res.status(404).json({
+        success: false,
+        message: "No profile picture found to delete",
+      });
+    }
+
+    // Delete from Cloudinary
+    const publicId = `SmartHire/profile/profile_${req.user.id}`;
+    await deleteFromCloudinary(publicId, "image").catch((err) =>
+      console.error("Error deleting profile picture from Cloudinary:", err)
+    );
+
+    profile.profilePicture = null;
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile picture deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting profile picture",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Upload resume (PDF/DOC/DOCX) to Cloudinary
  * @route   POST /api/v1/jobseekers/profile/resume
  * @access  Private (Job Seeker only)
  */
@@ -162,29 +261,37 @@ export const uploadResumeFile = async (req, res) => {
         message: "Please upload a resume file",
       });
     }
+
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      await deleteFile(req.file.path);
       return res.status(404).json({
         success: false,
         message: "Profile not found. Please create a profile first.",
       });
     }
 
-    // Delete old resume file if exists
-    if (profile.resume?.fileUrl) {
-      const oldFilePath = path.join(process.cwd(), profile.resume.fileUrl);
-      await deleteFile(oldFilePath).catch((err) =>
-        console.error("Error deleting old resume:", err)
+    // Delete old resume from Cloudinary if exists
+    if (profile.resume?.publicId) {
+      await deleteFromCloudinary(profile.resume.publicId, "raw").catch((err) =>
+        console.error("Error deleting old resume from Cloudinary:", err)
       );
     }
 
-    // Save new resume info
+    // Upload to Cloudinary: SmartHire/resume/resume_<userId>.<ext>
+    const ext = getExt(req.file.originalname);
+    const publicId = `resume_${req.user.id}${ext}`;
+
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: "SmartHire/resume",
+      resourceType: "raw",
+      publicId,
+    });
+
     profile.resume = {
       fileName: req.file.originalname,
-      fileUrl: `/uploads/resumes/${req.file.filename}`,
+      fileUrl: result.secure_url,
+      publicId: result.public_id,
       uploadedAt: new Date(),
     };
 
@@ -196,13 +303,6 @@ export const uploadResumeFile = async (req, res) => {
       data: profile.resume,
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
-    }
-
     res.status(500).json({
       success: false,
       message: "Error uploading resume",
@@ -234,16 +334,16 @@ export const deleteResume = async (req, res) => {
       });
     }
 
-    // Delete file from server
-    const filePath = path.join(process.cwd(), profile.resume.fileUrl);
-    await deleteFile(filePath).catch((err) =>
-      console.error("Error deleting resume file:", err)
-    );
+    if (profile.resume.publicId) {
+      await deleteFromCloudinary(profile.resume.publicId, "raw").catch((err) =>
+        console.error("Error deleting resume from Cloudinary:", err)
+      );
+    }
 
-    // Clear resume data from database
     profile.resume = {
       fileName: null,
       fileUrl: null,
+      publicId: null,
       uploadedAt: null,
     };
 
@@ -263,7 +363,7 @@ export const deleteResume = async (req, res) => {
 };
 
 /**
- * @desc    Upload video resume
+ * @desc    Upload video resume to Cloudinary
  * @route   POST /api/v1/jobseekers/profile/video-resume
  * @access  Private (Job Seeker only)
  */
@@ -279,26 +379,34 @@ export const uploadVideoResume = async (req, res) => {
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      await deleteFile(req.file.path);
       return res.status(404).json({
         success: false,
         message: "Profile not found. Please create a profile first.",
       });
     }
 
-    // Delete old video file if exists
-    if (profile.videoResume?.fileUrl) {
-      const oldFilePath = path.join(process.cwd(), profile.videoResume.fileUrl);
-      await deleteFile(oldFilePath).catch((err) =>
-        console.error("Error deleting old video:", err)
+    // Delete old video from Cloudinary if exists
+    if (profile.videoResume?.publicId) {
+      await deleteFromCloudinary(profile.videoResume.publicId, "video").catch(
+        (err) =>
+          console.error("Error deleting old video from Cloudinary:", err)
       );
     }
 
-    // Save new video info
+    // Upload to Cloudinary: SmartHire/video-resume/videoresume_<userId>.<ext>
+    const ext = getExt(req.file.originalname);
+    const publicId = `videoresume_${req.user.id}`;
+
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: "SmartHire/video-resume",
+      resourceType: "video",
+      publicId,
+    });
+
     profile.videoResume = {
       fileName: req.file.originalname,
-      fileUrl: `/uploads/videos/${req.file.filename}`,
+      fileUrl: result.secure_url,
+      publicId: result.public_id,
       uploadedAt: new Date(),
     };
 
@@ -310,13 +418,6 @@ export const uploadVideoResume = async (req, res) => {
       data: profile.videoResume,
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
-    }
-
     res.status(500).json({
       success: false,
       message: "Error uploading video resume",
@@ -348,16 +449,19 @@ export const deleteVideoResume = async (req, res) => {
       });
     }
 
-    // Delete file from server
-    const filePath = path.join(process.cwd(), profile.videoResume.fileUrl);
-    await deleteFile(filePath).catch((err) =>
-      console.error("Error deleting video file:", err)
-    );
+    if (profile.videoResume.publicId) {
+      await deleteFromCloudinary(
+        profile.videoResume.publicId,
+        "video"
+      ).catch((err) =>
+        console.error("Error deleting video from Cloudinary:", err)
+      );
+    }
 
-    // Clear video data from database
     profile.videoResume = {
       fileName: null,
       fileUrl: null,
+      publicId: null,
       uploadedAt: null,
     };
 
@@ -377,7 +481,7 @@ export const deleteVideoResume = async (req, res) => {
 };
 
 /**
- * @desc    Add portfolio item
+ * @desc    Add portfolio item (upload to Cloudinary)
  * @route   POST /api/v1/jobseekers/profile/portfolio
  * @access  Private (Job Seeker only)
  */
@@ -386,10 +490,6 @@ export const addPortfolioItem = async (req, res) => {
     const { title, description, projectUrl } = req.body;
 
     if (!title) {
-      // Clean up uploaded file if validation fails
-      if (req.file) {
-        await deleteFile(req.file.path);
-      }
       return res.status(400).json({
         success: false,
         message: "Title is required",
@@ -399,10 +499,6 @@ export const addPortfolioItem = async (req, res) => {
     const profile = await JobSeekerProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      // Delete uploaded file if profile doesn't exist
-      if (req.file) {
-        await deleteFile(req.file.path);
-      }
       return res.status(404).json({
         success: false,
         message: "Profile not found",
@@ -415,9 +511,19 @@ export const addPortfolioItem = async (req, res) => {
       projectUrl,
     };
 
-    // Add file URL if file was uploaded
+    // Upload file to Cloudinary if provided
     if (req.file) {
-      portfolioItem.fileUrl = `/uploads/portfolio/${req.file.filename}`;
+      const ext = getExt(req.file.originalname);
+      const portfolioIndex = profile.portfolio.length;
+      const publicId = `portfolio_${req.user.id}_${portfolioIndex}${ext}`;
+
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: "SmartHire/profile",
+        resourceType: "auto",
+        publicId,
+      });
+      portfolioItem.fileUrl = result.secure_url;
+      portfolioItem.publicId = result.public_id;
     }
 
     profile.portfolio.push(portfolioItem);
@@ -429,13 +535,6 @@ export const addPortfolioItem = async (req, res) => {
       data: profile.portfolio[profile.portfolio.length - 1],
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      await deleteFile(req.file.path).catch((err) =>
-        console.error("Error deleting file:", err)
-      );
-    }
-
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -482,15 +581,18 @@ export const deletePortfolioItem = async (req, res) => {
       });
     }
 
-    // Delete file from server if exists
-    if (item.fileUrl) {
-      const filePath = path.join(process.cwd(), item.fileUrl);
-      await deleteFile(filePath).catch((err) =>
-        console.error("Error deleting portfolio file:", err)
+    // Delete from Cloudinary if exists
+    if (item.publicId) {
+      const resourceType = item.fileUrl?.includes("/video/")
+        ? "video"
+        : item.fileUrl?.includes("/raw/")
+        ? "raw"
+        : "image";
+      await deleteFromCloudinary(item.publicId, resourceType).catch((err) =>
+        console.error("Error deleting portfolio file from Cloudinary:", err)
       );
     }
 
-    // Remove item from array
     profile.portfolio = profile.portfolio.filter(
       (item) => item._id.toString() !== itemId
     );
@@ -531,13 +633,11 @@ export const searchJobSeekers = async (req, res) => {
       "privacy.profileVisibility": "public",
     };
 
-    // Search by skills
     if (skills) {
       const skillsArray = skills.split(",").map((s) => s.trim());
       query.skills = { $in: skillsArray };
     }
 
-    // Search by location
     if (location) {
       query.$or = [
         { "location.city": { $regex: location, $options: "i" } },
@@ -545,12 +645,10 @@ export const searchJobSeekers = async (req, res) => {
       ];
     }
 
-    // Filter by job type preference
     if (jobType) {
       query["preferences.jobType"] = jobType;
     }
 
-    // Filter by remote work preference
     if (remoteWorkPreference) {
       query["preferences.remoteWorkPreference"] = remoteWorkPreference;
     }
@@ -604,16 +702,14 @@ export const getJobSeekerProfileById = async (req, res) => {
       });
     }
 
-    // Increment profile views
     await profile.incrementViews();
 
-    // Remove sensitive information based on privacy settings
     const profileData = profile.toObject();
-    
+
     if (!profile.privacy.showEmail) {
       delete profileData.email;
     }
-    
+
     if (!profile.privacy.showPhone) {
       delete profileData.phone;
     }

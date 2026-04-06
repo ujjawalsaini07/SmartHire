@@ -4,6 +4,7 @@ import {
   uploadResume,
   uploadVideo,
   uploadPortfolio,
+  uploadProfilePicture,
   handleMulterError,
 } from "../middlewares/upload/upload.middleware.js";
 import {
@@ -16,6 +17,8 @@ import {
   deleteVideoResume,
   addPortfolioItem,
   deletePortfolioItem,
+  uploadProfilePicture as uploadProfilePictureHandler,
+  deleteProfilePicture,
   searchJobSeekers,
   getJobSeekerProfileById,
 } from "../controllers/jobseeker.controller.js";
@@ -26,6 +29,22 @@ const jobseekerRouter = express.Router();
 jobseekerRouter.get("/profile", protect, authorize("jobseeker"), getMyProfile);
 jobseekerRouter.post("/profile", protect, authorize("jobseeker"), createProfile);
 jobseekerRouter.put("/profile", protect, authorize("jobseeker"), updateProfile);
+
+// Profile Picture routes (Job Seeker only)
+jobseekerRouter.post(
+  "/profile/profile-picture",
+  protect,
+  authorize("jobseeker"),
+  uploadProfilePicture,
+  handleMulterError,
+  uploadProfilePictureHandler
+);
+jobseekerRouter.delete(
+  "/profile/profile-picture",
+  protect,
+  authorize("jobseeker"),
+  deleteProfilePicture
+);
 
 // Resume routes (Job Seeker only)
 jobseekerRouter.post(
@@ -59,8 +78,6 @@ jobseekerRouter.delete(
   deleteVideoResume
 );
 
-
-
 // Portfolio routes (Job Seeker only)
 jobseekerRouter.post(
   "/profile/portfolio",
@@ -87,7 +104,5 @@ jobseekerRouter.get(
   authorize("recruiter"),
   getJobSeekerProfileById
 );
-
-
 
 export default jobseekerRouter;

@@ -20,6 +20,9 @@ import toast from 'react-hot-toast';
 // Helper function to get full file URL
 const getFileUrl = (path) => {
   if (!path) return null;
+  // If it's already an absolute URL (Cloudinary), return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // Legacy local paths: ensure leading slash
   const filePath = path.startsWith('/') ? path : `/${path}`;
   return filePath;
 };
@@ -49,6 +52,28 @@ const JobSeekerProfile = () => {
   const resumeInputRef = useRef(null);
   const videoResumeInputRef = useRef(null);
   const profilePictureInputRef = useRef(null);
+
+  const [resumePreviewOpen, setResumePreviewOpen] = useState(false);
+
+  const handleViewResume = () => {
+    setResumePreviewOpen(true);
+  };
+
+  const handleDownloadResume = () => {
+    if (!profile?.resume?.fileUrl) return;
+    
+    const url = getFileUrl(profile.resume.fileUrl);
+    
+    // Create an invisible anchor to trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const closeResumePreview = () => setResumePreviewOpen(false);
 
   // Fetch profile on mount
   useEffect(() => {
@@ -921,47 +946,51 @@ const JobSeekerProfile = () => {
               >
                 {profile?.resume?.fileUrl ? (
                   <div className="space-y-3">
-                    <div className="p-3 bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg">
-                      <p className="text-sm font-medium text-light-text dark:text-dark-text truncate mb-1">
+                    {/* Inline PDF preview */}
+                    <div className="rounded-lg overflow-hidden border border-light-border dark:border-dark-border bg-gray-100 dark:bg-gray-800" style={{ height: '180px' }}>
+                      <iframe
+                        src={getFileUrl(profile.resume.fileUrl)}
+                        title="Resume preview"
+                        className="w-full h-full border-0 pointer-events-none"
+                        tabIndex={-1}
+                      />
+                    </div>
+
+                    {/* File info */}
+                    <div className="px-1">
+                      <p className="text-sm font-medium text-light-text dark:text-dark-text truncate">
                         {profile.resume.fileName}
                       </p>
                       <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
                         Uploaded {new Date(profile.resume.uploadedAt).toLocaleDateString()}
                       </p>
                     </div>
+
+                    {/* Buttons */}
                     <div className="flex gap-2">
-                      <a
-                        href={getFileUrl(profile.resume.fileUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
+                      <button
+                        onClick={handleViewResume}
+                        className="flex-1 btn btn-outline btn-sm w-full flex items-center justify-center"
                       >
-                        <Button size="sm" variant="outline" className="w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View
-                        </Button>
-                      </a>
-                      <a
-                        href={getFileUrl(profile.resume.fileUrl)}
-                        download
-                        className="flex-1"
+                        <Eye className="w-4 h-4 mr-2" />
+                        View
+                      </button>
+                      <button
+                        onClick={handleDownloadResume}
+                        className="flex-1 btn btn-outline btn-sm w-full flex items-center justify-center"
                       >
-                        <Button size="sm" variant="outline" className="w-full">
-                          <Download className="w-4 h-4 mr-2" />
-                          Download
-                        </Button>
-                      </a>
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </button>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <button
                       onClick={handleResumeDelete}
                       disabled={uploadingFile === 'resume'}
-                      className="w-full text-error-600 hover:text-error-700 hover:bg-error-50 dark:hover:bg-error-900/20"
+                      className="btn btn-outline btn-sm w-full flex items-center justify-center text-error-600 hover:text-error-700 hover:bg-error-50 dark:hover:bg-error-900/20"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete
-                    </Button>
+                    </button>
                   </div>
                 ) : (
                   <div>
@@ -1208,6 +1237,14 @@ const JobSeekerProfile = () => {
           />
         </div>
       </Modal>
+
+      {/* Resume Preview Overlay */}
+      <ResumePreviewOverlay
+        open={resumePreviewOpen}
+        fileUrl={profile?.resume?.fileUrl ? getFileUrl(profile.resume.fileUrl) : null}
+        onClose={closeResumePreview}
+        fileName={profile?.resume?.fileName}
+      />
     </div>
   );
 };
@@ -1324,6 +1361,55 @@ const SocialLinksForm = ({ socialLinks, onSave, onCancel, saving }) => {
         </Button>
       </div>
     </div>
+  );
+};
+
+// Resume Preview Overlay
+const ResumePreviewOverlay = ({ open, fileUrl, onClose, fileName }) => {
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center"
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={onClose}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-4xl h-[90vh] mx-4 flex flex-col">
+          {/* Header bar */}
+          <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur rounded-t-xl px-5 py-3">
+            <p className="text-white text-sm font-medium truncate pr-4">
+              {fileName || 'Resume'}
+            </p>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors flex-shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="flex-1 bg-gray-800 rounded-b-xl overflow-hidden flex items-center justify-center">
+            {fileUrl ? (
+              <iframe
+                src={fileUrl}
+                title="Resume Preview"
+                className="w-full h-full border-0"
+              />
+            ) : null}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 const RecruiterProfileSchema = new mongoose.Schema(
   {
@@ -23,6 +22,16 @@ const RecruiterProfileSchema = new mongoose.Schema(
     },
 
     companyBanner: {
+      type: String,
+      trim: true,
+    },
+
+    companyLogoPublicId: {
+      type: String,
+      trim: true,
+    },
+
+    companyBannerPublicId: {
       type: String,
       trim: true,
     },

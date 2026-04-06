@@ -14,14 +14,12 @@ import Modal from '@components/common/Modal';
 import toast from 'react-hot-toast';
 
 // Helper function to get full image URL
-// Images will be loaded through the Vite proxy to avoid CORS issues
 const getImageUrl = (path) => {
   if (!path) return null;
-  
-  // Ensure path starts with / for proxy to work
+  // If it's already an absolute URL (Cloudinary), return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // Legacy local paths: ensure leading slash for proxy
   const imagePath = path.startsWith('/') ? path : `/${path}`;
-  
-  // Vite proxy will forward it to backend automatically
   return imagePath;
 };
 

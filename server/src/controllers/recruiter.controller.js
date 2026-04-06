@@ -1,6 +1,14 @@
 import RecruiterProfile from "../models/RecruiterProfile.model.js";
-import { deleteFile } from "../middlewares/upload/upload.middleware.js"; // Adjust path if your middleware is in a different folder
-import fs from "fs";
+import path from "path";
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} from "../config/cloudinary.js";
+
+/**
+ * Helper: extract file extension from original filename
+ */
+const getExt = (originalname) => path.extname(originalname).toLowerCase();
 
 /**
  * @desc    Get current recruiter's company profile
@@ -38,7 +46,6 @@ export const getMyCompanyProfile = async (req, res) => {
  */
 export const createCompanyProfile = async (req, res) => {
   try {
-    // Check if profile already exists for this user
     const existingProfile = await RecruiterProfile.findOne({
       userId: req.user.id,
     });
@@ -49,7 +56,7 @@ export const createCompanyProfile = async (req, res) => {
         message: "Profile already exists for this user",
       });
     }
-    // Ssanitization of the request body
+
     const sanitizedBody = { ...req.body };
     delete sanitizedBody.isVerified;
     delete sanitizedBody.verificationStatus;
@@ -57,8 +64,6 @@ export const createCompanyProfile = async (req, res) => {
     delete sanitizedBody.verifiedBy;
     delete sanitizedBody.userId;
 
-
-    // Create new profile linked to the logged-in user
     const profile = await RecruiterProfile.create({
       ...sanitizedBody,
       userId: req.user.id,
@@ -70,7 +75,6 @@ export const createCompanyProfile = async (req, res) => {
       data: profile,
     });
   } catch (error) {
-    // Handle Mongoose duplicate key or validation errors
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -100,7 +104,6 @@ export const createCompanyProfile = async (req, res) => {
  */
 export const updateCompanyProfile = async (req, res) => {
   try {
-    // Remove sensitive fields
     const sanitizedBody = { ...req.body };
     delete sanitizedBody.isVerified;
     delete sanitizedBody.verificationStatus;
@@ -147,7 +150,7 @@ export const updateCompanyProfile = async (req, res) => {
 };
 
 /**
- * @desc    Upload company logo
+ * @desc    Upload company logo to Cloudinary
  * @route   POST /api/v1/recruiters/profile/logo
  * @access  Private (Recruiter)
  */
@@ -163,26 +166,32 @@ export const uploadCompanyLogo = async (req, res) => {
     const profile = await RecruiterProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      // If profile doesn't exist, we delete the uploaded file to save space
-      await deleteFile(req.file.path);
       return res.status(404).json({
         success: false,
         message: "Please create a company profile before uploading a logo",
       });
     }
 
-    // If there is an existing logo, delete the old file
-    if (profile.companyLogo) {
+    // Delete old logo from Cloudinary if exists
+    if (profile.companyLogoPublicId) {
       try {
-        await deleteFile(profile.companyLogo);
+        await deleteFromCloudinary(profile.companyLogoPublicId, "image");
       } catch (err) {
-        console.error("Failed to delete old logo:", err);
-        // Continue even if delete fails
+        console.error("Failed to delete old logo from Cloudinary:", err);
       }
     }
 
-    // Update profile with new logo path
-    profile.companyLogo = req.file.path;
+    // Upload to Cloudinary: SmartHire/companylogo/companylogo_<userId>
+    const publicId = `companylogo_${req.user.id}`;
+
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: "SmartHire/companylogo",
+      resourceType: "image",
+      publicId,
+    });
+
+    profile.companyLogo = result.secure_url;
+    profile.companyLogoPublicId = result.public_id;
     await profile.save();
 
     res.status(200).json({
@@ -193,9 +202,6 @@ export const uploadCompanyLogo = async (req, res) => {
       },
     });
   } catch (error) {
-    // If error occurs, attempt to clean up the file just uploaded
-    if (req.file) await deleteFile(req.file.path);
-
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -205,7 +211,7 @@ export const uploadCompanyLogo = async (req, res) => {
 };
 
 /**
- * @desc    Upload company banner
+ * @desc    Upload company banner to Cloudinary
  * @route   POST /api/v1/recruiters/profile/banner
  * @access  Private (Recruiter)
  */
@@ -221,23 +227,32 @@ export const uploadCompanyBanner = async (req, res) => {
     const profile = await RecruiterProfile.findOne({ userId: req.user.id });
 
     if (!profile) {
-      await deleteFile(req.file.path);
       return res.status(404).json({
         success: false,
         message: "Please create a company profile before uploading a banner",
       });
     }
 
-    // If there is an existing banner, delete the old file
-    if (profile.companyBanner) {
+    // Delete old banner from Cloudinary if exists
+    if (profile.companyBannerPublicId) {
       try {
-        await deleteFile(profile.companyBanner);
+        await deleteFromCloudinary(profile.companyBannerPublicId, "image");
       } catch (err) {
-        console.error("Failed to delete old banner:", err);
+        console.error("Failed to delete old banner from Cloudinary:", err);
       }
     }
 
-    profile.companyBanner = req.file.path;
+    // Upload to Cloudinary: SmartHire/companybanner/banner_<userId>
+    const publicId = `banner_${req.user.id}`;
+
+    const result = await uploadToCloudinary(req.file.buffer, {
+      folder: "SmartHire/companybanner",
+      resourceType: "image",
+      publicId,
+    });
+
+    profile.companyBanner = result.secure_url;
+    profile.companyBannerPublicId = result.public_id;
     await profile.save();
 
     res.status(200).json({
@@ -248,8 +263,6 @@ export const uploadCompanyBanner = async (req, res) => {
       },
     });
   } catch (error) {
-    if (req.file) await deleteFile(req.file.path);
-
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -289,8 +302,6 @@ export const getVerificationStatus = async (req, res) => {
   }
 };
 
-// ... existing imports
-
 /**
  * @desc    Get public company profile by ID
  * @route   GET /api/v1/recruiters/:id/profile
@@ -300,13 +311,11 @@ export const getPublicCompanyProfile = async (req, res) => {
   try {
     const id = req.params.id;
 
-    // Try to find by userId first (assuming the ID passed is the User ID)
     let profile = await RecruiterProfile.findOne({ userId: id }).populate(
       "userId",
-      "firstName lastName email", // Optionally show recruiter basic info
+      "firstName lastName email",
     );
 
-    // If not found by userId, try finding by the Profile document _id
     if (!profile) {
       try {
         profile = await RecruiterProfile.findById(id).populate(
@@ -314,7 +323,6 @@ export const getPublicCompanyProfile = async (req, res) => {
           "firstName lastName email",
         );
       } catch (err) {
-        // Ignore casting error if ID is invalid for findById
         profile = null;
       }
     }

@@ -1,92 +1,7 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
 
-// Ensure upload directories exist
-const createUploadDirs = () => {
-  const dirs = [
-    "./uploads/resumes",
-    "./uploads/videos",
-    "./uploads/portfolio",
-    "./uploads/company-images", // Added company images directory here
-  ];
-
-  dirs.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-  });
-};
-
-// Initialize directories immediately
-createUploadDirs();
-
-// --- STORAGE CONFIGURATIONS ---
-
-// 1. Resumes
-const resumeStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads/resumes");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(
-      file.originalname.replaceAll(" ", ""),
-      ext,
-    );
-    cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
-  },
-});
-
-// 2. Videos
-const videoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads/videos");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(
-      file.originalname.replaceAll(" ", ""),
-      ext,
-    );
-    cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
-  },
-});
-
-// 3. Portfolio Files
-const portfolioStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads/portfolio");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(
-      file.originalname.replaceAll(" ", ""),
-      ext,
-    );
-    cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
-  },
-});
-
-// 4. Company Images (Logos/Banners)
-const companyImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Directory is now guaranteed to exist by createUploadDirs()
-    cb(null, "./uploads/company-images");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${req.user.id}_${Date.now()}`;
-    const ext = path.extname(file.originalname);
-    const nameWithoutExt = path.basename(
-      file.originalname.replaceAll(" ", ""),
-      ext,
-    );
-    cb(null, `${nameWithoutExt}_${uniqueSuffix}${ext}`);
-  },
-});
+// Use memory storage — files are kept in req.file.buffer for Cloudinary upload
+const memoryStorage = multer.memoryStorage();
 
 // --- FILE FILTERS ---
 
@@ -160,32 +75,37 @@ const imageFileFilter = (req, file, cb) => {
 // --- MULTER INSTANCES (EXPORTS) ---
 
 export const uploadResume = multer({
-  storage: resumeStorage,
+  storage: memoryStorage,
   fileFilter: resumeFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 }).single("resume");
 
 export const uploadVideo = multer({
-  storage: videoStorage,
+  storage: memoryStorage,
   fileFilter: videoFileFilter,
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
 }).single("video");
 
 export const uploadPortfolio = multer({
-  storage: portfolioStorage,
+  storage: memoryStorage,
   fileFilter: portfolioFileFilter,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 }).single("portfolioFile");
 
 export const uploadCompanyImage = multer({
-  storage: companyImageStorage,
+  storage: memoryStorage,
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 }).single("image");
 
-// --- UTILITIES ---
+export const uploadProfilePicture = multer({
+  storage: memoryStorage,
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+}).single("image");
 
-// Error handling middleware
+// --- ERROR HANDLER ---
+
 export const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
@@ -205,17 +125,4 @@ export const handleMulterError = (err, req, res, next) => {
     });
   }
   next();
-};
-
-// Delete file utility
-export const deleteFile = (filePath) => {
-  return new Promise((resolve, reject) => {
-    fs.unlink(filePath, (err) => {
-      if (err && err.code !== "ENOENT") {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
 };

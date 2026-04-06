@@ -1,8 +1,6 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js";
@@ -20,9 +18,6 @@ import analyticsRouter from "./routes/analytics.routes.js";
 import emailRouter from "./routes/email.routes.js";
 import { requestLogger } from "./config/logger.js";
 import { handleMulterError } from "./middlewares/upload/upload.middleware.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 app.set("trust proxy", 1); 
@@ -70,9 +65,6 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString() 
   });
 });
-
-// Serve static files from uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/v1/auth", authRoutes); // auth routes
 
