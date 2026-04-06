@@ -2,15 +2,13 @@ import nodemailer from "nodemailer";
 
 // Created once at module load — reused for every email (efficient & safe)
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  family: 4,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
+
 
 // ─── Core sender ────────────────────────────────────────────────────────────
 
