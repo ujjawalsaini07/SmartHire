@@ -1,22 +1,36 @@
 import nodemailer from "nodemailer";
 
-
 const getTransporter = () => {
+  // 1. Grab the variables
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+
+  // 2. The Trap: If they are missing, crash with a loud error in the Render logs
+  if (!user || !pass) {
+    console.error("=========================================");
+    console.error("🚨 NODEMAILER FATAL ERROR 🚨");
+    console.error("EMAIL_USER is:", user ? `Found (${user})` : "UNDEFINED OR EMPTY");
+    console.error("EMAIL_PASS is:", pass ? "Found (Hidden for security)" : "UNDEFINED OR EMPTY");
+    console.error("=========================================");
+    throw new Error("Cannot connect to Gmail. Environment variables are missing or empty on the Render server.");
+  }
+
+  // 3. Create the transporter safely
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      // .trim() removes invisible accidental spaces copied from the Render dashboard
+      user: user.trim(), 
+      pass: pass.trim(),
     },
   });
 };
 
 export const sendEmail = async ({ to, subject, html }) => {
-
   const transporter = getTransporter(); 
   
   await transporter.sendMail({
-    from: `"Smart Hire" <${process.env.EMAIL_USER}>`,
+    from: `"Smart Hire" <${process.env.EMAIL_USER.trim()}>`,
     to: to,
     subject: subject,
     html: html,
