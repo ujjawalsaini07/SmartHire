@@ -58,12 +58,9 @@ export const register = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Send verification email (implement this based on your email service)
-    try {
-      await sendVerificationEmail(user.email, verificationToken);
-    } catch (emailError) {
-      console.error("Failed to send verification email:", emailError);
-      // Continue with registration even if email fails
-    }
+sendVerificationEmail(user.email, verificationToken).catch((emailError) => {
+  console.error("Failed to send verification email:", emailError);
+});
 
     res.status(201).json({
       success: true,
@@ -355,25 +352,16 @@ export const forgotPassword = async (req, res) => {
     const resetToken = user.generateResetToken();
     await user.save({ validateBeforeSave: false });
 
-    // Send password reset email
-    try {
-      await sendPasswordResetEmail(user.email, resetToken);
-    } catch (emailError) {
-      console.error("Failed to send reset email:", emailError);
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpiry = undefined;
-      await user.save({ validateBeforeSave: false });
-
-      return res.status(500).json({
-        success: false,
-        message: "Error sending password reset email",
-      });
-    }
-
     res.status(200).json({
       success: true,
       message: "If an account exists, a password reset link will be sent",
     });
+
+ 
+    sendPasswordResetEmail(user.email, resetToken).catch((emailError) => {
+      console.error("Failed to send reset email:", emailError);
+    });
+
   } catch (error) {
     console.error("Forgot password error:", error);
     res.status(500).json({
