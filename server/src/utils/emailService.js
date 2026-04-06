@@ -1,20 +1,20 @@
-// 
-
-
 import nodemailer from "nodemailer";
 
-// Using the well-known "gmail" service automatically handles the host, 
-// port (465), and secure (true) settings needed to bypass cloud firewalls.
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
-// Generic send email function
+const getTransporter = () => {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+};
+
 export const sendEmail = async ({ to, subject, html }) => {
+
+  const transporter = getTransporter(); 
+  
   await transporter.sendMail({
     from: `"Smart Hire" <${process.env.EMAIL_USER}>`,
     to: to,
