@@ -16,7 +16,7 @@ const checkEnv = () => {
     "ADMIN_PASSWORD",
     "ADMIN_EMAIL",
     "EMAIL_USER",
-    "RESEND_API_KEY"
+    "EMAIL_PASS"
   ];
 
   const missing = required.filter(key => !process.env[key]);

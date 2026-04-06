@@ -1,24 +1,31 @@
-import { Resend } from "resend";
+// 
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+import nodemailer from "nodemailer";
+
+// Using the well-known "gmail" service automatically handles the host, 
+// port (465), and secure (true) settings needed to bypass cloud firewalls.
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // Generic send email function
 export const sendEmail = async ({ to, subject, html }) => {
-  const { error } = await resend.emails.send({
-    from: "Smart Hire <onboarding@resend.dev>", // use this until you add a custom domain
-    to,
-    subject,
-    html,
+  await transporter.sendMail({
+    from: `"Smart Hire" <${process.env.EMAIL_USER}>`,
+    to: to,
+    subject: subject,
+    html: html,
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
 };
 
 export const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-
+  
   const html = `
     <h2>Email Verification</h2>
     <p>Please verify your email by clicking the link below:</p>
@@ -31,7 +38,7 @@ export const sendVerificationEmail = async (email, token) => {
 
 export const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-
+  
   const html = `
     <h2>Password Reset</h2>
     <p>Click the link below to reset your password:</p>
