@@ -1,35 +1,33 @@
-import nodemailer from "nodemailer";
-
-// Created once at module load — reused for every email (efficient & safe)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-
-// ─── Core sender ────────────────────────────────────────────────────────────
+// ─── Core sender (External API) ──────────────────────────────────────────────
 
 export const sendEmail = async ({ to, subject, html }) => {
-  // Guard: skip gracefully instead of crashing the server
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn("[EMAIL] Skipped — EMAIL_USER or EMAIL_PASS not set in .env");
+  // Guard: gracefully skip if no API URL is configured
+  if (!process.env.EMAIL_API_URL) {
+    console.warn("[EMAIL] Skipped — EMAIL_API_URL not set in .env");
     return;
   }
 
   try {
-    const info = await transporter.sendMail({
-      from: `"Smart Hire" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
+    const response = await fetch(process.env.EMAIL_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: to,
+        subject: subject,
+        content: html,
+      }),
     });
-    console.info(`[EMAIL] Sent to ${to} — MessageId: ${info.messageId}`);
+
+    if (!response.ok) {
+      throw new Error(`External API responded with status: ${response.status}`);
+    }
+
+    console.info(`[EMAIL] Sent to ${to} via external API successfully.`);
   } catch (err) {
     // Log the error but don't re-throw — keeps the API route alive
-    console.error(`[EMAIL] Failed to send to ${to}: ${err.message}`);
+    console.error(`[EMAIL] Failed to send to ${to} via external API: ${err.message}`);
   }
 };
 
