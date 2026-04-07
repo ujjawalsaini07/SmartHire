@@ -55,11 +55,13 @@ api.interceptors.response.use(
     // Don't retry if:
     // 1. Response is not 401
     // 2. Request was already retried (_retry flag prevents infinite loops)
-    // 3. Request is to the refresh-token endpoint itself (prevents infinite refresh loops)
+    // 3. Request is to auth endpoints (prevents overwriting login/register errors with refresh token errors)
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
-      originalRequest.url?.includes('/auth/refresh-token')
+      originalRequest.url?.includes('/auth/refresh-token') ||
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/register')
     ) {
       return Promise.reject(error);
     }

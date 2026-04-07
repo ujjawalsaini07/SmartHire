@@ -1,7 +1,6 @@
 // ─── Core sender (External API) ──────────────────────────────────────────────
 
 export const sendEmail = async ({ to, subject, html }) => {
-  // Guard: gracefully skip if no API URL is configured
   if (!process.env.EMAIL_API_URL) {
     console.warn("[EMAIL] Skipped — EMAIL_API_URL not set in .env");
     return;
@@ -26,7 +25,6 @@ export const sendEmail = async ({ to, subject, html }) => {
 
     console.info(`[EMAIL] Sent to ${to} via external API successfully.`);
   } catch (err) {
-    // Log the error but don't re-throw — keeps the API route alive
     console.error(`[EMAIL] Failed to send to ${to} via external API: ${err.message}`);
   }
 };
@@ -38,49 +36,60 @@ export const sendVerificationEmail = async (email, token) => {
 
   const html = `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verify your email – Smart Hire</title>
+  <meta charset="UTF-8">
+  <title>Verify your email</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 0;">
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellspacing="0" cellpadding="0" style="padding:30px 0;background:#f3f4f6;">
     <tr>
       <td align="center">
-        <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-
+        <table width="520" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+          
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:32px 40px;">
-              <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,0.75);text-transform:uppercase;">Smart Hire</p>
-              <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#ffffff;">Verify your email</h1>
-              <span style="display:inline-block;padding:4px 14px;background:rgba(255,255,255,0.2);border-radius:20px;font-size:12px;font-weight:600;color:#fff;letter-spacing:0.5px;">✉ ACTION REQUIRED</span>
+            <td style="background:#2563eb;padding:28px;text-align:left;">
+              <h2 style="margin:0;color:#ffffff;font-size:22px;">Smart Hire</h2>
+              <p style="margin:6px 0 0;color:#dbeafe;font-size:13px;">Verify your email address</p>
             </td>
           </tr>
 
           <!-- Body -->
           <tr>
-            <td style="padding:32px 40px;">
-              <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.6;">
-                Thanks for signing up! Click the button below to verify your email address and activate your account.
+            <td style="padding:30px;">
+              <p style="margin:0 0 18px;font-size:15px;color:#333;line-height:1.6;">
+                Thank you for signing up. Please confirm your email address to activate your account.
               </p>
-              <a href="${verificationUrl}"
-                 style="display:inline-block;padding:14px 32px;background:#2563eb;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;">
-                Verify Email
-              </a>
-              <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;">
-                Or paste this link in your browser:<br/>
-                <span style="color:#2563eb;word-break:break-all;">${verificationUrl}</span>
+
+              <table cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" bgcolor="#2563eb" style="border-radius:6px;">
+                    <a href="${verificationUrl}" 
+                       style="display:inline-block;padding:12px 26px;font-size:14px;color:#ffffff;text-decoration:none;font-weight:bold;">
+                      Verify Email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:20px 0 0;font-size:13px;color:#666;">
+                If the button doesn't work, copy and paste this link:
               </p>
-              <p style="margin:16px 0 0;font-size:13px;color:#9ca3af;">This link will expire soon. If you didn't create an account, you can safely ignore this email.</p>
+              <p style="word-break:break-all;font-size:13px;color:#2563eb;">
+                ${verificationUrl}
+              </p>
+
+              <p style="margin-top:18px;font-size:12px;color:#999;">
+                If you did not create this account, you can ignore this email.
+              </p>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding:0 40px 32px;">
-              <p style="margin:0;font-size:12px;color:#d1d5db;text-align:center;">© 2026 Smart Hire &nbsp;|&nbsp; All rights reserved</p>
+            <td style="padding:20px;text-align:center;font-size:12px;color:#aaa;">
+              © 2026 Smart Hire. All rights reserved.
             </td>
           </tr>
 
@@ -91,7 +100,7 @@ export const sendVerificationEmail = async (email, token) => {
 </body>
 </html>`.trim();
 
-  await sendEmail({ to: email, subject: "Verify your Smart Hire account ✉", html });
+  await sendEmail({ to: email, subject: "Verify your Smart Hire account", html });
 };
 
 // ─── Password reset email ────────────────────────────────────────────────────
@@ -101,49 +110,60 @@ export const sendPasswordResetEmail = async (email, token) => {
 
   const html = `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reset your password – Smart Hire</title>
+  <meta charset="UTF-8">
+  <title>Reset your password</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 0;">
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellspacing="0" cellpadding="0" style="padding:30px 0;background:#f3f4f6;">
     <tr>
       <td align="center">
-        <table width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-
+        <table width="520" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+          
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:32px 40px;">
-              <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,0.75);text-transform:uppercase;">Smart Hire</p>
-              <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#ffffff;">Reset your password</h1>
-              <span style="display:inline-block;padding:4px 14px;background:rgba(255,255,255,0.2);border-radius:20px;font-size:12px;font-weight:600;color:#fff;letter-spacing:0.5px;">🔐 SECURITY NOTICE</span>
+            <td style="background:#7c3aed;padding:28px;text-align:left;">
+              <h2 style="margin:0;color:#ffffff;font-size:22px;">Smart Hire</h2>
+              <p style="margin:6px 0 0;color:#ede9fe;font-size:13px;">Password reset request</p>
             </td>
           </tr>
 
           <!-- Body -->
           <tr>
-            <td style="padding:32px 40px;">
-              <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.6;">
-                We received a request to reset your password. Click the button below to choose a new one.
+            <td style="padding:30px;">
+              <p style="margin:0 0 18px;font-size:15px;color:#333;line-height:1.6;">
+                A request was received to reset your password. Click below to proceed.
               </p>
-              <a href="${resetUrl}"
-                 style="display:inline-block;padding:14px 32px;background:#7c3aed;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;">
-                Reset Password
-              </a>
-              <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;">
-                Or paste this link in your browser:<br/>
-                <span style="color:#7c3aed;word-break:break-all;">${resetUrl}</span>
+
+              <table cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" bgcolor="#7c3aed" style="border-radius:6px;">
+                    <a href="${resetUrl}" 
+                       style="display:inline-block;padding:12px 26px;font-size:14px;color:#ffffff;text-decoration:none;font-weight:bold;">
+                      Reset Password
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:20px 0 0;font-size:13px;color:#666;">
+                If the button doesn't work, copy and paste this link:
               </p>
-              <p style="margin:16px 0 0;font-size:13px;color:#9ca3af;">If you didn't request a password reset, you can safely ignore this email. Your password will not change.</p>
+              <p style="word-break:break-all;font-size:13px;color:#7c3aed;">
+                ${resetUrl}
+              </p>
+
+              <p style="margin-top:18px;font-size:12px;color:#999;">
+                If you did not request this, you can ignore this email.
+              </p>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding:0 40px 32px;">
-              <p style="margin:0;font-size:12px;color:#d1d5db;text-align:center;">© 2026 Smart Hire &nbsp;|&nbsp; All rights reserved</p>
+            <td style="padding:20px;text-align:center;font-size:12px;color:#aaa;">
+              © 2026 Smart Hire. All rights reserved.
             </td>
           </tr>
 
@@ -154,5 +174,5 @@ export const sendPasswordResetEmail = async (email, token) => {
 </body>
 </html>`.trim();
 
-  await sendEmail({ to: email, subject: "Reset your Smart Hire password 🔐", html });
+  await sendEmail({ to: email, subject: "Reset your Smart Hire password", html });
 };
