@@ -1,4 +1,5 @@
 import Skill from "../models/Skills.model.js";
+import mongoose from "mongoose";
 
 /**
  * @desc    Get all skills (with optional filtering)
