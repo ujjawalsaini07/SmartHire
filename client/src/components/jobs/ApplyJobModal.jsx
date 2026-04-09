@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload, FileText, CheckCircle2 } from 'lucide-react';
+import { X, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@components/common/Button';
 import { jobSeekerApi } from '@api/jobSeekerApi';
@@ -13,14 +13,30 @@ const ApplyJobModal = ({ job, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const screeningQuestions = job.screeningQuestions || [];
+  const hasScreeningQuestions = screeningQuestions.length > 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Client-side validation for required screening questions
+    for (const sq of screeningQuestions) {
+      if (sq.isRequired && (!answers[sq.question] || !answers[sq.question].trim())) {
+        toast.error(`Please answer the required question: "${sq.question}"`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     
     try {
-      const formattedAnswers = Object.entries(answers).map(([question, answer]) => ({
-        question, answer
-      }));
+      // Build screening answers array — include all answered questions
+      const formattedAnswers = screeningQuestions
+        .map(sq => ({
+          question: sq.question,
+          answer: answers[sq.question] || ''
+        }))
+        .filter(a => a.answer.trim()); // Only send questions that were answered
 
       await jobSeekerApi.applyToJob({
         jobId: job._id,
@@ -32,7 +48,6 @@ const ApplyJobModal = ({ job, onClose }) => {
       setIsSuccess(true);
       toast.success('Application submitted successfully!');
       
-      // Auto close after 2 seconds
       setTimeout(() => {
         onClose();
       }, 2000);
@@ -80,17 +95,66 @@ const ApplyJobModal = ({ job, onClose }) => {
             </div>
           ) : (
             /* Body */
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-5">
+
+                {/* Screening Questions — shown first */}
+                {hasScreeningQuestions && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <AlertCircle className="w-4 h-4 text-primary" />
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        Screening Questions from the Recruiter
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+                      Questions marked <span className="text-red-500 font-semibold">*</span> are mandatory. Optional questions can be left blank.
+                    </p>
+                    {screeningQuestions.map((sq, idx) => (
+                      <div key={idx} className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 border border-gray-100 dark:border-dark-border">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <span className="flex items-start gap-1">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <span className="flex-1">
+                              {sq.question}
+                              {sq.isRequired ? (
+                                <span className="text-red-500 ml-1 font-semibold" title="Required">* (Required)</span>
+                              ) : (
+                                <span className="text-gray-400 ml-1 font-normal text-xs">(Optional)</span>
+                              )}
+                            </span>
+                          </span>
+                        </label>
+                        <textarea
+                          value={answers[sq.question] || ''}
+                          onChange={(e) => setAnswers(prev => ({...prev, [sq.question]: e.target.value}))}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-card text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                          rows={2}
+                          placeholder={sq.isRequired ? "Your answer is required..." : "Your answer (optional)..."}
+                          required={sq.isRequired}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Divider if there are screening questions */}
+                {hasScreeningQuestions && (
+                  <div className="border-t border-gray-100 dark:border-dark-border" />
+                )}
+
+                {/* Cover Letter — at the bottom */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Cover Letter (Optional)
+                    Cover Letter <span className="text-gray-400 font-normal">(Optional)</span>
                   </label>
                   <textarea
                     value={coverLetter}
                     onChange={(e) => setCoverLetter(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    rows={5}
+                    rows={4}
                     placeholder="Why are you a good fit for this role?"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
@@ -98,39 +162,10 @@ const ApplyJobModal = ({ job, onClose }) => {
                     Your profile and default resume will be attached automatically.
                   </p>
                 </div>
-                
-                {/* Screening Questions */}
-                {job.screeningQuestions && job.screeningQuestions.length > 0 && (
-                  <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-dark-border">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                      Questions from exactly the Employer
-                    </h3>
-                    {job.screeningQuestions.map((sq, idx) => (
-                      <div key={idx}>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {sq.question} 
-                          {sq.isRequired ? (
-                            <span className="text-red-500 ml-1" title="Required">* (Required)</span>
-                          ) : (
-                            <span className="text-gray-400 ml-1 font-normal">(Optional)</span>
-                          )}
-                        </label>
-                        <textarea
-                          required={sq.isRequired === true}
-                          value={answers[sq.question] || ''}
-                          onChange={(e) => setAnswers(prev => ({...prev, [sq.question]: e.target.value}))}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          rows={2}
-                          placeholder="Your answer..."
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Footer */}
-              <div className="mt-8 flex justify-end gap-3">
+              <div className="mt-6 flex justify-end gap-3">
                 <Button
                   type="button"
                   variant="outline"

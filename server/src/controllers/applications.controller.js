@@ -60,14 +60,32 @@ export const applyToJob = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please complete your job seeker profile before applying" });
     }
 
-    // 5. Create Application
+    // 5. Validate required screening questions
+    if (job.screeningQuestions && job.screeningQuestions.length > 0) {
+      const requiredQuestions = job.screeningQuestions.filter(q => q.isRequired);
+      
+      for (const rq of requiredQuestions) {
+        const answered = screeningAnswers?.find(a => a.question === rq.question);
+        if (!answered || !answered.answer || !answered.answer.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: `Please answer the required screening question: "${rq.question}"`
+          });
+        }
+      }
+    }
+
+    // Filter out unanswered optional questions (schema requires 'answer' field)
+    const filteredAnswers = (screeningAnswers || []).filter(a => a.answer && a.answer.trim());
+
+    // 6. Create Application
     // We get recruiterId directly from the Job model to ensure accuracy
     const application = await Application.create({
       jobId,
       jobSeekerId,
       recruiterId: job.recruiterId,
       coverLetter,
-      screeningAnswers,
+      screeningAnswers: filteredAnswers,
       resumeUsed: resumeUsed || (profile.resume ? {
         fileName: profile.resume.fileName,
         fileUrl: profile.resume.fileUrl

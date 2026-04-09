@@ -198,6 +198,18 @@ const JobManagement = () => {
       // Prepare payload to prevent validation errors with empty strings
       const payload = JSON.parse(JSON.stringify(formData));
       
+      // Auto-append any pending inputs that the user forgot to add via the '+' button
+      if (newQualification.trim()) {
+        payload.qualifications.push(newQualification.trim());
+      }
+      
+      if (newQuestion.question.trim()) {
+        payload.screeningQuestions.push({
+          question: newQuestion.question.trim(),
+          isRequired: newQuestion.isRequired
+        });
+      }
+      
       // Sanitize remoteType
       if (!payload.location.isRemote) {
         delete payload.location.remoteType;
@@ -590,6 +602,12 @@ const JobManagement = () => {
                     placeholder="Ask a question..."
                     value={newQuestion.question}
                     onChange={(e) => setNewQuestion(prev => ({ ...prev, question: e.target.value }))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addScreeningQuestion();
+                      }
+                    }}
                  />
                  <div className="flex items-center">
                     <input 

@@ -124,7 +124,7 @@ const Applications = () => {
 
   const handleSaveNotes = async (appId) => {
     try {
-      await recruiterApi.addRecruiterNote(appId, { notes: localNotes[appId] || '' });
+      await recruiterApi.addRecruiterNotes(appId, { note: localNotes[appId] || '' });
       toast.success('Notes saved');
       // No strict need to re-fetch unless desired, optimistic map allows keeping text
     } catch (err) {
@@ -329,10 +329,10 @@ const Applications = () => {
                                   const id = app.jobSeekerId?._id || app.jobSeekerId;
                                   if (id) navigate(`/recruiter/candidates/${id}`);
                                 }}
-                                className="text-primary hover:text-primary-600 p-1 flex items-center transition-colors"
-                                title="View Profile"
+                                className="ml-2 text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full flex items-center transition-colors border border-primary-100 dark:border-primary-800"
+                                title="View Full Profile"
                               >
-                                <ExternalLink className="w-4 h-4" />
+                                View Profile <ExternalLink className="w-3 h-3 ml-1.5" />
                               </button>
                             </div>
                             <p className="text-sm text-gray-500 flex items-center">
@@ -360,33 +360,38 @@ const Applications = () => {
                       
                       <div className="flex flex-col justify-end gap-2 border-t md:border-t-0 pt-4 md:pt-0">
                         {/* Rating & Notes */}
-                        <div className="mb-4 bg-gray-50 dark:bg-dark-bg-tertiary p-3 rounded-lg border border-gray-100 dark:border-dark-border">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Candidate Rating</span>
-                            <div className="flex gap-1">
+                        {/* Rating & Notes Box - Enhanced UX */}
+                        <div className="mb-4 flex flex-col sm:flex-row gap-4 bg-gray-50 dark:bg-dark-bg-tertiary p-4 rounded-xl border border-gray-100 dark:border-dark-border">
+                          
+                          {/* Notes Section - Clean text area filling space */}
+                          <div className="flex-1 w-full order-2 sm:order-1 border-t sm:border-t-0 sm:border-r border-gray-200 dark:border-dark-border pt-3 sm:pt-0 sm:pr-4">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Recruiter Notes</span>
+                            <textarea 
+                              className="w-full text-sm border border-gray-200 dark:border-dark-border rounded-lg p-3 dark:bg-dark-bg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary/50 focus:outline-none placeholder-gray-400" 
+                              rows={3}
+                              placeholder="Write internal processing notes here..."
+                              defaultValue={app.recruiterNotes?.length > 0 ? [...app.recruiterNotes].sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt))[0].note : ''}
+                              onChange={(e) => setLocalNotes({ ...localNotes, [app._id]: e.target.value })}
+                            />
+                            <div className="flex justify-end mt-2">
+                              <Button size="sm" className="px-4 text-xs font-medium" variant="primary" onClick={() => handleSaveNotes(app._id)}>Save Note</Button>
+                            </div>
+                          </div>
+
+                          {/* Ratings Section - Highlighted & Centered independently */}
+                          <div className="w-full sm:w-auto flex flex-col items-start sm:items-center justify-center order-1 sm:order-2 px-2">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2 text-center">Candidate Rating</span>
+                            <div className="flex gap-1.5 p-2 bg-white dark:bg-dark-bg rounded-lg shadow-sm border border-gray-100 dark:border-dark-border">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star 
                                   key={star} 
-                                  className={`w-4 h-4 cursor-pointer hover:text-yellow-400 hover:fill-current transition-colors ${app.rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-600'}`} 
+                                  className={`w-6 h-6 cursor-pointer hover:scale-110 hover:text-yellow-400 hover:fill-current shadow-transparent drop-shadow-sm transition-all ${app.rating >= star ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-600'}`} 
                                   onClick={() => handleRateCandidate(app._id, star)} 
                                 />
                               ))}
                             </div>
                           </div>
-                          <div>
-                            <div className="flex gap-2">
-                              <textarea 
-                                className="w-full text-xs border border-gray-200 dark:border-dark-border rounded p-2 dark:bg-dark-bg text-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-primary focus:outline-none placeholder-gray-400" 
-                                rows={2}
-                                placeholder="Write internal processing notes here..."
-                                defaultValue={app.notes || ''}
-                                onChange={(e) => setLocalNotes({ ...localNotes, [app._id]: e.target.value })}
-                              />
-                            </div>
-                            <div className="flex justify-end mt-2">
-                              <Button size="sm" className="px-2 py-1 text-xs" variant="outline" onClick={() => handleSaveNotes(app._id)}>Save Note</Button>
-                            </div>
-                          </div>
+                          
                         </div>
                         <div className="flex flex-wrap gap-2 justify-end mb-2">
                           <span className={`px-2 py-1 text-xs rounded font-medium ${
@@ -409,9 +414,11 @@ const Applications = () => {
                           <Button size="sm" variant="outline" onClick={() => requestStatusChange(app._id, 'rejected')}>
                             Reject
                           </Button>
-                          <Button size="sm" variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={() => setInterviewModal({ isOpen: true, appId: app._id, scheduledAt: '', meetingLink: '', notes: '' })}>
-                            Interview
-                          </Button>
+                          {app.status !== 'interviewing' && app.status !== 'accepted' && (
+                            <Button size="sm" variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={() => setInterviewModal({ isOpen: true, appId: app._id, scheduledAt: '', meetingLink: '', notes: '' })}>
+                              Interview
+                            </Button>
+                          )}
                           <Button size="sm" variant="primary" className="bg-green-600 hover:bg-green-700 border-green-600" onClick={() => requestStatusChange(app._id, 'accepted')}>
                             Accept
                           </Button>

@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Briefcase, Mail, Phone, Calendar, Download, Building, GraduationCap, ExternalLink, Linkedin, Github, Globe } from 'lucide-react';
+import { ArrowLeft, MapPin, Briefcase, Mail, Phone, Calendar, Download, Building, GraduationCap, ExternalLink, Linkedin, Github, Globe, Eye, X, FileText, Video } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { recruiterApi } from '@api/recruiterApi';
 import Button from '@components/common/Button';
 import Badge from '@components/common/Badge';
 import Modal from '@components/common/Modal';
 import Input from '@components/common/Input';
 import toast from 'react-hot-toast';
+
+const getFileUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const filePath = path.startsWith('/') ? path : `/${path}`;
+  return filePath;
+};
 
 const CandidateProfile = () => {
   const { id } = useParams();
@@ -17,6 +25,8 @@ const CandidateProfile = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [messageForm, setMessageForm] = useState({ subject: '', message: '' });
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [resumePreviewOpen, setResumePreviewOpen] = useState(false);
+  const [videoPreviewOpen, setVideoPreviewOpen] = useState(false);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -84,6 +94,7 @@ const CandidateProfile = () => {
     workExperience = [], 
     education = [], 
     resume, 
+    videoResume,
     socialLinks 
   } = candidate;
 
@@ -232,28 +243,14 @@ const CandidateProfile = () => {
 
           {/* Sidebar */}
           <div className="space-y-8">
-            {/* Actions */}
-            <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border sticky top-24">
+            {/* Contact Actions */}
+            <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border">
               <h3 className="font-semibold text-light-text dark:text-dark-text mb-4">Contact</h3>
-              <Button onClick={() => setIsMessageModalOpen(true)} className="w-full mb-3">
+              <Button onClick={() => setIsMessageModalOpen(true)} className="w-full">
                 <Mail className="w-4 h-4 mr-2" />
                 Message Candidate
               </Button>
-              {resume && (
-                <a 
-                  href={resume.fileUrl || resume} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block w-full"
-                >
-                  <Button variant="outline" className="w-full">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Resume
-                  </Button>
-                </a>
-              )}
             </div>
-
             {/* Skills */}
             <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border">
               <h3 className="font-semibold text-light-text dark:text-dark-text mb-4">Skills</h3>
@@ -269,6 +266,77 @@ const CandidateProfile = () => {
                 <p className="text-light-text-secondary dark:text-dark-text-secondary italic">No skills listed.</p>
               )}
             </div>
+            {/* Resume Block */}
+            {resume && (
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border">
+                <h3 className="font-semibold text-light-text dark:text-dark-text mb-4 flex items-center">
+                  <FileText className="w-5 h-5 mr-2 text-primary-600" /> Resume
+                </h3>
+                <div className="space-y-4">
+                  <div className="rounded-lg overflow-hidden border border-light-border dark:border-dark-border bg-gray-100 dark:bg-gray-800" style={{ height: '220px' }}>
+                    <iframe
+                      src={getFileUrl(resume.fileUrl || resume)}
+                      title="Resume preview"
+                      className="w-full h-full border-0 pointer-events-none"
+                      tabIndex={-1}
+                    />
+                  </div>
+                  <div>
+                    {resume.uploadedAt && (
+                       <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                         Uploaded {new Date(resume.uploadedAt).toLocaleDateString()}
+                       </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1 text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border-primary-100 dark:border-primary-800" onClick={() => setResumePreviewOpen(true)}>
+                      <Eye className="w-4 h-4 mr-2" /> View
+                    </Button>
+                    <a 
+                      href={resume.fileUrl || resume} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1"
+                    >
+                      <Button variant="outline" className="w-full text-sm">
+                        <Download className="w-4 h-4 mr-2" /> Download
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Video Resume Block */}
+            {videoResume && (
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border">
+                <h3 className="font-semibold text-light-text dark:text-dark-text mb-4 flex items-center">
+                  <Video className="w-5 h-5 mr-2 text-primary-600" /> Video Resume
+                </h3>
+                <div className="space-y-4">
+                  <div className="aspect-video bg-black rounded-lg overflow-hidden relative group">
+                    <video
+                      src={getFileUrl(videoResume.fileUrl || videoResume)}
+                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                        <Eye className="w-6 h-6" />
+                      </div>
+                    </div>
+                    {/* Invisible overlay capturing click to open modal */}
+                    <div className="absolute inset-0 cursor-pointer" onClick={() => setVideoPreviewOpen(true)}></div>
+                  </div>
+                  {videoResume.uploadedAt && (
+                    <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                      Uploaded {new Date(videoResume.uploadedAt).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            
 
             {/* Social Links */}
             {(socialLinks?.linkedin || socialLinks?.github || socialLinks?.portfolio) && (
@@ -347,7 +415,69 @@ const CandidateProfile = () => {
         </form>
       </Modal>
 
+      {/* Resume Preview Overlay */}
+      <ResumePreviewOverlay
+        open={resumePreviewOpen}
+        fileUrl={resume?.fileUrl ? getFileUrl(resume.fileUrl) : (typeof resume === 'string' ? resume : null)}
+        onClose={() => setResumePreviewOpen(false)}
+        fileName={resume?.fileName || 'candidate-resume'}
+      />
+
+      {/* Video Resume Overlay */}
+      <VideoResumeOverlay
+        open={videoPreviewOpen}
+        fileUrl={videoResume?.fileUrl ? getFileUrl(videoResume.fileUrl) : (typeof videoResume === 'string' ? videoResume : null)}
+        onClose={() => setVideoPreviewOpen(false)}
+      />
+
     </div>
+  );
+};
+
+// Overlay Components logic appended here
+const ResumePreviewOverlay = ({ open, fileUrl, onClose, fileName }) => {
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative z-10 w-full max-w-4xl h-[90vh] mx-4 flex flex-col">
+          <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur rounded-t-xl px-5 py-3">
+            <p className="text-white text-sm font-medium truncate pr-4">{fileName || 'Resume'}</p>
+            <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors flex-shrink-0">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 bg-gray-800 rounded-b-xl overflow-hidden flex items-center justify-center">
+            {fileUrl ? <iframe src={fileUrl} title="Resume Preview" className="w-full h-full border-0" /> : null}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const VideoResumeOverlay = ({ open, fileUrl, onClose }) => {
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative z-10 w-full max-w-4xl max-h-[90vh] mx-4 flex flex-col">
+          <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur rounded-t-xl px-5 py-3">
+            <p className="text-white text-sm font-medium truncate pr-4">Video Resume</p>
+            <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors flex-shrink-0">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 bg-black rounded-b-xl overflow-hidden aspect-video flex items-center justify-center">
+            {fileUrl ? <video src={fileUrl} controls autoPlay className="w-full h-full max-h-[85vh]" /> : null}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

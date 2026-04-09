@@ -4,7 +4,7 @@ import { publicApi } from '@api/publicApi';
 import useAuthStore from '@store/authStore';
 import { 
   MapPin, Briefcase, DollarSign, Clock, Building, 
-  ArrowLeft, Calendar, Share2, Bookmark 
+  ArrowLeft, Calendar, Share2, Bookmark, HelpCircle, CheckCircle2 
 } from 'lucide-react';
 import Button from '@components/common/Button';
 import Spinner from '@components/common/Spinner';
@@ -241,6 +241,40 @@ const JobDetails = () => {
                     ))}
                   </ul>
                 </>
+              )}
+
+              {/* Screening Questions */}
+              {job.screeningQuestions?.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-gray-100 dark:border-dark-border">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-primary" />
+                    Screening Questions
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    You will be asked the following questions when applying for this position.
+                  </p>
+                  <div className="space-y-3">
+                    {job.screeningQuestions.map((sq, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-gray-50 dark:bg-dark-bg rounded-lg p-4 border border-gray-100 dark:border-dark-border">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
+                          {i + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-gray-800 dark:text-gray-200 font-medium">{sq.question}</p>
+                        </div>
+                        {sq.isRequired ? (
+                          <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                            Required
+                          </span>
+                        ) : (
+                          <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                            Optional
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
             

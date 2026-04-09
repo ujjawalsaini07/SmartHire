@@ -509,8 +509,8 @@ export const updateJob = async (req, res) => {
       }
     }
 
-    // Update job with sanitized data
-    Object.assign(job, sanitizedBody);
+    // Update job with sanitized data using Mongoose's .set() for proper array updates
+    job.set(sanitizedBody);
     await job.save();
 
     // Populate the updated job

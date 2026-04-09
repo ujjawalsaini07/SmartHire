@@ -258,9 +258,15 @@ ApplicationSchema.methods.scheduleInterview = async function (
     notes: notes || "",
   };
 
-  // Update status to interviewing if not already
-  if (this.status === "shortlisted") {
+  // Update status to interviewing unconditionally when scheduled
+  if (this.status !== "interviewing") {
     this.status = "interviewing";
+    this.statusHistory.push({
+      status: "interviewing",
+      changedBy: this.recruiterId,
+      changedAt: new Date(),
+      notes: notes || "Interview scheduled",
+    });
   }
 
   this.lastUpdated = new Date();

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Briefcase, DollarSign, Clock, Bookmark, ChevronDown, ChevronUp, ExternalLink, Building, GraduationCap, Users, Calendar, Layers } from 'lucide-react';
+import { MapPin, Briefcase, DollarSign, Clock, Bookmark, ChevronDown, ChevronUp, ExternalLink, Building, GraduationCap, Users, Calendar, Layers, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import Card from '@components/common/Card';
@@ -103,6 +103,11 @@ const JobCard = ({ job, isSavedView, onUnsave }) => {
       return;
     }
     setIsApplyModalOpen(true);
+  };
+
+  const handleViewJob = (e) => {
+    e.stopPropagation();
+    navigate(`/jobs/${job._id}`);
   };
 
   const handleVisitCompany = (e) => {
@@ -277,6 +282,28 @@ const JobCard = ({ job, isSavedView, onUnsave }) => {
                     </ul>
                 </div>
             )}
+
+            {/* Screening Questions Preview */}
+            {job.screeningQuestions?.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-dark-border">
+                    <h4 className="font-semibold text-light-text dark:text-dark-text mb-2 text-sm">Screening Questions</h4>
+                    <div className="space-y-2">
+                        {job.screeningQuestions.map((sq, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0">
+                                    {idx + 1}
+                                </span>
+                                <span className="text-light-text-secondary dark:text-dark-text-secondary flex-1">{sq.question}</span>
+                                {sq.isRequired ? (
+                                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 flex-shrink-0">Required</span>
+                                ) : (
+                                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">Optional</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
       )}
 
@@ -333,6 +360,10 @@ const JobCard = ({ job, isSavedView, onUnsave }) => {
                     </Button>
                 ) : showActions && (
                     <>
+                        <Button variant="outline" size="sm" onClick={handleViewJob}>
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                        </Button>
                         <Button 
                             variant={localIsSaved ? 'primary' : 'outline'} 
                             size="sm" 
