@@ -75,7 +75,7 @@ export const adminApi = {
   },
   
   featureJob: async (jobId) => {
-    const response = await api.patch(`/admin/jobs/${jobId}/feature`);
+    const response = await api.patch(`/jobs/${jobId}/featured`);
     return response.data;
   },
   

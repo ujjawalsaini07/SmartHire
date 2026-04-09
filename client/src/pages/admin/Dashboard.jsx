@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, UserCheck, Briefcase, Building, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StatCard from '@components/dashboard/StatCard';
@@ -8,6 +9,7 @@ import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -126,7 +128,7 @@ const AdminDashboard = () => {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <button
-            onClick={() => window.location.href = '/admin/users'}
+            onClick={() => navigate('/admin/users')}
             className="p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors text-left group"
           >
             <Users className="w-6 h-6 text-primary-600 dark:text-primary-400 mb-2 group-hover:scale-110 transition-transform" />
@@ -136,7 +138,7 @@ const AdminDashboard = () => {
           </button>
 
           <button
-            onClick={() => window.location.href = '/admin/recruiters/verify'}
+            onClick={() => navigate('/admin/recruiters')}
             className="p-4 rounded-lg bg-success-50 dark:bg-success-900/20 hover:bg-success-100 dark:hover:bg-success-900/30 transition-colors text-left group"
           >
             <Building className="w-6 h-6 text-success-600 dark:text-success-400 mb-2 group-hover:scale-110 transition-transform" />
@@ -146,7 +148,7 @@ const AdminDashboard = () => {
           </button>
 
           <button
-            onClick={() => window.location.href = '/admin/jobs/moderate'}
+            onClick={() => navigate('/admin/jobs/moderate')}
             className="p-4 rounded-lg bg-warning-50 dark:bg-warning-900/20 hover:bg-warning-100 dark:hover:bg-warning-900/30 transition-colors text-left group"
           >
             <Briefcase className="w-6 h-6 text-warning-600 dark:text-warning-400 mb-2 group-hover:scale-110 transition-transform" />
@@ -156,7 +158,7 @@ const AdminDashboard = () => {
           </button>
 
           <button
-            onClick={() => window.location.href = '/admin/analytics'}
+            onClick={() => navigate('/admin/analytics')}
             className="p-4 rounded-lg bg-accent-50 dark:bg-accent-900/20 hover:bg-accent-100 dark:hover:bg-accent-900/30 transition-colors text-left group"
           >
             <FileText className="w-6 h-6 text-accent-600 dark:text-accent-400 mb-2 group-hover:scale-110 transition-transform" />

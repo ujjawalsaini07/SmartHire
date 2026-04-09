@@ -152,6 +152,12 @@ export const jobSeekerApi = {
     return response.data;
   },
 
+  // Get applied job ids
+  getAppliedJobIds: async () => {
+    const response = await api.get('/applications/applied-jobs');
+    return response.data;
+  },
+
   // Get application details
   getApplicationDetails: async (applicationId) => {
     const response = await api.get(`/applications/${applicationId}`);
@@ -161,6 +167,12 @@ export const jobSeekerApi = {
   // Withdraw application
   withdrawApplication: async (applicationId) => {
     const response = await api.patch(`/applications/${applicationId}/withdraw`);
+    return response.data;
+  },
+
+  // Delete application
+  deleteApplication: async (applicationId) => {
+    const response = await api.delete(`/applications/${applicationId}`);
     return response.data;
   },
 
@@ -192,7 +204,7 @@ export const jobSeekerApi = {
   
   // Get recommended jobs
   getRecommendedJobs: async (params) => {
-    const response = await api.get('/jobs/recommendations', { params });
+    const response = await api.get('/jobs/recommended', { params });
     return response.data;
   },
 };

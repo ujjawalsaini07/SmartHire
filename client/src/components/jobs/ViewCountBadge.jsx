@@ -32,18 +32,16 @@ const ViewCountBadge = ({ count = 0, size = 'md', className = '' }) => {
   return (
     <div
       className={`
-        flex items-center space-x-1.5 rounded-full
-        bg-gradient-to-r from-blue-50 to-purple-50
-        dark:from-blue-900/20 dark:to-purple-900/20
-        border border-blue-100 dark:border-blue-800/30
-        backdrop-blur-sm
+        inline-flex flex-shrink-0 items-center space-x-1 rounded-full
+        bg-gray-100 dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border
+        text-gray-500 dark:text-gray-400
         ${sizeClasses.container}
         ${className}
       `}
       title={`${count.toLocaleString()} ${count === 1 ? 'view' : 'views'}`}
     >
-      <Eye className={`${sizeClasses.icon} text-blue-600 dark:text-blue-400`} />
-      <span className={`${sizeClasses.text} font-medium text-gray-700 dark:text-gray-300`}>
+      <Eye className={`${sizeClasses.icon} opacity-70`} />
+      <span className={`${sizeClasses.text} font-medium tracking-wide`}>
         {formatCount(count)}
       </span>
     </div>

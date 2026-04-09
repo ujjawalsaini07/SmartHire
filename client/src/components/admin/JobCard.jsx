@@ -1,9 +1,9 @@
-import { Briefcase, MapPin, Calendar, DollarSign, Building2, Users2, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Briefcase, MapPin, Calendar, DollarSign, Building2, Users2, CheckCircle, XCircle, Eye, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Badge from '@components/common/Badge';
 import Button from '@components/common/Button';
 
-const JobCard = ({ job, onApprove, onReject, onViewJob, loading }) => {
+const JobCard = ({ job, onApprove, onReject, onViewJob, onToggleFeatured, loading }) => {
   const getStatusBadgeVariant = (status) => {
     switch (status) {
       case 'active':
@@ -182,16 +182,32 @@ const JobCard = ({ job, onApprove, onReject, onViewJob, loading }) => {
           )}
         </div>
 
-        {/* View Full Job Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onViewJob(job._id)}
-          className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
-        >
-          <Eye className="w-4 h-4 mr-1" />
-          View Full Job
-        </Button>
+        <div className="flex items-center space-x-2">
+          {/* Featured Toggle */}
+          {job.status === 'active' && onToggleFeatured && (
+            <Button
+              variant={job.isFeatured ? 'primary' : 'outline'}
+              size="sm"
+              onClick={() => onToggleFeatured(job._id)}
+              disabled={loading}
+              className={job.isFeatured ? 'bg-yellow-500 hover:bg-yellow-600 border-yellow-500 text-white' : 'text-yellow-600 border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'}
+            >
+              <Star className={`w-4 h-4 mr-1 ${job.isFeatured ? 'fill-current' : ''}`} />
+              {job.isFeatured ? 'Featured' : 'Feature'}
+            </Button>
+          )}
+
+          {/* View Full Job Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onViewJob(job._id)}
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
+          >
+            <Eye className="w-4 h-4 mr-1" />
+            View Full Job
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

@@ -143,6 +143,15 @@ export const login = async (req, res) => {
     // Set refresh token as httpOnly cookie
     setRefreshTokenCookie(res, refreshToken);
 
+    let appliedJobs = [];
+    if (user.role === "jobseeker") {
+      const applications = await Application.find(
+        { jobSeekerId: user._id },
+        { jobId: 1, _id: 0 }
+      ).lean();
+      appliedJobs = applications.map(app => app.jobId.toString());
+    }
+
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -153,6 +162,7 @@ export const login = async (req, res) => {
           email: user.email,
           role: user.role,
           isVerified: user.isVerified,
+          appliedJobs,
         },
         accessToken,
       },
@@ -431,6 +441,8 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+import Application from "../models/Application.model.js";
+
 /**
  * @desc    Get current user
  * @route   GET /api/v1/auth/me
@@ -447,6 +459,15 @@ export const getCurrentUser = async (req, res) => {
       });
     }
 
+    let appliedJobs = [];
+    if (user.role === "jobseeker") {
+      const applications = await Application.find(
+        { jobSeekerId: user._id },
+        { jobId: 1, _id: 0 }
+      ).lean();
+      appliedJobs = applications.map(app => app.jobId.toString());
+    }
+
     res.status(200).json({
       success: true,
       data: {
@@ -458,6 +479,7 @@ export const getCurrentUser = async (req, res) => {
         isActive: user.isActive,
         lastLogin: user.lastLogin,
         createdAt: user.createdAt,
+        appliedJobs: appliedJobs,
       },
     });
   } catch (error) {
@@ -465,6 +487,64 @@ export const getCurrentUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching user data",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Change password
+ * @route   POST /api/v1/auth/change-password
+ * @access  Private
+ */
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide current and new password",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters",
+      });
+    }
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Incorrect current password",
+      });
+    }
+
+    user.password = newPassword;
+    user.refreshToken = undefined; // Force re-login on other devices
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error changing password",
       error: error.message,
     });
   }

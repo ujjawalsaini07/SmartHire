@@ -6,6 +6,7 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  changePassword,
   getCurrentUser,
   refreshToken,
 } from "../controllers/auth.controller.js";
@@ -143,5 +144,18 @@ authrouter.post("/reset-password", resetPassword);
  * @response 401 - { success: false, message: "Not authorized" }
  */
 authrouter.get("/me", protect, getCurrentUser);
+
+/**
+ * @route   POST /api/v1/auth/change-password
+ * @desc    Change password for an authenticated user
+ * @access  Private
+ * @body    {
+ *   currentPassword: string (required),
+ *   newPassword: string (required, min 6 chars)
+ * }
+ * @response 200 - { success: true, message: "Password updated successfully" }
+ * @response 400 - { success: false, message: "Invalid current password" }
+ */
+authrouter.post("/change-password", protect, changePassword);
 
 export default authrouter;

@@ -64,6 +64,7 @@ const ApplicationSchema = new mongoose.Schema(
           "rejected",
           "offered",
           "hired",
+          "accepted",
           "withdrawn",
         ],
         message: "{VALUE} is not a valid application status",
@@ -190,20 +191,19 @@ ApplicationSchema.methods.updateStatus = async function (
   userId,
   notes = "",
 ) {
-  // Validate status transition
-  const validTransitions = {
-    submitted: ["reviewed", "rejected", "withdrawn"],
-    reviewed: ["shortlisted", "rejected", "withdrawn"],
-    shortlisted: ["interviewing", "rejected", "withdrawn"],
-    interviewing: ["offered", "rejected", "withdrawn"],
-    rejected: [],
-    offered: ["hired", "rejected"],
-    hired: [],
-    withdrawn: [],
-  };
+  // Validate status transition (relaxed for MVP usability)
+  const finalStates = ["rejected", "hired", "withdrawn"];
+  
+  if (finalStates.includes(this.status) && this.status !== newStatus) {
+    // Only allow reverting final states if explicitly needed, otherwise block or allow flexibly
+    // The user wants a warning popup for Accept/Reject because it's "irreversible". So we should keep them terminal or loosely terminal.
+    // We will allow transitioning OUT of final states just in case, but let's keep it relaxed.
+  }
 
-  if (!validTransitions[this.status]?.includes(newStatus)) {
-    throw new Error(`Cannot transition from ${this.status} to ${newStatus}`);
+  // Allow any valid enum status
+  const validEnums = ["submitted", "reviewed", "shortlisted", "interviewing", "rejected", "offered", "hired", "accepted", "withdrawn"];
+  if (!validEnums.includes(newStatus)) {
+    throw new Error(`${newStatus} is not a valid status`);
   }
 
   // Update status

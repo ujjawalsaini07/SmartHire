@@ -9,13 +9,18 @@ import useAuthStore from '@store/authStore';
 import { jobSeekerApi } from '@api/jobSeekerApi';
 import { publicApi } from '@api/publicApi';
 import ViewCountBadge from '@components/jobs/ViewCountBadge';
+import ApplyJobModal from '@components/jobs/ApplyJobModal';
 
-const JobCard = ({ job }) => {
+const JobCard = ({ job, isSavedView, onUnsave }) => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, appliedJobs } = useAuthStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hasTrackedView, setHasTrackedView] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [localIsSaved, setLocalIsSaved] = useState(job.isSaved || false);
+
+  const hasApplied = appliedJobs?.includes(job._id) || false;
 
   const formatSalary = (min, max) => {
     if (!min && !max) return 'Not specified';
@@ -68,19 +73,23 @@ const JobCard = ({ job }) => {
   const handleSaveJob = async (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
-      toast.error('Please login to save this job');
-      navigate('/login');
+      toast.error('Please login to save jobs');
       return;
     }
-    
-    if (user?.role !== 'candidate') return;
 
     try {
       setSaving(true);
-      await jobSeekerApi.saveJob(job._id);
-      toast.success('Job saved successfully');
+      if (localIsSaved) {
+        await jobSeekerApi.unsaveJob(job._id);
+        toast.success('Job removed from saved list');
+        setLocalIsSaved(false);
+      } else {
+        await jobSeekerApi.saveJob(job._id);
+        toast.success('Job saved successfully');
+        setLocalIsSaved(true);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to save job');
+      toast.error(error.response?.data?.message || 'Failed to update saved status');
     } finally {
       setSaving(false);
     }
@@ -93,7 +102,7 @@ const JobCard = ({ job }) => {
       navigate('/login');
       return;
     }
-    toast.success('Application functionality coming soon!');
+    setIsApplyModalOpen(true);
   };
 
   const handleVisitCompany = (e) => {
@@ -126,22 +135,17 @@ const JobCard = ({ job }) => {
   };
 
   // Hide action buttons for non-candidates (Recruiters/Admins)
-  const showActions = !isAuthenticated || user?.role === 'candidate';
+  const showActions = !isAuthenticated || user?.role === 'jobseeker';
 
   return (
     <Card
-      className={`p-6 transition-all duration-300 border-l-4 ${
+      className={`p-6 transition-all duration-300 border-l-4 flex flex-col ${
         isExpanded ? 'border-l-primary-600 shadow-md ring-1 ring-primary-100 dark:ring-primary-900' : 'border-l-transparent hover:shadow-lg hover:border-primary-200 dark:hover:border-primary-800'
       } cursor-default relative`}
       onClick={handleCardExpand}
     >
-      {/* View Count Badge - Positioned in top-right */}
-      <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
-        <ViewCountBadge count={job.views || 0} size="sm" />
-      </div>
-
       <div className="flex items-start justify-between mb-4 cursor-pointer">
-        <div className="flex items-start space-x-4 flex-1 pr-20">
+        <div className="flex items-start space-x-4 flex-1">
           {/* Company Logo */}
           {companyLogo ? (
             <img
@@ -176,6 +180,10 @@ const JobCard = ({ job }) => {
               <div className="flex items-center space-x-1">
                 <Clock className="w-4 h-4" />
                 <span>{getTimeAgo(job.createdAt)}</span>
+              </div>
+              
+              <div className="flex items-center space-x-1 ml-auto shrink-0 mt-0">
+                 <ViewCountBadge count={job.views || 0} size="sm" />
               </div>
             </div>
           </div>
@@ -313,20 +321,37 @@ const JobCard = ({ job }) => {
                     Company
                 </Button>
                 
-                {showActions && (
+                {isSavedView ? (
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={(e) => { e.stopPropagation(); onUnsave?.(job._id); }}
+                        className="text-red-500 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                        <Bookmark className="w-4 h-4 mr-1 text-red-500" />
+                        Unsave
+                    </Button>
+                ) : showActions && (
                     <>
                         <Button 
-                            variant="outline" 
+                            variant={localIsSaved ? 'primary' : 'outline'} 
                             size="sm" 
                             onClick={handleSaveJob}
                             disabled={saving}
+                            className={localIsSaved ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 border-primary-200 dark:border-primary-800' : ''}
                         >
-                            <Bookmark className={`w-4 h-4 mr-1 ${saving ? 'animate-pulse' : ''}`} />
-                            Save
+                            <Bookmark className={`w-4 h-4 mr-1 ${saving ? 'animate-pulse' : ''} ${localIsSaved ? 'fill-current' : ''}`} />
+                            {localIsSaved ? 'Saved' : 'Save'}
                         </Button>
-                        <Button variant="primary" size="sm" onClick={handleApply}>
-                            Apply Now
-                            <ExternalLink className="w-3 h-3 ml-2" />
+                        <Button 
+                            variant={hasApplied ? 'outline' : 'primary'} 
+                            size="sm" 
+                            onClick={hasApplied ? null : handleApply}
+                            disabled={hasApplied}
+                            className={hasApplied ? "text-green-600 border-green-200 dark:border-green-800 dark:text-green-400 bg-green-50 dark:bg-green-900/20" : ""}
+                        >
+                            {hasApplied ? 'Applied' : 'Apply Now'}
+                            {!hasApplied && <ExternalLink className="w-3 h-3 ml-2" />}
                         </Button>
                     </>
                 )}
@@ -334,18 +359,30 @@ const JobCard = ({ job }) => {
         ) : (
              <div className="flex items-center space-x-2">
                 {job.isUrgent && <Badge variant="error">Urgent</Badge>}
-                {showActions && (
+                {isSavedView ? (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onUnsave?.(job._id); }}
+                        className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                        aria-label="Unsave job"
+                    >
+                        <Bookmark className="w-5 h-5 text-red-500" />
+                    </button>
+                ) : showActions && (
                     <button
                         onClick={handleSaveJob}
-                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
-                        aria-label="Save job"
+                        className={`p-2 rounded-lg transition-colors ${localIsSaved ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600' : 'hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'}`}
+                        aria-label={localIsSaved ? "Unsave job" : "Save job"}
                     >
-                        <Bookmark className="w-5 h-5 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400" />
+                        <Bookmark className={`w-5 h-5 ${localIsSaved ? 'fill-current' : ''}`} />
                     </button>
                 )}
              </div>
         )}
       </div>
+
+      {isApplyModalOpen && (
+        <ApplyJobModal job={job} onClose={() => setIsApplyModalOpen(false)} />
+      )}
     </Card>
   );
 };

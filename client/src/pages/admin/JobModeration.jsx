@@ -186,6 +186,29 @@ const JobModeration = () => {
     }
   };
 
+  // Toggle Featured status
+  const handleToggleFeatured = async (jobId) => {
+    try {
+      setActionLoading(true);
+      const response = await adminApi.featureJob(jobId);
+      
+      toast.success(response.message || 'Job featured status updated');
+      
+      setJobs(prevJobs =>
+        prevJobs.map(job =>
+          job._id === jobId
+            ? { ...job, isFeatured: response.data?.isFeatured ?? !job.isFeatured }
+            : job
+        )
+      );
+    } catch (err) {
+      console.error('Error toggling featured status:', err);
+      toast.error(err.response?.data?.message || 'Failed to update featured status');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // View full job
   const handleViewJob = (jobId) => {
     window.open(`/jobs/${jobId}`, '_blank');
@@ -388,14 +411,15 @@ const JobModeration = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <JobCard
-                    job={job}
-                    onApprove={handleApproveJob}
-                    onReject={handleRejectJob}
-                    onViewJob={handleViewJob}
-                    loading={actionLoading}
-                  />
-                </motion.div>
+                    <JobCard
+                      job={job}
+                      onApprove={handleApproveJob}
+                      onReject={handleRejectJob}
+                      onViewJob={handleViewJob}
+                      onToggleFeatured={handleToggleFeatured}
+                      loading={actionLoading}
+                    />
+                  </motion.div>
               ))}
             </div>
 

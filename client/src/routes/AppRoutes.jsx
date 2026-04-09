@@ -14,10 +14,15 @@ import Register from '@pages/public/Register';
 import ForgotPassword from '@pages/public/ForgotPassword';
 import ResetPassword from '@pages/public/ResetPassword';
 import VerifyEmail from '@pages/public/VerifyEmail';
+import About from '@pages/public/About';
+import Contact from '@pages/public/Contact';
+import TermsOfService from '@pages/public/TermsOfService';
+import PrivacyPolicy from '@pages/public/PrivacyPolicy';
+import CompanyProfile from '@pages/public/CompanyProfile';
 
 // Job Pages
 import JobListings from '@pages/jobs/JobListings';
-
+import JobDetails from '@pages/public/JobDetails';
 
 // Job Seeker Pages
 import JobSeekerDashboard from '@pages/jobseeker/Dashboard';
@@ -55,11 +60,10 @@ import Unauthorized from '@pages/errors/Unauthorized';
 
 const AppRoutes = () => {
   const { isAuthenticated, user } = useAuthStore();
-  
+
   // Redirect authenticated users from landing page to their dashboard
   const getDashboardRoute = () => {
     if (!isAuthenticated) return '/';
-    
     switch (user?.role) {
       case 'jobseeker':
         return '/jobseeker/dashboard';
@@ -71,25 +75,42 @@ const AppRoutes = () => {
         return '/';
     }
   };
-  
+
+  // Guard: redirect already-authenticated users away from auth pages
+  const AuthGuard = ({ children }) => {
+    if (isAuthenticated) {
+      return <Navigate to={getDashboardRoute()} replace />;
+    }
+    return children;
+  };
+
   return (
     <Routes>
       {/* Public Routes */}
-      <Route 
-        path="/" 
-        element={isAuthenticated ? <Navigate to={getDashboardRoute()} replace /> : <LandingPage />} 
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to={getDashboardRoute()} replace /> : <LandingPage />}
       />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<AuthGuard><Login /></AuthGuard>} />
+      <Route path="/register" element={<AuthGuard><Register /></AuthGuard>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/verify-email/:token" element={<VerifyEmail />} />
-      <Route path="/verify-email" element={<VerifyEmail />} /> {/* Query parameter support */}
-      
+      <Route path="/verify-email" element={<VerifyEmail />} />
+
+      {/* Info Pages */}
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+
       {/* Job Browsing Routes (Public + Authenticated) */}
       <Route path="/jobs" element={<JobListings />} />
+      <Route path="/jobs/:id" element={<JobDetails />} />
 
-      
+      {/* Public Company Profile */}
+      <Route path="/companies/:id" element={<CompanyProfile />} />
+
       {/* Job Seeker Protected Routes - Nested with Layout */}
       <Route element={<ProtectedRoute allowedRoles={['jobseeker']} />}>
         <Route element={<JobSeekerLayout />}>
@@ -101,7 +122,7 @@ const AppRoutes = () => {
           <Route path="/jobseeker/settings" element={<JobSeekerSettings />} />
         </Route>
       </Route>
-      
+
       {/* Recruiter Protected Routes - Nested with Layout */}
       <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
         <Route element={<RecruiterLayout />}>
@@ -117,7 +138,7 @@ const AppRoutes = () => {
           <Route path="/recruiter/settings" element={<RecruiterSettings />} />
         </Route>
       </Route>
-      
+
       {/* Admin Protected Routes - Nested with Layout */}
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
         <Route element={<AdminLayout />}>
@@ -131,7 +152,7 @@ const AppRoutes = () => {
           <Route path="/admin/settings" element={<SystemSettings />} />
         </Route>
       </Route>
-      
+
       {/* Error Routes */}
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="*" element={<NotFound />} />

@@ -2,6 +2,28 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authApi } from '@api/authApi';
 
+const customAuthStorage = {
+  getItem: (name) => localStorage.getItem(name) || sessionStorage.getItem(name),
+  setItem: (name, value) => {
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed.state && parsed.state.rememberMe === false) {
+        sessionStorage.setItem(name, value);
+        localStorage.removeItem(name);
+      } else {
+        localStorage.setItem(name, value);
+        sessionStorage.removeItem(name);
+      }
+    } catch (e) {
+      localStorage.setItem(name, value);
+    }
+  },
+  removeItem: (name) => {
+    localStorage.removeItem(name);
+    sessionStorage.removeItem(name);
+  }
+};
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -9,13 +31,16 @@ const useAuthStore = create(
       accessToken: null,
       isAuthenticated: false,
       isLoading: false,
+      rememberMe: true,
+      appliedJobs: [],
       
       // Set authentication data
-      setAuth: (user, accessToken) => {
+      setAuth: (user, accessToken, rememberMe = true) => {
         set({
           user,
           accessToken,
           isAuthenticated: true,
+          rememberMe,
         });
       },
       
@@ -26,14 +51,25 @@ const useAuthStore = create(
         }));
       },
       
+      // Set completely initialized appliedJobs list
+      setAppliedJobs: (jobIds) => {
+        set({ appliedJobs: jobIds });
+      },
+
+      // Push one job locally after applying
+      addAppliedJob: (jobId) => {
+        set((state) => ({ appliedJobs: [...state.appliedJobs, jobId] }));
+      },
+      
       // Logout user
       logout: () => {
         set({
           user: null,
           accessToken: null,
           isAuthenticated: false,
+          appliedJobs: [],
         });
-        localStorage.removeItem('auth-storage');
+        customAuthStorage.removeItem('auth-storage');
       },
       
       // Set loading state
@@ -67,6 +103,7 @@ const useAuthStore = create(
             set({
               user: response.data,
               isAuthenticated: true,
+              appliedJobs: response.data.appliedJobs || [],
             });
           } else {
             // Invalid session - clear auth state
@@ -74,6 +111,7 @@ const useAuthStore = create(
               user: null,
               accessToken: null,
               isAuthenticated: false,
+              appliedJobs: [],
             });
           }
         } catch (error) {
@@ -83,6 +121,7 @@ const useAuthStore = create(
             user: null,
             accessToken: null,
             isAuthenticated: false,
+            appliedJobs: [],
           });
         } finally {
           set({ isLoading: false });
@@ -91,11 +130,12 @@ const useAuthStore = create(
     }),
     {
       name: 'auth-storage',
-      getStorage: () => localStorage,
+      getStorage: () => customAuthStorage,
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         accessToken: state.accessToken, // Persist access token too if needed for API interceptors
+        rememberMe: state.rememberMe,
       }),
     }
   )

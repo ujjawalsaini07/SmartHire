@@ -63,12 +63,14 @@ const CandidateSearch = () => {
         const response = await recruiterApi.searchJobSeekers(params);
         
         // Handle response flexibility
-        const data = response.data || response;
-        const items = data.jobSeekers || data.candidates || [];
+        const dataPayload = response;
+        const items = Array.isArray(dataPayload.data) 
+          ? dataPayload.data 
+          : (dataPayload.jobSeekers || dataPayload.candidates || []);
         
         setCandidates(items);
-        setTotalCandidates(data.total || data.count || 0);
-        setTotalPages(data.totalPages || Math.ceil((data.total || 0) / 10));
+        setTotalCandidates(dataPayload.total || dataPayload.count || 0);
+        setTotalPages(dataPayload.totalPages || Math.ceil((dataPayload.total || 0) / 10));
 
         // Update URL params (optional, keeps URL in sync)
         const newParams = new URLSearchParams();

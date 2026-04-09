@@ -113,6 +113,12 @@ export const recruiterApi = {
     return response.data;
   },
 
+  // Delete a rejected application
+  deleteApplication: async (applicationId) => {
+    const response = await api.delete(`/applications/${applicationId}`);
+    return response.data;
+  },
+
   // ============================================
   // Recruiter Analytics
   // ============================================

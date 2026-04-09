@@ -24,6 +24,8 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [activeUsersCount, setActiveUsersCount] = useState(0);
+  const [inactiveUsersCount, setInactiveUsersCount] = useState(0);
   const limit = 10;
   
   // Confirmation modal states
@@ -61,6 +63,8 @@ const UserManagement = () => {
       setUsers(response.data || []);
       setTotalPages(response.pagination?.pages || 1);
       setTotalUsers(response.pagination?.total || 0);
+      setActiveUsersCount(response.stats?.active || 0);
+      setInactiveUsersCount(response.stats?.inactive || 0);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err.response?.data?.message || 'Failed to load users');
@@ -112,6 +116,8 @@ const UserManagement = () => {
           user._id === userId ? { ...user, isActive: true } : user
         )
       );
+      setActiveUsersCount(prev => prev + 1);
+      setInactiveUsersCount(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error('Error activating user:', err);
       toast.error(err.response?.data?.message || 'Failed to activate user');
@@ -143,6 +149,9 @@ const UserManagement = () => {
         )
       );
       
+      setActiveUsersCount(prev => Math.max(0, prev - 1));
+      setInactiveUsersCount(prev => prev + 1);
+      
       closeConfirmModal();
     } catch (err) {
       console.error('Error deactivating user:', err);
@@ -171,6 +180,11 @@ const UserManagement = () => {
       // Remove the user from the list
       setUsers(prevUsers => prevUsers.filter(user => user._id !== confirmModal.user._id));
       setTotalUsers(prev => prev - 1);
+      if (confirmModal.user.isActive) {
+        setActiveUsersCount(prev => Math.max(0, prev - 1));
+      } else {
+        setInactiveUsersCount(prev => Math.max(0, prev - 1));
+      }
       
       closeConfirmModal();
       
@@ -238,13 +252,13 @@ const UserManagement = () => {
             <div className="bg-white dark:bg-dark-bg-secondary p-4 rounded-lg border border-light-border dark:border-dark-border">
               <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">Active Users</p>
               <p className="text-2xl font-bold text-success-600 dark:text-success-400">
-                {users.filter(u => u.isActive).length}
+                {activeUsersCount}
               </p>
             </div>
             <div className="bg-white dark:bg-dark-bg-secondary p-4 rounded-lg border border-light-border dark:border-dark-border">
               <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">Inactive Users</p>
               <p className="text-2xl font-bold text-error-600 dark:text-error-400">
-                {users.filter(u => !u.isActive).length}
+                {inactiveUsersCount}
               </p>
             </div>
             <div className="bg-white dark:bg-dark-bg-secondary p-4 rounded-lg border border-light-border dark:border-dark-border">

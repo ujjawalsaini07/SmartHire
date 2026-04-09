@@ -4,6 +4,8 @@ import { ArrowLeft, MapPin, Briefcase, Mail, Phone, Calendar, Download, Building
 import { recruiterApi } from '@api/recruiterApi';
 import Button from '@components/common/Button';
 import Badge from '@components/common/Badge';
+import Modal from '@components/common/Modal';
+import Input from '@components/common/Input';
 import toast from 'react-hot-toast';
 
 const CandidateProfile = () => {
@@ -11,6 +13,34 @@ const CandidateProfile = () => {
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [messageForm, setMessageForm] = useState({ subject: '', message: '' });
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!messageForm.subject.trim() || !messageForm.message.trim()) {
+      return toast.error("Please fill in all fields.");
+    }
+    
+    try {
+      setSendingMessage(true);
+      await recruiterApi.contactCandidate({
+         candidateId: id,
+         subject: messageForm.subject,
+         message: messageForm.message
+      });
+      toast.success("Message sent to candidate.");
+      setIsMessageModalOpen(false);
+      setMessageForm({ subject: '', message: '' });
+    } catch(error) {
+      console.error('Error sending message:', error);
+      toast.error(error.response?.data?.message || "Failed to send message.");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,8 +71,24 @@ const CandidateProfile = () => {
 
   if (!candidate) return null;
 
-  const { firstName, lastName, email, phoneNumber, photo, profile } = candidate;
-  const { title, bio, location, skills = [], experience = [], education = [], resume, socialLinks } = profile || {};
+  const { 
+    firstName, 
+    lastName, 
+    email, 
+    phone, 
+    profilePicture,
+    headline,
+    summary,
+    location,
+    skills = [], 
+    workExperience = [], 
+    education = [], 
+    resume, 
+    socialLinks 
+  } = candidate;
+
+  // Format location
+  const locationString = location ? `${location.city || ''}${location.city && location.state ? ', ' : ''}${location.state || ''}` : '';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-bg py-8 transition-colors duration-300">
@@ -65,9 +111,9 @@ const CandidateProfile = () => {
               <div className="flex flex-col md:flex-row gap-6 items-start">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  {photo ? (
+                  {profilePicture ? (
                     <img 
-                      src={photo} 
+                      src={profilePicture} 
                       alt={`${firstName} ${lastName}`} 
                       className="w-24 h-24 rounded-full object-cover border-4 border-gray-50 dark:border-dark-bg shadow-md"
                     />
@@ -83,14 +129,14 @@ const CandidateProfile = () => {
                     {firstName} {lastName}
                   </h1>
                   <p className="text-xl text-primary-600 dark:text-primary-400 font-medium mb-3">
-                    {title || 'Open to Work'}
+                    {headline || 'Open to Work'}
                   </p>
                   
                   <div className="flex flex-wrap gap-4 text-light-text-secondary dark:text-dark-text-secondary">
-                    {location && (
+                    {locationString && (
                       <div className="flex items-center">
                         <MapPin className="w-4 h-4 mr-1.5" />
-                        {location}
+                        {locationString}
                       </div>
                     )}
                     {email && (
@@ -99,10 +145,10 @@ const CandidateProfile = () => {
                         {email}
                       </div>
                     )}
-                    {phoneNumber && (
+                    {phone && (
                       <div className="flex items-center">
                         <Phone className="w-4 h-4 mr-1.5" />
-                        {phoneNumber}
+                        {phone}
                       </div>
                     )}
                   </div>
@@ -113,7 +159,7 @@ const CandidateProfile = () => {
               <div className="mt-8 pt-8 border-t border-light-border dark:border-dark-border">
                 <h3 className="text-lg font-semibold text-light-text dark:text-dark-text mb-3">About</h3>
                 <p className="text-light-text-secondary dark:text-dark-text-secondary leading-relaxed">
-                  {bio || 'No bio provided.'}
+                  {summary || 'No bio provided.'}
                 </p>
               </div>
             </div>
@@ -126,8 +172,8 @@ const CandidateProfile = () => {
               </h2>
               
               <div className="space-y-8">
-                {experience.length > 0 ? (
-                  experience.map((exp, index) => (
+                {workExperience.length > 0 ? (
+                  workExperience.map((exp, index) => (
                     <div key={index} className="relative pl-8 border-l-2 border-gray-100 dark:border-dark-bg-tertiary">
                       <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-100 dark:bg-primary-900 border-2 border-white dark:border-dark-bg-secondary"></div>
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
@@ -189,13 +235,13 @@ const CandidateProfile = () => {
             {/* Actions */}
             <div className="bg-white dark:bg-dark-bg-secondary rounded-2xl p-6 shadow-sm border border-light-border dark:border-dark-border sticky top-24">
               <h3 className="font-semibold text-light-text dark:text-dark-text mb-4">Contact</h3>
-              <Button className="w-full mb-3">
+              <Button onClick={() => setIsMessageModalOpen(true)} className="w-full mb-3">
                 <Mail className="w-4 h-4 mr-2" />
                 Message Candidate
               </Button>
               {resume && (
                 <a 
-                  href={resume} 
+                  href={resume.fileUrl || resume} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="block w-full"
@@ -253,6 +299,54 @@ const CandidateProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Message Candidate Modal */}
+      <Modal
+        isOpen={isMessageModalOpen}
+        onClose={() => setIsMessageModalOpen(false)}
+        title="Message Candidate"
+      >
+        <form onSubmit={handleSendMessage} className="space-y-4">
+          <Input
+            label="Subject"
+            name="subject"
+            value={messageForm.subject}
+            onChange={(e) => setMessageForm({ ...messageForm, subject: e.target.value })}
+            placeholder="e.g. Discussing the Software Engineer role"
+            required
+          />
+          
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Message
+            </label>
+            <textarea
+              name="message"
+              value={messageForm.message}
+              onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })}
+              rows="5"
+              className="w-full px-4 py-2 bg-white dark:bg-dark-bg-secondary border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all dark:text-white"
+              placeholder={`Write your message to ${firstName}...`}
+              required
+            ></textarea>
+          </div>
+          
+          <div className="flex justify-end pt-4 space-x-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsMessageModalOpen(false)}
+              disabled={sendingMessage}
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={sendingMessage}>
+              Send Message
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 };

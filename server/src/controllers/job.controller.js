@@ -14,6 +14,7 @@ export const getAllJobs = async (req, res) => {
     const {
       page = 1,
       limit = 10,
+      keyword,        // frontend sends 'keyword'
       experienceLevel,
       employmentType,
       location,
@@ -24,7 +25,15 @@ export const getAllJobs = async (req, res) => {
     } = req.query;
 
     // Build filter object
-    const filter = { status: "active" }; 
+    const filter = { status: "active" };
+
+    // Keyword search (title / description)
+    if (keyword && keyword.trim()) {
+      filter.$or = [
+        { title: { $regex: keyword.trim(), $options: 'i' } },
+        { description: { $regex: keyword.trim(), $options: 'i' } },
+      ];
+    } 
 
     if (experienceLevel) filter.experienceLevel = experienceLevel;
     if (employmentType) filter.employmentType = employmentType;
@@ -41,8 +50,8 @@ export const getAllJobs = async (req, res) => {
     if (isRemote === "true") filter["location.isRemote"] = true;
     if (isFeatured === "true") filter.isFeatured = true;
 
-    // 🔥 Exclude expired jobs
-    // This adds a condition: deadline must be either not set OR in the future
+    // Exclude expired jobs — only exclude when a deadline is explicitly set AND it has passed.
+    // Jobs with no deadline (null/undefined) are open-ended and should always be shown.
     filter.$and = filter.$and || [];
     filter.$and.push({
       $or: [
@@ -56,6 +65,15 @@ export const getAllJobs = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortOrder = order === "asc" ? 1 : -1;
 
+    // Map frontend sort values to MongoDB field names
+    let sortField = sortBy;
+    let customSortOrder = sortOrder;
+    if (sortBy === 'newest') { sortField = 'postedAt'; customSortOrder = -1; }
+    else if (sortBy === 'oldest') { sortField = 'postedAt'; customSortOrder = 1; }
+    else if (sortBy === 'salary-high') { sortField = 'salary.max'; customSortOrder = -1; }
+    else if (sortBy === 'salary-low') { sortField = 'salary.min'; customSortOrder = 1; }
+    else if (sortBy === 'relevance') { sortField = 'isFeatured'; customSortOrder = -1; }
+
     // Get total count for pagination
     const totalJobs = await Job.countDocuments(filter);
 
@@ -65,7 +83,7 @@ export const getAllJobs = async (req, res) => {
       .populate("companyId", "companyName companyLogo industry location")
       .populate("requiredSkills", "name")
       .populate("category", "name")
-      .sort({ [sortBy]: sortOrder })
+      .sort({ [sortField]: customSortOrder })
       .skip(skip)
       .limit(parseInt(limit));
 
@@ -759,6 +777,41 @@ export const trackJobView = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error tracking job view",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Toggle featured status of a job (Admin only)
+ * @route   PATCH /api/v1/jobs/:id/featured
+ * @access  Private (Admin)
+ */
+export const toggleFeaturedJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid job ID" });
+    }
+
+    const job = await Job.findById(id);
+    if (!job) {
+      return res.status(404).json({ success: false, message: "Job not found" });
+    }
+
+    job.isFeatured = !job.isFeatured;
+    await job.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      message: `Job ${job.isFeatured ? "featured" : "unfeatured"} successfully`,
+      data: { isFeatured: job.isFeatured },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error toggling featured status",
       error: error.message,
     });
   }

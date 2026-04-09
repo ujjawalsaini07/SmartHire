@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { publicApi } from '@api/publicApi';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, DollarSign } from 'lucide-react';
@@ -8,16 +8,21 @@ import Badge from '@components/common/Badge';
 import Button from '@components/common/Button';
 
 const FeaturedJobs = () => {
+    const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchFeaturedJobs = async () => {
             try {
-                // Fetch featured jobs or just latest jobs if no featured ones
-                const response = await publicApi.getAllJobs({ limit: 4, sortBy: 'createdAt' });
-                if (response.success) {
-                    setJobs(response.data.jobs);
+                // Fetch featured jobs
+                const response = await publicApi.getAllJobs({ limit: 4, isFeatured: true });
+                if (response.success && response.data?.length > 0) {
+                    setJobs(response.data);
+                } else {
+                    // Fallback to latest jobs if no featured ones
+                    const latestResponse = await publicApi.getAllJobs({ limit: 4, sortBy: 'newest' });
+                    if (latestResponse.success) setJobs(latestResponse.data || []);
                 }
             } catch (error) {
                 console.error("Error fetching featured jobs", error);
@@ -56,44 +61,59 @@ const FeaturedJobs = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                         >
-                            <Link to={`/jobs/${job._id}`}>
-                                <Card hover className="h-full">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center font-bold text-xl text-primary-600">
-                                                {job.company?.name?.charAt(0) || 'C'}
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-lg hover:text-primary-600 transition-colors cursor-pointer">
-                                                    {job.title}
-                                                </h3>
-                                                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                                                    {job.company?.name || 'Confidential'}
-                                                </p>
-                                            </div>
+                            <Card 
+                                hover 
+                                className="h-full cursor-pointer"
+                                onClick={() => navigate(`/jobs/${job._id}`)}
+                            >
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center font-bold text-xl text-primary-600">
+                                            {(job.companyId?.companyName || job.company?.name || 'C').charAt(0)}
                                         </div>
-                                        <Badge>{job.employmentType}</Badge>
-                                    </div>
-                                    <div className="flex flex-wrap gap-4 text-sm text-light-text-muted dark:text-dark-text-muted mb-6">
-                                        <div className="flex items-center">
-                                            <MapPin className="w-4 h-4 mr-1" />
-                                            {job.location?.city || 'Remote'}
-                                        </div>
-                                        <div className="flex items-center">
-                                            <DollarSign className="w-4 h-4 mr-1" />
-                                            {job.salary ? `${job.salary.min/1000}k - ${job.salary.max/1000}k` : 'Competitive'}
-                                        </div>
-                                        <div className="flex items-center">
-                                            <Clock className="w-4 h-4 mr-1" />
-                                            {new Date(job.createdAt).toLocaleDateString()}
+                                        <div>
+                                            <h3 className="font-semibold text-lg hover:text-primary-600 transition-colors cursor-pointer">
+                                                {job.title}
+                                            </h3>
+                                            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                                                {job.companyId?.companyName || job.company?.name || 'Confidential'}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <Button size="sm" variant="outline" className="w-full mr-2">Details</Button>
-                                        <Button size="sm" className="w-full ml-2">Apply Now</Button>
+                                    <Badge>{job.employmentType}</Badge>
+                                </div>
+                                <div className="flex flex-wrap gap-4 text-sm text-light-text-muted dark:text-dark-text-muted mb-6">
+                                    <div className="flex items-center">
+                                        <MapPin className="w-4 h-4 mr-1" />
+                                        {job.location?.city || 'Remote'}
                                     </div>
-                                </Card>
-                            </Link>
+                                    <div className="flex items-center">
+                                        <DollarSign className="w-4 h-4 mr-1" />
+                                        {job.salary ? `${job.salary.min/1000}k - ${job.salary.max/1000}k` : 'Competitive'}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Clock className="w-4 h-4 mr-1" />
+                                        {new Date(job.createdAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Button 
+                                        size="sm" 
+                                        variant="outline" 
+                                        className="w-full mr-2"
+                                        onClick={(e) => { e.stopPropagation(); navigate(`/jobs/${job._id}`); }}
+                                    >
+                                        Details
+                                    </Button>
+                                    <Button 
+                                        size="sm" 
+                                        className="w-full ml-2"
+                                        onClick={(e) => { e.stopPropagation(); navigate(`/jobs/${job._id}?apply=true`); }}
+                                    >
+                                        Apply Now
+                                    </Button>
+                                </div>
+                            </Card>
                         </motion.div>
                     ))}
                 </div>

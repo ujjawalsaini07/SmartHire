@@ -31,8 +31,12 @@ export const getUsers = async (req, res) => {
       ];
     }
 
-    // Get total count for pagination
-    const total = await User.countDocuments(filter);
+    // Get total count and stats for pagination
+    const [total, activeCount, inactiveCount] = await Promise.all([
+      User.countDocuments(filter),
+      User.countDocuments({ ...filter, isActive: true }),
+      User.countDocuments({ ...filter, isActive: false })
+    ]);
 
     // Fetch users
     const users = await User.find(filter)
@@ -44,6 +48,10 @@ export const getUsers = async (req, res) => {
     res.status(200).json({
       success: true,
       data: users,
+      stats: {
+        active: activeCount,
+        inactive: inactiveCount
+      },
       pagination: {
         page,
         limit,

@@ -17,6 +17,7 @@ const Login = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   
@@ -60,7 +61,7 @@ const Login = () => {
       const response = await authApi.login(formData);
       
       if (response.success) {
-        setAuth(response.data.user, response.data.accessToken);
+        setAuth(response.data.user, response.data.accessToken, rememberMe);
         toast.success('Login successful!');
         
         // Redirect based on role
@@ -144,6 +145,8 @@ const Login = () => {
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">

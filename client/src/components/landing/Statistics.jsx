@@ -1,11 +1,34 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Briefcase, Building2, TrendingUp } from 'lucide-react';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { publicApi } from '@api/publicApi';
 
 const Statistics = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const [jobCount, setJobCount] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await publicApi.getAllJobs({ limit: 1 });
+        if (res.success && res.data?.pagination?.total) {
+          setJobCount(res.data.pagination.total);
+        }
+      } catch (err) {
+        console.error('Failed to fetch job count:', err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const formatCount = (count) => {
+    if (count === null) return '...';
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K+`;
+    return `${count}+`;
+  };
   
   const stats = [
     {
@@ -22,7 +45,7 @@ const Statistics = () => {
     },
     {
       icon: Briefcase,
-      value: '15K+',
+      value: jobCount !== null ? formatCount(jobCount) : '...',
       label: 'Active Job Listings',
       color: 'from-success-500 to-success-600',
     },

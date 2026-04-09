@@ -182,7 +182,7 @@ const RecruiterVerification = () => {
 
   // Visit public profile
   const handleVisitProfile = (profileId) => {
-    window.open(`/recruiters/${profileId}/profile`, '_blank');
+    window.open(`/companies/${profileId}`, '_blank');
   };
 
   // Reset filters

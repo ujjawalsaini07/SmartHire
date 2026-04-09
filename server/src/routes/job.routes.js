@@ -10,6 +10,7 @@ import {
   closeJob,
   getMyJobs,
   trackJobView,
+  toggleFeaturedJob,
 } from "../controllers/job.controller.js";
 import { protect, authorize } from "../middlewares/auth/auth.middleware.js";
 
@@ -89,5 +90,12 @@ jobRouter.delete("/:id", protect, authorize("recruiter"), deleteJob);
  * @access  Private (Recruiter - Owner)
  */
 jobRouter.patch("/:id/close", protect, authorize("recruiter"), closeJob);
+
+/**
+ * @route   PATCH /api/v1/jobs/:id/featured
+ * @desc    Toggle featured status (Admin only)
+ * @access  Private (Admin)
+ */
+jobRouter.patch("/:id/featured", protect, authorize("admin"), toggleFeaturedJob);
 
 export default jobRouter;

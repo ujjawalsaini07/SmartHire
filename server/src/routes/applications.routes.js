@@ -10,6 +10,8 @@ import {
   addRecruiterNote,
   rateCandidate,
   scheduleInterview,
+  deleteApplication,
+  getAppliedJobIds,
 } from "../controllers/applications.controller.js";
 
 const applicationRouter = express.Router();
@@ -44,6 +46,17 @@ applicationRouter.use(protect);
  * @response 403 - { success: false, message: "Job seeker access required" }
  */
 applicationRouter.post("/", authorize("jobseeker"), applyToJob);
+
+/**
+ * @route   GET /api/v1/applications/applied-jobs
+ * @desc    Get all applied job IDs
+ * @access  Private (Job Seeker)
+ */
+applicationRouter.get(
+  "/applied-jobs",
+  authorize("jobseeker"),
+  getAppliedJobIds,
+);
 
 /**
  * @route   GET /api/v1/applications/my-applications
@@ -226,6 +239,17 @@ applicationRouter.get(
   "/:id",
   authorize("recruiter", "jobseeker"),
   getApplicationById,
+);
+
+/**
+ * @route   DELETE /api/v1/applications/:id
+ * @desc    Delete a rejected/withdrawn application
+ * @access  Private (Recruiter or Jobseeker)
+ */
+applicationRouter.delete(
+  "/:id",
+  authorize("recruiter", "jobseeker"),
+  deleteApplication,
 );
 
 export default applicationRouter;

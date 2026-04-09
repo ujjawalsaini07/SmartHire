@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Sun, Moon, Bell, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, LogOut, Settings } from 'lucide-react';
 import useAuthStore from '@store/authStore';
 import useThemeStore from '@store/themeStore';
 import Button from '@components/common/Button';
@@ -9,38 +9,69 @@ import Avatar from '@components/common/Avatar';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  
+
   const { isAuthenticated, user, logout } = useAuthStore();
   const { displayMode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
+    setIsProfileMenuOpen(false);
+    setIsMobileMenuOpen(false);
     navigate('/');
     logout();
   };
-  
-const navLinks = [
-        { to: '/jobs', label: 'Browse Jobs' },
-        { to: '/pagenotfound', label: 'About' },
-        { to: '/pagenotfound', label: 'Contact' },
-      ];
 
+  // Role-based profile and settings paths
+  const getProfilePath = () => {
+    switch (user?.role) {
+      case 'jobseeker': return '/jobseeker/profile';
+      case 'recruiter': return '/recruiter/profile';
+      case 'admin': return '/admin/users';
+      default: return '/';
+    }
+  };
 
-const recuiterNavLinks = [
-  { to: '/recruiter/dashboard', label: 'Dashboard' },
-  { to: '/pagenotfound', label: 'Contact' },
-];
+  const getSettingsPath = () => {
+    switch (user?.role) {
+      case 'jobseeker': return '/jobseeker/settings';
+      case 'recruiter': return '/recruiter/settings';
+      case 'admin': return '/admin/settings';
+      default: return '/';
+    }
+  };
 
-const jobseekerNavLinks = [
-  { to: '/jobseeker/dashboard', label: 'Dashboard' },
-  { to: '/pagenotfound', label: 'Contact' },
-];
+  const publicNavLinks = [
+    { to: '/jobs', label: 'Browse Jobs' },
+    { to: '/about', label: 'About' },
+    { to: '/contact', label: 'Contact' },
+  ];
 
-const adminNavLinks = [
-  { to: '/admin/dashboard', label: 'Dashboard' },
-  { to: '/pagenotfound', label: 'Contact' },
-];
-  
+  const recruiterNavLinks = [
+    { to: '/recruiter/dashboard', label: 'Dashboard' },
+    { to: '/contact', label: 'Contact' },
+  ];
+
+  const jobseekerNavLinks = [
+    { to: '/jobseeker/dashboard', label: 'Dashboard' },
+    { to: '/contact', label: 'Contact' },
+  ];
+
+  const adminNavLinks = [
+    { to: '/admin/dashboard', label: 'Dashboard' },
+    { to: '/contact', label: 'Contact' },
+  ];
+
+  const getNavLinks = () => {
+    switch (user?.role) {
+      case 'jobseeker': return jobseekerNavLinks;
+      case 'recruiter': return recruiterNavLinks;
+      case 'admin': return adminNavLinks;
+      default: return publicNavLinks;
+    }
+  };
+
+  const activeNavLinks = getNavLinks();
+
   return (
     <nav className="sticky top-0 z-40 bg-white dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
       <div className="container-custom">
@@ -54,46 +85,32 @@ const adminNavLinks = [
               SmartHire
             </span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {(() => {
-              const links = (() => {
-                switch(user?.role) {
-                  case 'jobseeker':
-                    return jobseekerNavLinks;
-                  case 'recruiter':
-                    return recuiterNavLinks;
-                  case 'admin':
-                    return adminNavLinks;
-                  default:
-                    return navLinks;
+            {activeNavLinks.map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.to}
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text dark:hover:text-dark-text'
+                  }`
                 }
-              })();
-              
-              return links.map((link, index) => (
-                <NavLink
-                  key={index}
-                  to={link.to}
-                  className={({ isActive }) =>
-                    `text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text dark:hover:text-dark-text'
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ));
-            })()}
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </div>
-          
+
           {/* Right Section */}
           <div className="flex items-center space-x-4">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
+              aria-label="Toggle theme"
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
             >
               {displayMode === 'dark' ? (
@@ -102,47 +119,55 @@ const adminNavLinks = [
                 <Moon className="w-5 h-5" />
               )}
             </button>
-            
+
             {isAuthenticated ? (
               <>
-                
-                
                 {/* Profile Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                    aria-label="Open profile menu"
                   >
                     <Avatar src={user?.profilePicture} size="sm" />
-                    <span className="hidden lg:block text-sm font-medium">
+                    <span className="hidden lg:block text-sm font-medium text-light-text dark:text-dark-text">
                       {user?.name || user?.email}
                     </span>
                   </button>
-                  
+
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-large border border-light-border dark:border-dark-border">
-                      <Link
-                        to={`#`}
-                        className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors"
-                      >
-                        <User className="w-4 h-4" />
-                        <span>Profile</span>
-                      </Link>
-                      <Link
-                        to={`#`}
-                        className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span>Settings</span>
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-error-600 border-t border-light-border dark:border-dark-border"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
-                      </button>
-                    </div>
+                    <>
+                      {/* Backdrop to close menu */}
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-large border border-light-border dark:border-dark-border z-20">
+                        <Link
+                          to={getProfilePath()}
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-light-text dark:text-dark-text"
+                        >
+                          <User className="w-4 h-4" />
+                          <span>Profile</span>
+                        </Link>
+                        <Link
+                          to={getSettingsPath()}
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-light-text dark:text-dark-text"
+                        >
+                          <Settings className="w-4 h-4" />
+                          <span>Settings</span>
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-error-600 border-t border-light-border dark:border-dark-border"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </>
@@ -151,16 +176,15 @@ const adminNavLinks = [
                 <Button variant="ghost" onClick={() => navigate('/login')}>
                   Login
                 </Button>
-                <Button onClick={() => navigate('/register')}>
-                  Sign Up
-                </Button>
+                <Button onClick={() => navigate('/register')}>Sign Up</Button>
               </div>
             )}
-            
+
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -170,11 +194,11 @@ const adminNavLinks = [
             </button>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 border-t border-light-border dark:border-dark-border">
-            {navLinks.map((link) => (
+            {activeNavLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -183,32 +207,52 @@ const adminNavLinks = [
                   `block px-4 py-2 rounded-lg transition-colors ${
                     isActive
                       ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                      : 'hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary'
+                      : 'hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text'
                   }`
                 }
               >
                 {link.label}
               </NavLink>
             ))}
-            
-            {!isAuthenticated && (
+
+            {isAuthenticated ? (
+              <div className="pt-2 space-y-1 border-t border-light-border dark:border-dark-border">
+                <Link
+                  to={getProfilePath()}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Profile</span>
+                </Link>
+                <Link
+                  to={getSettingsPath()}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Settings</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-error-600"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
               <div className="pt-4 space-y-2">
                 <Button
                   variant="ghost"
                   className="w-full"
-                  onClick={() => {
-                    navigate('/login');
-                    setIsMobileMenuOpen(false);
-                  }}
+                  onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}
                 >
                   Login
                 </Button>
                 <Button
                   className="w-full"
-                  onClick={() => {
-                    navigate('/register');
-                    setIsMobileMenuOpen(false);
-                  }}
+                  onClick={() => { navigate('/register'); setIsMobileMenuOpen(false); }}
                 >
                   Sign Up
                 </Button>

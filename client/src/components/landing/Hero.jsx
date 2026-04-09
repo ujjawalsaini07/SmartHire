@@ -1,11 +1,28 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, TrendingUp } from 'lucide-react';
 import Button from '@components/common/Button';
 import JobSearchBar from '@components/common/JobSearchBar';
+import { publicApi } from '@api/publicApi';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [jobCount, setJobCount] = useState(null);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const res = await publicApi.getAllJobs({ limit: 1 });
+        if (res.success && res.data?.pagination?.total) {
+          setJobCount(res.data.pagination.total);
+        }
+      } catch (err) {
+        // Silently fall back
+      }
+    };
+    fetchCount();
+  }, []);
   
   const popularSearches = [
     'Frontend Developer',
@@ -55,7 +72,7 @@ const Hero = () => {
           >
             <TrendingUp className="w-4 h-4 text-primary-600" />
             <span className="text-sm font-medium text-light-text dark:text-dark-text">
-              10,000+ Jobs Posted This Month
+              {jobCount !== null ? `${jobCount.toLocaleString()}+ Jobs Available` : 'Thousands of Jobs Available'}
             </span>
           </motion.div>
           

@@ -7,27 +7,33 @@ const CandidateCard = ({ candidate }) => {
   const navigate = useNavigate();
   
   // Destructure candidate data safely
-  const { _id, firstName, lastName, photo, email, profile } = candidate;
   const { 
-    title, 
-    location, 
-    experienceYears, 
+    userId,
+    firstName, 
+    lastName, 
+    profilePicture, 
+    email, 
+    headline,
+    location,
     skills = [], 
-    bio,
+    summary,
     education = []
-  } = profile || {};
+  } = candidate;
+
+  const locationString = location ? `${location.city || ''}${location.city && location.state ? ', ' : ''}${location.state || ''}` : '';
 
   const handleViewProfile = () => {
-    navigate(`/recruiter/candidates/${_id}`);
+    const id = userId?._id || userId || candidate._id;
+    navigate(`/recruiter/candidates/${id}`);
   };
 
   return (
     <div className="card card-hover p-6 flex flex-col md:flex-row gap-6 transition-all duration-300">
       {/* Avatar Section */}
       <div className="flex-shrink-0">
-        {photo ? (
+        {profilePicture ? (
           <img 
-            src={photo} 
+            src={profilePicture} 
             alt={`${firstName} ${lastName}`} 
             className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-md"
           />
@@ -49,20 +55,15 @@ const CandidateCard = ({ candidate }) => {
             </h3>
             <div className="flex items-center mt-1 text-primary-600 dark:text-primary-400 font-medium">
               <Briefcase className="w-4 h-4 mr-1.5" />
-              {title || 'Open to Work'}
+              {headline || 'Open to Work'}
             </div>
             
             {/* Meta Info */}
             <div className="flex flex-wrap gap-4 mt-3 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-              {location && (
+              {locationString && (
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-1.5 text-gray-400" />
-                  {location}
-                </div>
-              )}
-              {experienceYears !== undefined && (
-                <div className="flex items-center">
-                  <span className="font-medium mr-1">{experienceYears}</span> years experience
+                  {locationString}
                 </div>
               )}
               {education.length > 0 && (
@@ -89,7 +90,7 @@ const CandidateCard = ({ candidate }) => {
 
         {/* Bio */}
         <p className="mt-4 text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">
-          {bio || 'No professional bio available.'}
+          {summary || 'No professional bio available.'}
         </p>
 
         {/* Skills */}
