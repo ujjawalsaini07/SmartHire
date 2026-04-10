@@ -3,6 +3,7 @@ import Application from "../models/Application.model.js";
 import Job from "../models/Jobs.models.js"; // Assuming this path
 import JobSeekerProfile from "../models/JobSeekerProfile.model.js";
 import { sendInterviewEmail } from "../utils/emailService.js";
+import Notification from "../models/Notification.model.js";
 
 /**
  * @desc    Get all applied job IDs for the authenticated job seeker
@@ -277,6 +278,15 @@ export const updateApplicationStatus = async (req, res) => {
     // Use schema method to handle logic and history
     await application.updateStatus(status, req.user.id, notes);
 
+    if (status !== 'submitted') {
+      await Notification.create({
+        user: application.jobSeekerId,
+        type: 'status_update',
+        title: 'Application Status Updated',
+        message: `Your application status has been updated to: ${status}.`
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: `Application status updated to ${status}`,
@@ -374,12 +384,19 @@ export const scheduleInterview = async (req, res) => {
     const candidateEmail = application.jobSeekerId?.email;
     const jobTitle = application.jobId?.title || 'a Job';
     const companyName = application.jobId?.companyId?.companyName || application.jobId?.company || 'our company';
-
+    const recruiterEmail = req.user.email; // reply to this email
     if (candidateEmail) {
-      sendInterviewEmail(candidateEmail, jobTitle, companyName, scheduledAt, meetingLink, notes).catch(e => {
+      sendInterviewEmail(candidateEmail, jobTitle, companyName, scheduledAt, meetingLink, notes, recruiterEmail).catch(e => {
         console.error("Failed to send interview email: ", e);
       });
     }
+
+    await Notification.create({
+      user: application.jobSeekerId._id ? application.jobSeekerId._id : application.jobSeekerId,
+      type: 'status_update',
+      title: 'Interview Scheduled',
+      message: `An interview has been scheduled for your application at ${companyName}. Please check your email or dashboard for details.`
+    });
 
     res.status(200).json({
       success: true,

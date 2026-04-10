@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Sun, Moon, User, LogOut, Settings } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, Sun, Moon, User, LogOut, Settings, Bell, Trash2 } from 'lucide-react';
 import useAuthStore from '@store/authStore';
 import useThemeStore from '@store/themeStore';
 import Button from '@components/common/Button';
 import Avatar from '@components/common/Avatar';
+import { notificationApi } from '@api/notificationApi';
+import toast from 'react-hot-toast';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,6 +15,49 @@ const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
   const { displayMode, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationMenuOpen, setIsNotificationMenuOpen] = useState(false);
+  const [hasShownLoginPopup, setHasShownLoginPopup] = useState(false);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await notificationApi.getNotifications();
+      if (res.success) {
+        setNotifications(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && (user?.role === 'jobseeker' || user?.role === 'recruiter')) {
+      fetchNotifications();
+    }
+  }, [isAuthenticated, user?.role, location.pathname]); // Re-fetch on navigation for freshness
+
+  useEffect(() => {
+    if (isAuthenticated && notifications.length > 0 && !hasShownLoginPopup) {
+      const unreadCount = notifications.filter(n => !n.isRead).length;
+      if (unreadCount > 0) {
+        toast('You have unread notifications', { icon: '🔔' });
+        setHasShownLoginPopup(true);
+      }
+    }
+  }, [isAuthenticated, notifications, hasShownLoginPopup]);
+
+  const handleClearNotifications = async () => {
+    try {
+      await notificationApi.clearAll();
+      setNotifications([]);
+      toast.success("Notifications cleared");
+      setIsNotificationMenuOpen(false);
+    } catch (err) {
+      toast.error("Failed to clear notifications");
+    }
+  };
 
   const handleLogout = () => {
     setIsProfileMenuOpen(false);
@@ -122,6 +167,55 @@ const Navbar = () => {
 
             {isAuthenticated ? (
               <>
+                {/* Notification Bell */}
+                {(user?.role === 'jobseeker' || user?.role === 'recruiter') && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsNotificationMenuOpen(!isNotificationMenuOpen)}
+                      className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                      aria-label="Open notifications"
+                    >
+                      <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                      {notifications.filter(n => !n.isRead).length > 0 && (
+                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg"></span>
+                      )}
+                    </button>
+
+                    {isNotificationMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setIsNotificationMenuOpen(false)} />
+                        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-large border border-light-border dark:border-dark-border z-20 flex flex-col max-h-96">
+                          <div className="p-3 border-b border-light-border dark:border-dark-border flex items-center justify-between">
+                            <h3 className="font-semibold text-light-text dark:text-dark-text">Notifications</h3>
+                            {notifications.length > 0 && (
+                              <button onClick={handleClearNotifications} className="text-xs text-error-600 hover:text-error-700 flex items-center">
+                                <Trash2 className="w-3 h-3 mr-1" /> Clear All
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex-1 overflow-y-auto">
+                            {notifications.length > 0 ? (
+                              <div className="flex flex-col">
+                                {notifications.map(notif => (
+                                  <div key={notif._id} className={`p-3 border-b border-light-border dark:border-dark-border last:border-0 ${!notif.isRead ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}>
+                                    <p className="text-sm font-medium text-light-text dark:text-dark-text">{notif.title}</p>
+                                    <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-1">{notif.message}</p>
+                                    <p className="text-[10px] text-gray-400 mt-2">{new Date(notif.createdAt).toLocaleDateString()}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                No notifications to display.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 {/* Profile Menu */}
                 <div className="relative">
                   <button

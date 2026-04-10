@@ -28,6 +28,71 @@ export const authorize = (...roles) => {
   };
 };
 
+// export const protect = async (req, res, next) => {
+//   try {
+//     // Get token from header
+//     const token = req.headers.authorization?.split(" ")[1];
+
+//     if (!token) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "No token provided, authorization denied",
+//       });
+//     }
+
+//     // Verify token
+//     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+//     // Optional: Verify user still exists and is active
+//     const user = await User.findById(decoded.id).select(
+//       "role isActive isVerified",
+//     );
+
+//     if (!user) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "User no longer exists",
+//       });
+//     }
+
+//     if (!user.isActive) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Account has been deactivated",
+//       });
+//     }
+
+//     // Attach user info to request
+//     req.user = {
+//       id: decoded.id,
+//       role: user.role,
+//       // email: decoded.email
+//     };
+
+//     next();
+//   } catch (error) {
+//     if (error.name === "JsonWebTokenError") {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid token",
+//       });
+//     }
+//     if (error.name === "TokenExpiredError") {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Token expired",
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: "Authorization error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 export const protect = async (req, res, next) => {
   try {
     // Get token from header
@@ -43,9 +108,9 @@ export const protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-    // Optional: Verify user still exists and is active
+    // Fetch user with email included
     const user = await User.findById(decoded.id).select(
-      "role isActive isVerified",
+      "role isActive isVerified email name"
     );
 
     if (!user) {
@@ -66,7 +131,8 @@ export const protect = async (req, res, next) => {
     req.user = {
       id: decoded.id,
       role: user.role,
-      // email: decoded.email
+      email: user.email, // ✅ added
+      name: user.name
     };
 
     next();
@@ -77,6 +143,7 @@ export const protect = async (req, res, next) => {
         message: "Invalid token",
       });
     }
+
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,

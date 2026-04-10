@@ -3,6 +3,7 @@ import { protect, authorize } from "../middlewares/auth/auth.middleware.js";
 import {
   contactCandidate,
   sendBroadcastEmail,
+  adminContactRecruiter,
 } from "../controllers/email.controller.js";
 
 const emailRouter = express.Router();
@@ -83,5 +84,11 @@ emailRouter.post(
  * @response 429 - { success: false, message: "Rate limit exceeded" }
  */
 emailRouter.post("/admin/broadcast", authorize("admin"), sendBroadcastEmail);
+
+emailRouter.post(
+  "/admin/contact-recruiter",
+  authorize("admin"),
+  adminContactRecruiter
+);
 
 export default emailRouter;

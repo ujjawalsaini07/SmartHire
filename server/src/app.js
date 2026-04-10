@@ -16,6 +16,7 @@ import skillsRouter from "./routes/skills.routes.js";
 import categoriesRouter from "./routes/Jobcategories.routes.js";
 import analyticsRouter from "./routes/analytics.routes.js";
 import emailRouter from "./routes/email.routes.js";
+import notificationRouter from "./routes/notification.routes.js";
 import { requestLogger } from "./config/logger.js";
 import { handleMulterError } from "./middlewares/upload/upload.middleware.js";
 
@@ -80,6 +81,7 @@ app.use("/api/v1/skills", skillsRouter); // skills jobs routes
 app.use("/api/v1/categories", categoriesRouter); // categories jobs routes
 app.use("/api/v1/analytics", analyticsRouter); // analytics jobs routes
 app.use("/api/v1/emails", emailRouter); // email routes
+app.use("/api/v1/notifications", notificationRouter); // notification routes
 
 // 2. Handle File Upload Errors
 app.use(handleMulterError);

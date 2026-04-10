@@ -160,6 +160,11 @@ export const adminApi = {
     return response.data;
   },
 
+  contactRecruiter: async (emailData) => {
+    const response = await api.post('/emails/admin/contact-recruiter', emailData);
+    return response.data;
+  },
+
   // Analytics
   getAdminDashboardStats: async () => {
     const response = await api.get('/analytics/admin/dashboard');

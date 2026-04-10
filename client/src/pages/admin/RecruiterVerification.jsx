@@ -33,6 +33,13 @@ const RecruiterVerification = () => {
     rejectReason: '',
   });
 
+  const [messageModal, setMessageModal] = useState({
+    isOpen: false,
+    profile: null,
+    subject: '',
+    message: '',
+  });
+
   // Fetch recruiter profiles
   const fetchProfiles = async () => {
     try {
@@ -183,6 +190,38 @@ const RecruiterVerification = () => {
   // Visit public profile
   const handleVisitProfile = (profileId) => {
     window.open(`/companies/${profileId}`, '_blank');
+  };
+
+  const handleMessageRecruiter = (profile) => {
+    setMessageModal({
+      isOpen: true,
+      profile,
+      subject: '',
+      message: '',
+    });
+  };
+
+  const submitMessage = async (e) => {
+    e.preventDefault();
+    if (!messageModal.subject.trim() || !messageModal.message.trim()) {
+      toast.error('Subject and message are required');
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      await adminApi.contactRecruiter({
+        recruiterId: messageModal.profile.userId?._id || messageModal.profile.userId,
+        subject: messageModal.subject,
+        message: messageModal.message
+      });
+      toast.success('Message sent to recruiter');
+      setMessageModal({ isOpen: false, profile: null, subject: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to send message');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // Reset filters
@@ -387,6 +426,7 @@ const RecruiterVerification = () => {
                     onVerify={handleVerifyRecruiter}
                     onReject={handleRejectRecruiter}
                     onVisitProfile={handleVisitProfile}
+                    onMessage={handleMessageRecruiter}
                     loading={actionLoading}
                   />
                 </motion.div>
@@ -646,7 +686,60 @@ const RecruiterVerification = () => {
           </div>
         )}
       </Modal>
-    </div>
+
+      {/* Message Modal */}
+      <Modal
+        isOpen={messageModal.isOpen}
+        onClose={() => setMessageModal({ ...messageModal, isOpen: false })}
+          title={`Message ${messageModal.profile?.companyName}`}
+          size="md"
+        >
+          <form onSubmit={submitMessage} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-light-text dark:text-dark-text mb-1">
+                Subject
+              </label>
+              <input
+                type="text"
+                value={messageModal.subject}
+                onChange={(e) => setMessageModal({ ...messageModal, subject: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-dark-bg-secondary border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Enter subject"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-light-text dark:text-dark-text mb-1">
+                Message Body
+              </label>
+              <textarea
+                value={messageModal.message}
+                onChange={(e) => setMessageModal({ ...messageModal, message: e.target.value })}
+                rows={5}
+                className="w-full px-4 py-2 bg-white dark:bg-dark-bg-secondary border border-light-border dark:border-dark-border rounded-lg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                placeholder="Type your message..."
+                required
+              />
+            </div>
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setMessageModal({ ...messageModal, isOpen: false })}
+                disabled={actionLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={actionLoading} className="flex items-center">
+                {actionLoading ? <Spinner size="sm" className="mr-2" /> : null}
+                Send Message
+              </Button>
+            </div>
+          </form>
+        </Modal>
+
+      </div>
+    // </div>
   );
 };
 

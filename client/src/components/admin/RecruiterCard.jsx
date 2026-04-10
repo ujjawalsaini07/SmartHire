@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import Badge from '@components/common/Badge';
 import Button from '@components/common/Button';
 
-const RecruiterCard = ({ profile, onVerify, onReject, onVisitProfile, loading }) => {
+const RecruiterCard = ({ profile, onVerify, onReject, onVisitProfile, onMessage, loading }) => {
   const getStatusBadgeVariant = (status) => {
     switch (status) {
       case 'verified':
@@ -179,16 +179,29 @@ const RecruiterCard = ({ profile, onVerify, onReject, onVisitProfile, loading })
           )}
         </div>
 
-        {/* Visit Public Profile Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onVisitProfile(profile._id)}
-          className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
-        >
-          <ExternalLink className="w-4 h-4 mr-1" />
-          Visit Public Profile
-        </Button>
+        {/* Message and Public Profile Button */}
+        <div className="flex space-x-2">
+          {profile.verificationStatus === 'verified' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onMessage(profile)}
+              className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+            >
+              <Mail className="w-4 h-4 mr-1" />
+              Message
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onVisitProfile(profile._id)}
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
+          >
+            <ExternalLink className="w-4 h-4 mr-1" />
+            Visit Public Profile
+          </Button>
+        </div>
       </div>
     </motion.div>
   );
