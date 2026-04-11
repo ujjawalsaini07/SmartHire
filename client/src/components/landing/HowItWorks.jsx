@@ -26,7 +26,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-dark-bg">
+    <section className="py-20">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
@@ -39,7 +39,7 @@ const HowItWorks = () => {
 
         <div className="relative">
           {/* Connecting Line (Desktop) */}
-          <div className="hidden lg:block absolute top-[2.5rem] left-1/2 -translate-x-1/2 w-[85%] h-0.5 bg-gray-200 dark:bg-gray-700 z-0" />
+          <div className="absolute left-1/2 top-[2.5rem] z-0 hidden h-0.5 w-[85%] -translate-x-1/2 bg-gradient-to-r from-primary-200 via-success-300 to-accent-200 dark:from-primary-800 dark:via-success-800 dark:to-accent-700 lg:block" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
             {steps.map((step, index) => {
@@ -53,11 +53,11 @@ const HowItWorks = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="flex justify-center mb-6 relative">
-                    <div className="w-20 h-20 bg-white dark:bg-dark-bg-secondary rounded-full border-4 border-primary-50 dark:border-primary-900/30 flex items-center justify-center shadow-soft">
+                  <div className="relative mb-6 flex justify-center">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-primary-100 bg-white shadow-soft dark:border-primary-800/40 dark:bg-dark-bg-secondary">
                       <Icon className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <div className="absolute top-0 right-1/2 -mr-10 -mt-2 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm border-2 border-white dark:border-dark-bg">
+                    <div className="absolute right-1/2 top-0 -mr-10 -mt-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-primary-500 to-accent-600 text-sm font-bold text-white dark:border-dark-bg">
                       {index + 1}
                     </div>
                   </div>

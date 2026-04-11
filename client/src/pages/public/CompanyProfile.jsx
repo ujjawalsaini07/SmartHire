@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Building2, Globe, MapPin, Users, Briefcase, ExternalLink,
-  ArrowLeft, AlertCircle, Calendar, Mail
+  ArrowLeft, AlertCircle, Calendar
 } from 'lucide-react';
 import { publicApi } from '@api/publicApi';
 import Button from '@components/common/Button';
 import Badge from '@components/common/Badge';
 import Spinner from '@components/common/Spinner';
+import Navbar from '@components/layout/Navbar';
+import Footer from '@components/layout/Footer';
 
 const CompanyProfile = () => {
   const { id } = useParams();
@@ -34,34 +36,43 @@ const CompanyProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg">
-        <Spinner size="lg" />
+      <div className="page-shell">
+        <Navbar />
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-8">
-          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-light-text dark:text-dark-text mb-2">
-            Company Not Found
-          </h2>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
-            {error || 'This company profile is not available.'}
-          </p>
-          <Button onClick={() => navigate(-1)} className="flex items-center space-x-2 mx-auto">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Go Back</span>
-          </Button>
+      <div className="page-shell">
+        <Navbar />
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <div className="card mx-auto max-w-md p-8 text-center">
+            <AlertCircle className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+            <h2 className="mb-2 text-2xl font-bold text-light-text dark:text-dark-text">
+              Company Not Found
+            </h2>
+            <p className="mb-6 text-light-text-secondary dark:text-dark-text-secondary">
+              {error || 'This company profile is not available.'}
+            </p>
+            <Button onClick={() => navigate(-1)} className="mx-auto flex items-center space-x-2">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Go Back</span>
+            </Button>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="page-shell">
+      <Navbar />
       {/* Banner */}
       <div className="h-48 bg-gradient-to-r from-primary-600 to-accent-600 relative">
         {profile.companyBanner && (
@@ -78,13 +89,13 @@ const CompanyProfile = () => {
 
       <div className="container-custom max-w-4xl">
         {/* Header */}
-        <div className="bg-white dark:bg-dark-bg-secondary rounded-xl border border-light-border dark:border-dark-border p-6 -mt-10 relative z-10 mb-6">
+        <div className="card relative z-10 -mt-10 mb-6 p-6">
           <div className="flex items-start space-x-5">
             {profile.companyLogo ? (
               <img
                 src={profile.companyLogo}
                 alt={profile.companyName}
-                className="w-20 h-20 rounded-xl object-cover border border-light-border dark:border-dark-border"
+                className="h-20 w-20 rounded-xl border border-light-border object-cover dark:border-dark-border"
               />
             ) : (
               <div className="w-20 h-20 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
@@ -142,7 +153,7 @@ const CompanyProfile = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-dark-bg-secondary rounded-xl border border-light-border dark:border-dark-border p-6"
+                className="card p-6"
               >
                 <h2 className="text-lg font-semibold text-light-text dark:text-dark-text mb-3">About</h2>
                 <p className="text-light-text-secondary dark:text-dark-text-secondary leading-relaxed whitespace-pre-wrap">
@@ -158,7 +169,7 @@ const CompanyProfile = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-dark-bg-secondary rounded-xl border border-light-border dark:border-dark-border p-6"
+              className="card p-6"
             >
               <h2 className="text-lg font-semibold text-light-text dark:text-dark-text mb-4">Company Info</h2>
               <div className="space-y-3">
@@ -191,6 +202,7 @@ const CompanyProfile = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

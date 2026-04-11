@@ -1,15 +1,20 @@
 import { motion } from 'framer-motion';
+import Navbar from '@components/layout/Navbar';
+import Footer from '@components/layout/Footer';
 
 const TermsOfService = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
-      <div className="container-custom max-w-4xl py-12">
+    <div className="page-shell">
+      <Navbar />
+      <div className="container-custom max-w-4xl py-14">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-4xl font-bold text-light-text dark:text-dark-text mb-2">Terms of Service</h1>
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-8">
-            Last updated: April 2026
-          </p>
-          <div className="bg-white dark:bg-dark-bg-secondary rounded-xl border border-light-border dark:border-dark-border p-8 space-y-6 text-light-text dark:text-dark-text">
+          <div className="page-hero mb-8">
+            <h1 className="text-4xl font-bold text-light-text dark:text-dark-text mb-2">Terms of Service</h1>
+            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+              Last updated: April 2026
+            </p>
+          </div>
+          <div className="legal-panel space-y-6 text-light-text dark:text-dark-text">
             <section>
               <h2 className="text-xl font-semibold mb-3">1. Acceptance of Terms</h2>
               <p className="text-light-text-secondary dark:text-dark-text-secondary leading-relaxed">
@@ -65,6 +70,7 @@ const TermsOfService = () => {
           </div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 };

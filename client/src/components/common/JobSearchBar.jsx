@@ -28,15 +28,15 @@ const JobSearchBar = ({ className = '', variant = 'default' }) => {
   // Variant styles
   const variants = {
     default: {
-      container: 'shadow-xl border border-gray-100 dark:border-dark-border',
-      input: 'bg-gray-50 dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary',
+      container: 'shadow-large border border-light-border bg-white/90 backdrop-blur-xl dark:border-dark-border dark:bg-dark-bg-secondary/85',
+      input: 'bg-light-bg-tertiary dark:bg-dark-bg hover:bg-white dark:hover:bg-dark-bg-tertiary',
     },
     compact: {
-      container: 'shadow-md border border-gray-200 dark:border-dark-border',
-      input: 'bg-white dark:bg-dark-bg-secondary',
+      container: 'shadow-soft border border-light-border bg-white/92 dark:border-dark-border dark:bg-dark-bg-secondary/90',
+      input: 'bg-white dark:bg-dark-bg-tertiary',
     },
     minimal: {
-      container: 'shadow-sm border border-gray-200 dark:border-dark-border',
+      container: 'shadow-soft border border-light-border dark:border-dark-border',
       input: 'bg-transparent',
     },
   };
@@ -46,11 +46,11 @@ const JobSearchBar = ({ className = '', variant = 'default' }) => {
   return (
     <form
       onSubmit={handleSearch}
-      className={`relative ${className}`}
+      className={`relative group ${className}`}
     >
-      <div className={`flex flex-col md:flex-row gap-3 p-3 rounded-2xl bg-white dark:bg-dark-bg-secondary ${currentVariant.container}`}>
+      <div className={`flex flex-col gap-3 rounded-3xl p-3 md:flex-row ${currentVariant.container}`}>
         {/* Job Title Input */}
-        <div className={`flex-1 flex items-center space-x-3 px-5 py-3 rounded-xl transition-colors group ${currentVariant.input}`}>
+        <div className={`group flex flex-1 items-center space-x-3 rounded-2xl px-5 py-3 transition-colors ${currentVariant.input}`}>
           <Search className="w-5 h-5 text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" />
           <input
             type="text"
@@ -63,7 +63,7 @@ const JobSearchBar = ({ className = '', variant = 'default' }) => {
         </div>
 
         {/* Location Input */}
-        <div className={`flex-1 flex items-center space-x-3 px-5 py-3 rounded-xl transition-colors group ${currentVariant.input}`}>
+        <div className={`group flex flex-1 items-center space-x-3 rounded-2xl px-5 py-3 transition-colors ${currentVariant.input}`}>
           <MapPin className="w-5 h-5 text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" />
           <input
             type="text"
@@ -79,7 +79,7 @@ const JobSearchBar = ({ className = '', variant = 'default' }) => {
         <Button
           type="submit"
           size="lg"
-          className="md:w-auto w-full px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          className="w-full px-8 py-3 md:w-auto"
         >
           <Search className="w-5 h-5 mr-2" />
           Search Jobs
@@ -87,7 +87,7 @@ const JobSearchBar = ({ className = '', variant = 'default' }) => {
       </div>
 
       {/* Decorative gradient border effect */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-accent-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity -z-10" />
+      <div className="absolute -inset-1 -z-10 rounded-3xl bg-gradient-to-r from-primary-400/20 via-success-400/20 to-accent-500/20 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
     </form>
   );
 };

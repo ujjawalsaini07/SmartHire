@@ -27,13 +27,13 @@ const Sidebar = ({ links = [], isMobile = false, onClose, isCollapsed = false, o
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-dark-bg-secondary border-r border-light-border dark:border-dark-border">
+    <div className="flex h-full flex-col border-r border-light-border/80 bg-white/88 backdrop-blur-md dark:border-dark-border/80 dark:bg-dark-bg-secondary/92">
       {/* Sidebar Header - Collapse/Close Button */}
-      <div className="p-4 border-b border-light-border dark:border-dark-border flex justify-end">
+      <div className="flex justify-end border-b border-light-border/80 p-4 dark:border-dark-border/80">
         {!isMobile && onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+            className="rounded-lg border border-light-border bg-white p-2 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-tertiary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
             aria-label="Toggle sidebar"
           >
             <ChevronLeft
@@ -46,7 +46,7 @@ const Sidebar = ({ links = [], isMobile = false, onClose, isCollapsed = false, o
         {isMobile && onClose && (
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+            className="rounded-lg border border-light-border bg-white p-2 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-tertiary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
             aria-label="Close sidebar"
           >
             <X className="w-5 h-5" />
@@ -56,7 +56,7 @@ const Sidebar = ({ links = [], isMobile = false, onClose, isCollapsed = false, o
 
       {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {links.map((link, index) => {
             const Icon = link.icon;
             return (
@@ -65,10 +65,10 @@ const Sidebar = ({ links = [], isMobile = false, onClose, isCollapsed = false, o
                 to={link.to}
                 onClick={() => isMobile && onClose && onClose()}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                  `flex items-center space-x-3 rounded-xl px-4 py-3 transition-colors ${
                     isActive
-                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                      : 'hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text'
+                      ? 'bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 shadow-soft dark:from-primary-900/35 dark:to-primary-900/10 dark:text-primary-300'
+                      : 'text-light-text-secondary hover:bg-light-bg-tertiary hover:text-light-text dark:text-dark-text-secondary dark:hover:bg-dark-hover dark:hover:text-dark-text'
                   }`
                 }
               >
@@ -83,9 +83,9 @@ const Sidebar = ({ links = [], isMobile = false, onClose, isCollapsed = false, o
       </nav>
 
       {/* User Info & Logout */}
-      <div className="p-4 border-t border-light-border dark:border-dark-border space-y-2">
+      <div className="space-y-2 border-t border-light-border/80 p-4 dark:border-dark-border/80">
         <div
-          className={`px-3 py-2 rounded-lg bg-gray-50 dark:bg-dark-bg-tertiary ${
+          className={`rounded-xl border border-light-border bg-light-bg-tertiary px-3 py-2 dark:border-dark-border dark:bg-dark-bg-tertiary ${
             isCollapsed && !isMobile ? 'text-center' : ''
           }`}
         >

@@ -35,9 +35,10 @@ const Features = () => {
   ];
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-dark-bg-secondary">
+    <section className="relative overflow-hidden py-20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(76,140,228,0.14),transparent_35%),radial-gradient(circle_at_85%_85%,rgba(145,208,108,0.16),transparent_34%)]" />
       <div className="container-custom">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="mx-auto mb-16 max-w-2xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
             Why Choose SmartHire?
           </h2>
@@ -46,7 +47,7 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
@@ -57,8 +58,8 @@ const Features = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card hover className="h-full text-center p-8">
-                  <div className={`inline-flex p-3 rounded-xl ${feature.bg} ${feature.color} mb-6`}>
+                <Card hover className="h-full border-light-border/80 p-8 text-center dark:border-dark-border/80">
+                  <div className={`mb-6 inline-flex rounded-2xl border border-light-border/80 p-3 ${feature.bg} ${feature.color} dark:border-dark-border/80`}>
                     <Icon className="w-8 h-8" />
                   </div>
                   <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>

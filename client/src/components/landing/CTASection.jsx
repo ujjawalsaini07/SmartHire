@@ -6,21 +6,23 @@ const CTASection = () => {
     const navigate = useNavigate();
 
     return (
-        <section className="py-20 bg-white dark:bg-dark-bg">
+        <section className="py-20">
             <div className="container-custom">
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="relative overflow-hidden rounded-3xl bg-primary-600 px-6 py-16 sm:px-12 sm:py-24 text-center shadow-2xl"
+                    className="relative overflow-hidden rounded-3xl border border-primary-300/50 bg-gradient-to-br from-primary-600 via-accent-600 to-primary-dark px-6 py-16 text-center shadow-large sm:px-12 sm:py-24"
                 >
                     {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0 opacity-20">
                         <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                             <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
                         </svg>
                     </div>
+                    <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-success-400/30 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-warning-300/25 blur-3xl" />
 
                     <div className="relative z-10 max-w-3xl mx-auto">
                         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
@@ -32,7 +34,7 @@ const CTASection = () => {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Button 
                                 size="lg" 
-                                className="bg-white text-primary-600 hover:bg-gray-100 w-full sm:w-auto"
+                                className="w-full border-white bg-white text-primary-700 hover:bg-primary-50 sm:w-auto"
                                 onClick={() => navigate('/register?role=jobseeker')}
                             >
                                 Get Started Now
@@ -40,7 +42,7 @@ const CTASection = () => {
                         <Button 
                             size="lg" 
                             variant="outline" 
-                            className="border-white text-white hover:bg-primary-700 w-full sm:w-auto"
+                            className="w-full border-white text-white hover:bg-white/10 sm:w-auto"
                             as="a"
                             href="#"
                         >

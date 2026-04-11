@@ -1,7 +1,9 @@
-import { motion } from 'framer-motion';
-import { Users, Target, Award, Briefcase } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import Button from '@components/common/Button';
+import { motion } from "framer-motion";
+import { Users, Target, Award, Briefcase } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Button from "@components/common/Button";
+import Navbar from "@components/layout/Navbar";
+import Footer from "@components/layout/Footer";
 
 const About = () => {
   const navigate = useNavigate();
@@ -9,62 +11,65 @@ const About = () => {
   const values = [
     {
       icon: <Target className="w-6 h-6 text-primary-600" />,
-      title: 'Our Mission',
+      title: "Our Mission",
       description:
-        'To connect talented professionals with the right opportunities and help companies find the best candidates — efficiently and transparently.',
+        "To connect talented professionals with the right opportunities and help companies find the best candidates — efficiently and transparently.",
     },
     {
       icon: <Users className="w-6 h-6 text-primary-600" />,
-      title: 'For Everyone',
+      title: "For Everyone",
       description:
-        'Whether you are a fresh graduate, an experienced professional, or a growing company, SmartHire is built to serve you.',
+        "Whether you are a fresh graduate, an experienced professional, or a growing company, SmartHire is built to serve you.",
     },
     {
       icon: <Award className="w-6 h-6 text-primary-600" />,
-      title: 'Quality First',
+      title: "Quality First",
       description:
-        'We verify recruiters and curate listings so job seekers see only legitimate, high-quality opportunities.',
+        "We verify recruiters and curate listings so job seekers see only legitimate, high-quality opportunities.",
     },
     {
       icon: <Briefcase className="w-6 h-6 text-primary-600" />,
-      title: 'Smart Matching',
+      title: "Smart Matching",
       description:
-        'Our intelligent matching surfaces the most relevant candidates and jobs, saving time for both parties.',
+        "Our intelligent matching surfaces the most relevant candidates and jobs, saving time for both parties.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="page-shell">
+      <Navbar />
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-dark-bg dark:via-dark-bg-secondary dark:to-dark-bg py-20">
+      <section className="py-16 md:py-20">
         <div className="container-custom text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl font-bold text-light-text dark:text-dark-text mb-6"
-          >
-            About <span className="gradient-text">SmartHire</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-light-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto mb-8"
-          >
-            SmartHire is a modern job portal that brings together job seekers
-            and verified recruiters on a single, easy-to-use platform.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex justify-center gap-4"
-          >
-            <Button onClick={() => navigate('/jobs')}>Browse Jobs</Button>
-            <Button variant="outline" onClick={() => navigate('/register')}>
-              Join Free
-            </Button>
-          </motion.div>
+          <div className="page-hero">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl font-bold text-light-text dark:text-dark-text mb-6"
+            >
+              About <span className="gradient-text">SmartHire</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-light-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto mb-8"
+            >
+              SmartHire is a modern job portal that brings together job seekers
+              and verified recruiters on a single, easy-to-use platform.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center gap-4"
+            >
+              <Button onClick={() => navigate("/jobs")}>Browse Jobs</Button>
+              <Button variant="outline" onClick={() => navigate("/register")}>
+                Join Free
+              </Button>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -81,7 +86,7 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white dark:bg-dark-bg-secondary rounded-xl p-8 border border-light-border dark:border-dark-border shadow-sm"
+              className="card p-8"
             >
               <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/20 rounded-lg flex items-center justify-center mb-4">
                 {val.icon}
@@ -96,23 +101,29 @@ const About = () => {
           ))}
         </div>
       </section>
-
       {/* CTA */}
-      <section className="bg-primary-600 dark:bg-primary-800 py-16 text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">
-          Ready to get started?
-        </h2>
-        <p className="text-primary-100 mb-8 max-w-md mx-auto">
-          Join thousands of professionals and companies already using SmartHire.
-        </p>
-        <Button
-          variant="outline"
-          className="border-white text-white hover:bg-white hover:text-primary-600"
-          onClick={() => navigate('/register')}
-        >
-          Create your free account
-        </Button>
+      <section className="py-4 pb-16 text-center">
+        <div className="container-custom">
+          <div className="rounded-3xl border border-primary-300/50 bg-gradient-to-br from-primary-600 via-accent-600 to-primary-dark px-6 py-14 text-center shadow-large">
+            <h2 className="mb-4 text-3xl font-bold text-white">
+              Ready to get started?
+            </h2>
+            <p className="mx-auto mb-8 max-w-md text-primary-100">
+              Join thousands of professionals and companies already using
+              SmartHire.
+            </p>
+            <Button
+              variant="outline"
+              // Added "mx-auto flex" to ensure it respects the centering in a flex context
+              className="border-white text-white hover:bg-white hover:text-primary-700 justify-center mx-auto flex"
+              onClick={() => navigate("/register")}
+            >
+              Create your free account
+            </Button>
+          </div>
+        </div>
       </section>
+      <Footer />
     </div>
   );
 };

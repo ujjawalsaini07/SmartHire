@@ -1,61 +1,65 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Linkedin, Instagram, Mail } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Mail, Sparkles } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
     'For Job Seekers': [
       { label: 'Browse Jobs', to: '/jobs' },
-      { label: 'Career Advice', to: '#' },
-      { label: 'Resume Tips', to: '#' },
-      { label: 'Interview Prep', to: '#' },
+      { label: 'Career Advice', to: '/about' },
+      { label: 'Resume Tips', to: '/about' },
+      { label: 'Interview Prep', to: '/about' },
     ],
     'For Employers': [
       { label: 'Post a Job', to: '/recruiter/post-job' },
-      { label: 'Pricing', to: '#' },
-      { label: 'Recruiter Resources', to: '#' },
-      { label: 'Hiring Guide', to: '#' },
+      { label: 'Hiring Guide', to: '/about' },
+      { label: 'Recruiter Resources', to: '/contact' },
+      { label: 'Candidate Search', to: '/recruiter/candidates' },
     ],
-    'Company': [
-      { label: 'About Us', to: '#' },
-      { label: 'Contact', to: '#' },
-      { label: 'Careers', to: '#' },
-      { label: 'Press', to: '#' },
+    Company: [
+      { label: 'About Us', to: '/about' },
+      { label: 'Contact', to: '/contact' },
+      { label: 'Platform Story', to: '/about' },
+      { label: 'Security', to: '/privacy' },
     ],
-    'Legal': [
-      { label: 'Privacy Policy', to: '#' },
-      { label: 'Terms of Service', to: '#' },
-      { label: 'Cookie Policy', to: '#' },
-      { label: 'Accessibility', to: '#' },
+    Legal: [
+      { label: 'Privacy Policy', to: '/privacy' },
+      { label: 'Terms of Service', to: '/terms' },
+      { label: 'Cookie Policy', to: '/privacy' },
+      { label: 'Accessibility', to: '/contact' },
     ],
   };
-  
+
   const socialLinks = [
     { icon: Facebook, to: 'https://facebook.com', label: 'Facebook' },
     { icon: Twitter, to: 'https://twitter.com', label: 'Twitter' },
     { icon: Linkedin, to: 'https://linkedin.com', label: 'LinkedIn' },
     { icon: Instagram, to: 'https://instagram.com', label: 'Instagram' },
   ];
-  
+
   return (
-    <footer className="bg-gray-50 dark:bg-dark-bg-secondary border-t border-light-border dark:border-dark-border">
-      <div className="container-custom py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          {/* Brand Section */}
+    <footer className="relative mt-16 border-t border-light-border/70 bg-light-bg-tertiary/70 backdrop-blur-md dark:border-dark-border/70 dark:bg-dark-bg-secondary/40">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary-300 to-transparent opacity-70" />
+
+      <div className="container-custom py-14">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">S</span>
+            <Link to="/" className="mb-5 flex items-center space-x-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 shadow-soft">
+                <span className="text-xl font-bold text-white">S</span>
               </div>
-              <span className="text-xl font-bold text-light-text dark:text-dark-text">
-                SmartHire
-              </span>
+              <span className="text-2xl font-bold text-light-text dark:text-dark-text">SmartHire</span>
             </Link>
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-4">
-              Connecting talent with opportunity. Find your dream job or hire the perfect candidate.
+
+            <p className="mb-5 text-sm leading-relaxed text-light-text-secondary dark:text-dark-text-secondary">
+              Precision hiring experiences for ambitious teams and world-class candidates.
             </p>
-            
-            {/* Social Links */}
-            <div className="flex items-center space-x-3">
+
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 dark:border-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              Trusted by modern hiring teams
+            </div>
+
+            <div className="flex items-center space-x-2">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -64,28 +68,27 @@ const Footer = () => {
                     href={social.to}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                    className="rounded-lg border border-light-border bg-white p-2.5 text-light-text-secondary transition-all hover:-translate-y-0.5 hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
                     aria-label={social.label}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="h-4 w-4" />
                   </a>
                 );
               })}
             </div>
           </div>
-          
-          {/* Footer Links */}
+
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h3 className="font-semibold text-light-text dark:text-dark-text mb-4">
+              <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.08em] text-light-text dark:text-dark-text">
                 {title}
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       to={link.to}
-                      className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                      className="text-sm text-light-text-secondary transition-colors hover:text-primary-700 dark:text-dark-text-secondary dark:hover:text-primary-300"
                     >
                       {link.label}
                     </Link>
@@ -95,21 +98,12 @@ const Footer = () => {
             </div>
           ))}
         </div>
-        
-        {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-              © {new Date().getFullYear()} SmartHire. All rights reserved.
-            </p>
-            
-            {/* Newsletter */}
-            <div className="flex items-center space-x-2">
-              <Mail className="w-5 h-5 text-light-text-secondary dark:text-dark-text-secondary" />
-              <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                Subscribe to our newsletter
-              </span>
-            </div>
+
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-light-border/80 pt-6 text-sm text-light-text-secondary dark:border-dark-border/80 dark:text-dark-text-secondary md:flex-row md:items-center">
+          <p>© {new Date().getFullYear()} SmartHire. All rights reserved.</p>
+          <div className="inline-flex items-center gap-2 rounded-full border border-light-border bg-white px-3 py-1 dark:border-dark-border dark:bg-dark-bg">
+            <Mail className="h-4 w-4" />
+            <span>support@smarthire.io</span>
           </div>
         </div>
       </div>

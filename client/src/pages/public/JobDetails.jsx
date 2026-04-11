@@ -4,13 +4,15 @@ import { publicApi } from '@api/publicApi';
 import useAuthStore from '@store/authStore';
 import { 
   MapPin, Briefcase, DollarSign, Clock, Building, 
-  ArrowLeft, Calendar, Share2, Bookmark, HelpCircle, CheckCircle2 
+  ArrowLeft, Calendar, Share2, Bookmark, HelpCircle 
 } from 'lucide-react';
 import Button from '@components/common/Button';
 import Spinner from '@components/common/Spinner';
 import ApplyJobModal from '@components/jobs/ApplyJobModal';
 import toast from 'react-hot-toast';
 import { jobSeekerApi } from '@api/jobSeekerApi';
+import Navbar from '@components/layout/Navbar';
+import Footer from '@components/layout/Footer';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -95,28 +97,38 @@ const JobDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg">
-        <Spinner size="lg" />
+      <div className="page-shell">
+        <Navbar />
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-dark-bg">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Oops! Something went wrong.
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">{error || 'Job not found'}</p>
-        <Button onClick={() => navigate('/jobs')} variant="outline">
-          Back to Jobs
-        </Button>
+      <div className="page-shell">
+        <Navbar />
+        <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+            Oops! Something went wrong.
+          </h2>
+          <p className="mb-6 text-gray-600 dark:text-gray-400">{error || 'Job not found'}</p>
+          <Button onClick={() => navigate('/jobs')} variant="outline">
+            Back to Jobs
+          </Button>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg py-8">
+    <div className="page-shell">
+      <Navbar />
+      <div className="py-8">
       <div className="container-custom max-w-5xl mx-auto">
         
         {/* Back Button */}
@@ -132,7 +144,7 @@ const JobDetails = () => {
           
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border p-8">
+            <div className="card p-8">
               
               <div className="flex items-start gap-6">
                 {/* Company Logo */}
@@ -140,7 +152,7 @@ const JobDetails = () => {
                   <img 
                     src={job.companyId.companyLogo} 
                     alt={job.companyId.companyName} 
-                    className="w-16 h-16 rounded-xl object-contain bg-gray-50 dark:bg-dark-bg p-2 flex-shrink-0"
+                    className="h-16 w-16 flex-shrink-0 rounded-xl bg-gray-50 p-2 object-contain dark:bg-dark-bg"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -173,7 +185,7 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mt-8 pt-8 border-t border-gray-100 dark:border-dark-border">
+              <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-8 dark:border-dark-border">
                 <div className="flex gap-4">
                   <Button onClick={hasApplied ? null : handleApplyClick} size="lg" className={`px-8 ${hasApplied ? 'bg-green-500 hover:bg-green-600 text-white border-green-500' : ''}`} disabled={hasApplied}>
                     {hasApplied ? 'Already Applied' : 'Apply Now'}
@@ -214,7 +226,7 @@ const JobDetails = () => {
             </div>
 
             {/* Description */}
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border p-8">
+            <div className="card p-8">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Job Description</h2>
               <div 
                 className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
@@ -282,7 +294,7 @@ const JobDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border p-6">
+            <div className="card p-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Job Overview</h3>
               
               <div className="space-y-4">
@@ -324,7 +336,7 @@ const JobDetails = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border p-6">
+            <div className="card p-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {job.requiredSkills?.map((skill) => (
@@ -344,6 +356,8 @@ const JobDetails = () => {
 
         </div>
       </div>
+      </div>
+      <Footer />
 
       {isApplyModalOpen && (
         <ApplyJobModal job={job} onClose={() => setIsApplyModalOpen(false)} />

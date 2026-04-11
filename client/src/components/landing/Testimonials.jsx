@@ -29,7 +29,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-dark-bg">
+    <section className="py-20">
       <div className="container-custom">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
@@ -49,8 +49,8 @@ const Testimonials = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full relative overflow-visible">
-                <div className="absolute -top-6 left-8 bg-primary-500 text-white p-3 rounded-xl shadow-lg">
+              <Card className="relative h-full overflow-visible">
+                <div className="absolute -top-6 left-8 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 p-3 text-white shadow-soft">
                     <Quote className="w-5 h-5" />
                 </div>
                 <div className="pt-8">

@@ -27,7 +27,7 @@ const Avatar = ({
   const iconSize = iconSizes[size] || iconSizes.md;
   
   return (
-    <div className={`${sizeClass} rounded-full overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-dark-bg-tertiary ${className}`}>
+    <div className={`${sizeClass} flex items-center justify-center overflow-hidden rounded-full border border-light-border bg-light-bg-tertiary shadow-sm dark:border-dark-border dark:bg-dark-bg-tertiary ${className}`}>
       {src ? (
         <img src={src} alt={alt} className="w-full h-full object-cover" />
       ) : (

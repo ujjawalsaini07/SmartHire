@@ -55,7 +55,7 @@ const Modal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-50 bg-black/45 backdrop-blur-sm"
           />
           
           {/* Modal */}
@@ -64,11 +64,11 @@ const Modal = ({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className={`w-full ${sizeClass} bg-white dark:bg-dark-bg-secondary rounded-2xl shadow-large max-h-[90vh] overflow-hidden flex flex-col`}
+              className={`w-full ${sizeClass} flex max-h-[90vh] flex-col overflow-hidden rounded-3xl border border-light-border bg-white/95 shadow-large backdrop-blur-lg dark:border-dark-border dark:bg-dark-bg-secondary/95`}
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-center justify-between p-6 border-b border-light-border dark:border-dark-border">
+                <div className="flex items-center justify-between border-b border-light-border p-6 dark:border-dark-border">
                   {title && (
                     <h2 className="text-2xl font-semibold text-light-text dark:text-dark-text">
                       {title}
@@ -77,7 +77,7 @@ const Modal = ({
                   {showCloseButton && (
                     <button
                       onClick={onClose}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                      className="rounded-lg border border-light-border bg-white p-2 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-tertiary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
                     >
                       <X className="w-5 h-5" />
                     </button>

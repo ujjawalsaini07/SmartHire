@@ -32,7 +32,7 @@ const Hero = () => {
   ];
   
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-dark-bg dark:via-dark-bg-secondary dark:to-dark-bg">
+    <section className="relative overflow-hidden border-b border-light-border/70 bg-gradient-to-br from-primary-100/55 via-white to-warning-100/50 dark:border-dark-border/70 dark:from-primary-900/15 dark:via-dark-bg-secondary dark:to-success-900/10">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -45,7 +45,7 @@ const Hero = () => {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-primary-100/20 to-accent-100/20 dark:from-primary-900/10 dark:to-accent-900/10 rounded-full blur-3xl"
+          className="absolute -right-1/2 -top-1/2 h-full w-full rounded-full bg-gradient-to-br from-primary-300/35 to-success-200/25 blur-3xl dark:from-primary-700/20 dark:to-success-600/10"
         />
         <motion.div
           animate={{
@@ -57,18 +57,18 @@ const Hero = () => {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent-100/20 to-primary-100/20 dark:from-accent-900/10 dark:to-primary-900/10 rounded-full blur-3xl"
+          className="absolute -bottom-1/2 -left-1/2 h-full w-full rounded-full bg-gradient-to-tr from-accent-200/28 to-primary-200/26 blur-3xl dark:from-accent-700/18 dark:to-primary-700/15"
         />
       </div>
       
-      <div className="container-custom relative z-10 py-20 md:py-32">
+      <div className="container-custom relative z-10 py-20 md:py-28">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white dark:bg-dark-bg-secondary shadow-soft mb-8"
+            className="mb-8 inline-flex items-center space-x-2 rounded-full border border-light-border bg-white/95 px-4 py-2 shadow-soft backdrop-blur-md dark:border-dark-border dark:bg-dark-bg-secondary/90"
           >
             <TrendingUp className="w-4 h-4 text-primary-600" />
             <span className="text-sm font-medium text-light-text dark:text-dark-text">
@@ -81,7 +81,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance"
+            className="mb-6 text-balance text-5xl font-bold leading-tight md:text-6xl lg:text-7xl"
           >
             Find Your{' '}
             <span className="gradient-text">Dream Career</span>
@@ -94,7 +94,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl text-light-text-secondary dark:text-dark-text-secondary mb-12 max-w-2xl mx-auto"
+            className="mx-auto mb-12 max-w-2xl text-lg text-light-text-secondary dark:text-dark-text-secondary md:text-xl"
           >
             Connect with top employers and discover opportunities that match your skills and aspirations. Start your journey now.
           </motion.p>
@@ -122,7 +122,7 @@ const Hero = () => {
               <button
                 key={search}
                 onClick={() => navigate(`/jobs?keyword=${search}`)}
-                className="px-4 py-1.5 rounded-full bg-white dark:bg-dark-bg-secondary text-sm font-medium hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-colors border border-gray-100 dark:border-gray-800"
+                className="rounded-full border border-light-border bg-white px-4 py-1.5 text-sm font-semibold text-light-text-secondary transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-dark-border dark:bg-dark-bg-secondary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:bg-primary-900/20 dark:hover:text-primary-300"
               >
                 {search}
               </button>
@@ -134,7 +134,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
+            className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Button size="lg" onClick={() => navigate('/register?role=jobseeker')}>
               <Briefcase className="w-5 h-5 mr-2" />
@@ -148,7 +148,7 @@ const Hero = () => {
       </div>
       
       {/* Decorative Elements */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-dark-bg to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-light-bg dark:from-dark-bg to-transparent" />
     </section>
   );
 };

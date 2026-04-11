@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Filter, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '@components/layout/Navbar';
+import Footer from '@components/layout/Footer';
 import JobSearchBar from '@components/common/JobSearchBar';
 import JobCard from '@components/jobs/JobCard';
 import FilterSection from '@components/jobs/FilterSection';
@@ -13,6 +14,8 @@ import { toast } from 'react-hot-toast';
 
 const JobListings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const isJobSeekerRoute = location.pathname.startsWith('/jobseeker/');
   
   // State
   const [jobs, setJobs] = useState([]);
@@ -156,8 +159,8 @@ const JobListings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
-      <Navbar />
+    <div className={isJobSeekerRoute ? 'w-full' : 'page-shell'}>
+      {!isJobSeekerRoute && <Navbar />}
       
       {/* Search Bar Section */}
       <div className="bg-white dark:bg-dark-bg-secondary border-b border-light-border dark:border-dark-border py-8">
@@ -474,6 +477,7 @@ const JobListings = () => {
           </div>
         </div>
       )}
+      {!isJobSeekerRoute && <Footer />}
     </div>
   );
 };

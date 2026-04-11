@@ -38,7 +38,7 @@ const FeaturedJobs = () => {
     return (
         <section className="py-20 bg-gray-50 dark:bg-dark-bg-secondary">
             <div className="container-custom">
-                <div className="flex items-end justify-between mb-12">
+        <div className="mb-12 flex items-end justify-between">
                     <div className="max-w-2xl">
                         <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
                             Featured <span className="gradient-text">Jobs</span>
@@ -66,9 +66,9 @@ const FeaturedJobs = () => {
                                 className="h-full cursor-pointer"
                                 onClick={() => navigate(`/jobs/${job._id}`)}
                             >
-                                <div className="flex items-start justify-between mb-4">
+                                <div className="mb-4 flex items-start justify-between">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center font-bold text-xl text-primary-600">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-light-border bg-light-bg-tertiary text-xl font-bold text-primary-600 dark:border-dark-border dark:bg-dark-bg-tertiary">
                                             {(job.companyId?.companyName || job.company?.name || 'C').charAt(0)}
                                         </div>
                                         <div>
@@ -100,14 +100,14 @@ const FeaturedJobs = () => {
                                     <Button 
                                         size="sm" 
                                         variant="outline" 
-                                        className="w-full mr-2"
+                                        className="mr-2 w-full"
                                         onClick={(e) => { e.stopPropagation(); navigate(`/jobs/${job._id}`); }}
                                     >
                                         Details
                                     </Button>
                                     <Button 
                                         size="sm" 
-                                        className="w-full ml-2"
+                                        className="ml-2 w-full"
                                         onClick={(e) => { e.stopPropagation(); navigate(`/jobs/${job._id}?apply=true`); }}
                                     >
                                         Apply Now

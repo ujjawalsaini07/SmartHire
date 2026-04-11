@@ -96,10 +96,7 @@ const Navbar = () => {
     { to: '/contact', label: 'Contact' },
   ];
 
-  const jobseekerNavLinks = [
-    { to: '/jobseeker/dashboard', label: 'Dashboard' },
-    { to: '/contact', label: 'Contact' },
-  ];
+  const jobseekerNavLinks = [];
 
   const adminNavLinks = [
     { to: '/admin/dashboard', label: 'Dashboard' },
@@ -118,30 +115,30 @@ const Navbar = () => {
   const activeNavLinks = getNavLinks();
 
   return (
-    <nav className="sticky top-0 z-40 bg-white dark:bg-dark-bg border-b border-light-border dark:border-dark-border">
+    <nav className="sticky top-0 z-50 border-b border-light-border/70 bg-white/80 shadow-[0_12px_34px_-24px_rgba(64,96,147,0.58)] backdrop-blur-xl dark:border-dark-border/70 dark:bg-dark-bg/80">
       <div className="container-custom">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex h-20 items-center justify-between py-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">S</span>
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 shadow-soft">
+              <span className="text-xl font-bold text-white">S</span>
             </div>
-            <span className="text-xl font-bold text-light-text dark:text-dark-text">
+            <span className="text-xl font-bold tracking-tight text-light-text dark:text-dark-text">
               SmartHire
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden items-center rounded-full border border-light-border/80 bg-white/90 px-2 py-1 shadow-soft dark:border-dark-border/80 dark:bg-dark-bg-secondary/80 md:flex">
             {activeNavLinks.map((link, index) => (
               <NavLink
                 key={index}
                 to={link.to}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors ${
+                  `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
                     isActive
-                      ? 'text-primary-600 dark:text-primary-400'
-                      : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text dark:hover:text-dark-text'
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                      : 'text-light-text-secondary hover:bg-light-bg-tertiary hover:text-light-text dark:text-dark-text-secondary dark:hover:bg-dark-hover dark:hover:text-dark-text'
                   }`
                 }
               >
@@ -151,12 +148,12 @@ const Navbar = () => {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              className="rounded-lg border border-light-border bg-white p-2.5 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-secondary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
             >
               {displayMode === 'dark' ? (
                 <Sun className="w-5 h-5" />
@@ -172,7 +169,7 @@ const Navbar = () => {
                   <div className="relative">
                     <button
                       onClick={() => setIsNotificationMenuOpen(!isNotificationMenuOpen)}
-                      className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                      className="relative rounded-lg border border-light-border bg-white p-2.5 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-secondary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300"
                       aria-label="Open notifications"
                     >
                       <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
@@ -184,8 +181,8 @@ const Navbar = () => {
                     {isNotificationMenuOpen && (
                       <>
                         <div className="fixed inset-0 z-10" onClick={() => setIsNotificationMenuOpen(false)} />
-                        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-large border border-light-border dark:border-dark-border z-20 flex flex-col max-h-96">
-                          <div className="p-3 border-b border-light-border dark:border-dark-border flex items-center justify-between">
+                        <div className="absolute right-0 z-20 mt-2 flex max-h-96 w-80 flex-col rounded-2xl border border-light-border bg-white/95 shadow-large backdrop-blur-lg dark:border-dark-border dark:bg-dark-bg-secondary/95">
+                          <div className="flex items-center justify-between border-b border-light-border px-3 py-3 dark:border-dark-border">
                             <h3 className="font-semibold text-light-text dark:text-dark-text">Notifications</h3>
                             {notifications.length > 0 && (
                               <button onClick={handleClearNotifications} className="text-xs text-error-600 hover:text-error-700 flex items-center">
@@ -220,7 +217,7 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                    className="flex items-center space-x-2 rounded-lg border border-light-border bg-white p-2 transition-colors hover:border-primary-300 hover:bg-primary-50/70 dark:border-dark-border dark:bg-dark-bg-secondary dark:hover:border-primary-500 dark:hover:bg-dark-hover"
                     aria-label="Open profile menu"
                   >
                     <Avatar src={user?.profilePicture} size="sm" />
@@ -236,11 +233,11 @@ const Navbar = () => {
                         className="fixed inset-0 z-10"
                         onClick={() => setIsProfileMenuOpen(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-large border border-light-border dark:border-dark-border z-20">
+                      <div className="absolute right-0 z-20 mt-2 w-52 rounded-2xl border border-light-border bg-white/95 shadow-large backdrop-blur-lg dark:border-dark-border dark:bg-dark-bg-secondary/95">
                         <Link
                           to={getProfilePath()}
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-light-text dark:text-dark-text"
+                          className="flex items-center space-x-2 px-4 py-3 text-light-text transition-colors hover:bg-primary-50 dark:text-dark-text dark:hover:bg-dark-hover"
                         >
                           <User className="w-4 h-4" />
                           <span>Profile</span>
@@ -248,14 +245,14 @@ const Navbar = () => {
                         <Link
                           to={getSettingsPath()}
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-light-text dark:text-dark-text"
+                          className="flex items-center space-x-2 px-4 py-3 text-light-text transition-colors hover:bg-primary-50 dark:text-dark-text dark:hover:bg-dark-hover"
                         >
                           <Settings className="w-4 h-4" />
                           <span>Settings</span>
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors text-error-600 border-t border-light-border dark:border-dark-border"
+                          className="w-full flex items-center space-x-2 border-t border-light-border px-4 py-3 text-error-600 transition-colors hover:bg-error-50 dark:border-dark-border dark:hover:bg-error-900/20"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -277,7 +274,7 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              className="rounded-lg border border-light-border bg-white p-2.5 text-light-text-secondary transition-colors hover:border-primary-300 hover:text-primary-600 dark:border-dark-border dark:bg-dark-bg-secondary dark:text-dark-text-secondary dark:hover:border-primary-500 dark:hover:text-primary-300 md:hidden"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
@@ -291,17 +288,17 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 border-t border-light-border dark:border-dark-border">
+          <div className="space-y-2 border-t border-light-border py-4 dark:border-dark-border md:hidden">
             {activeNavLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block px-4 py-2 rounded-lg transition-colors ${
+                  `block rounded-xl px-4 py-2.5 font-semibold transition-colors ${
                     isActive
                       ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                      : 'hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text'
+                      : 'text-light-text hover:bg-light-bg-tertiary dark:text-dark-text dark:hover:bg-dark-hover'
                   }`
                 }
               >
@@ -310,11 +307,11 @@ const Navbar = () => {
             ))}
 
             {isAuthenticated ? (
-              <div className="pt-2 space-y-1 border-t border-light-border dark:border-dark-border">
+              <div className="space-y-1 border-t border-light-border pt-2 dark:border-dark-border">
                 <Link
                   to={getProfilePath()}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text"
+                  className="flex items-center space-x-2 rounded-xl px-4 py-2.5 text-light-text transition-colors hover:bg-light-bg-tertiary dark:text-dark-text dark:hover:bg-dark-hover"
                 >
                   <User className="w-4 h-4" />
                   <span>Profile</span>
@@ -322,14 +319,14 @@ const Navbar = () => {
                 <Link
                   to={getSettingsPath()}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-light-text dark:text-dark-text"
+                  className="flex items-center space-x-2 rounded-xl px-4 py-2.5 text-light-text transition-colors hover:bg-light-bg-tertiary dark:text-dark-text dark:hover:bg-dark-hover"
                 >
                   <Settings className="w-4 h-4" />
                   <span>Settings</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-error-600"
+                  className="w-full flex items-center space-x-2 rounded-xl px-4 py-2.5 text-error-600 transition-colors hover:bg-error-50 dark:hover:bg-error-900/20"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Logout</span>

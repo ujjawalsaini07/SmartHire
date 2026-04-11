@@ -58,9 +58,9 @@ const Statistics = () => {
   ];
   
   return (
-    <section ref={ref} className="py-16 bg-white dark:bg-dark-bg">
+    <section ref={ref} className="py-16">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -69,9 +69,9 @@ const Statistics = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center"
+                className="card text-center p-6"
               >
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} mb-4 shadow-lg`}>
+                <div className={`mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${stat.color} shadow-soft`}>
                   <Icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-4xl font-bold text-light-text dark:text-dark-text mb-2">

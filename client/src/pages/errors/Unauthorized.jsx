@@ -5,8 +5,9 @@ import { Lock } from 'lucide-react';
 const Unauthorized = () => {
     const navigate = useNavigate();
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-dark-bg text-center p-4">
-            <div className="w-16 h-16 bg-error-50 dark:bg-error-900/20 rounded-full flex items-center justify-center mb-6">
+        <div className="page-shell flex min-h-screen flex-col items-center justify-center p-4 text-center">
+            <div className="card max-w-xl p-10">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-error-50 dark:bg-error-900/20">
                 <Lock className="w-8 h-8 text-error-500" />
             </div>
             <h1 className="text-3xl font-bold text-light-text dark:text-dark-text mb-2">Access Denied</h1>
@@ -14,6 +15,7 @@ const Unauthorized = () => {
                 You do not have permission to view this page. Please contact your administrator if you believe this is an error.
             </p>
             <Button onClick={() => navigate('/')}>Return Home</Button>
+            </div>
         </div>
     );
 };

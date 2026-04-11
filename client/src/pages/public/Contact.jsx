@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import Button from '@components/common/Button';
 import toast from 'react-hot-toast';
+import Navbar from '@components/layout/Navbar';
+import Footer from '@components/layout/Footer';
 
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -33,10 +35,12 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="page-shell">
+      <Navbar />
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-dark-bg dark:via-dark-bg-secondary dark:to-dark-bg py-16">
+      <section className="py-16">
         <div className="container-custom text-center">
+          <div className="page-hero">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -47,6 +51,7 @@ const Contact = () => {
           <p className="text-light-text-secondary dark:text-dark-text-secondary max-w-xl mx-auto">
             Have a question, feedback, or need support? We're here to help.
           </p>
+          </div>
         </div>
       </section>
 
@@ -57,7 +62,7 @@ const Contact = () => {
             <h2 className="text-xl font-bold text-light-text dark:text-dark-text">Get in Touch</h2>
             {contactInfo.map((info) => (
               <div key={info.label} className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-primary-50 dark:bg-primary-900/20 rounded-lg flex items-center justify-center text-primary-600 flex-shrink-0">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-light-border bg-primary-50 text-primary-600 dark:border-dark-border dark:bg-primary-900/20">
                   {info.icon}
                 </div>
                 <div>
@@ -71,7 +76,7 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="lg:col-span-2 bg-white dark:bg-dark-bg-secondary rounded-xl border border-light-border dark:border-dark-border p-8">
+          <div className="card lg:col-span-2 p-8">
             <h2 className="text-xl font-bold text-light-text dark:text-dark-text mb-6">Send a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -85,7 +90,7 @@ const Contact = () => {
                     value={form.name}
                     onChange={handleChange}
                     placeholder="Your full name"
-                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-gray-400"
+                    className="input"
                   />
                 </div>
                 <div>
@@ -98,7 +103,7 @@ const Contact = () => {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-gray-400"
+                    className="input"
                   />
                 </div>
               </div>
@@ -110,7 +115,7 @@ const Contact = () => {
                   value={form.subject}
                   onChange={handleChange}
                   placeholder="How can we help?"
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-gray-400"
+                  className="input"
                 />
               </div>
               <div>
@@ -123,7 +128,7 @@ const Contact = () => {
                   onChange={handleChange}
                   rows={5}
                   placeholder="Write your message here..."
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-gray-400 resize-none"
+                  className="input resize-none"
                 />
               </div>
               <div className="flex justify-end">
@@ -136,6 +141,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
