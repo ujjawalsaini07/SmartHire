@@ -47,6 +47,25 @@
   --color-error-500:   #EF4444;
   --color-info-500:    #3B82F6;
 
+  /* Semantic aliases used across pages/components */
+  --color-light-bg: var(--color-bg-base);
+  --color-light-bg-secondary: var(--color-bg-card);
+  --color-light-bg-tertiary: var(--color-bg-subtle);
+  --color-light-border: var(--color-border);
+  --color-light-text: var(--color-text-primary);
+  --color-light-text-secondary: var(--color-text-secondary);
+  --color-light-text-muted: var(--color-text-muted);
+
+  --color-dark-bg: var(--dm-bg-base);
+  --color-dark-bg-secondary: var(--dm-bg-card);
+  --color-dark-bg-tertiary: var(--dm-bg-elevated);
+  --color-dark-card: var(--dm-bg-card);
+  --color-dark-hover: var(--dm-bg-elevated);
+  --color-dark-border: var(--dm-border);
+  --color-dark-text: var(--dm-text-primary);
+  --color-dark-text-secondary: var(--dm-text-secondary);
+  --color-dark-text-muted: var(--dm-text-muted);
+
   --radius-sm:  6px;
   --radius-md:  10px;
   --radius-lg:  14px;
@@ -772,6 +791,27 @@
   /* No scrollbar */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Dark-mode fallback mappings for legacy light-only utility usage */
+  :where(html.dark) .bg-white { background-color: var(--dm-bg-card); }
+  :where(html.dark) .bg-white\/95 { background-color: color-mix(in srgb, var(--dm-bg-card) 95%, transparent); }
+  :where(html.dark) .bg-white\/90 { background-color: color-mix(in srgb, var(--dm-bg-card) 90%, transparent); }
+  :where(html.dark) .bg-white\/85 { background-color: color-mix(in srgb, var(--dm-bg-card) 85%, transparent); }
+  :where(html.dark) .bg-white\/80 { background-color: color-mix(in srgb, var(--dm-bg-card) 80%, transparent); }
+  :where(html.dark) .bg-white\/70 { background-color: color-mix(in srgb, var(--dm-bg-card) 70%, transparent); }
+  :where(html.dark) .bg-slate-50 { background-color: var(--dm-bg-subtle); }
+  :where(html.dark) .bg-slate-100 { background-color: var(--dm-bg-elevated); }
+  :where(html.dark) .text-slate-900 { color: var(--dm-text-primary); }
+  :where(html.dark) .text-slate-800 { color: var(--dm-text-primary); }
+  :where(html.dark) .text-slate-700 { color: var(--dm-text-secondary); }
+  :where(html.dark) .text-slate-600 { color: var(--dm-text-secondary); }
+  :where(html.dark) .text-slate-500 { color: var(--dm-text-muted); }
+  :where(html.dark) .text-slate-400 { color: var(--dm-text-muted); }
+  :where(html.dark) .border-white\/80 { border-color: rgba(255,255,255,0.18); }
+  :where(html.dark) .border-white\/70 { border-color: rgba(255,255,255,0.14); }
+  :where(html.dark) .border-slate-300 { border-color: var(--dm-border-strong); }
+  :where(html.dark) .border-slate-200 { border-color: var(--dm-border); }
+  :where(html.dark) .border-slate-100 { border-color: var(--dm-border); }
 }
 
 /* ══════════════════════════════════════════

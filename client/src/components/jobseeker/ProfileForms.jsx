@@ -4,6 +4,22 @@ import Button from '@components/common/Button';
 import Modal from '@components/common/Modal';
 import SkillSearchFilter from '@components/jobs/SkillSearchFilter';
 
+const toMonthInputValue = (value) => {
+  if (!value) return '';
+
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4})-(\d{2})/);
+    if (match) return `${match[1]}-${match[2]}`;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return `${parsed.getUTCFullYear()}-${String(parsed.getUTCMonth() + 1).padStart(2, '0')}`;
+};
+
+const toFirstOfMonthDate = (value) => (value ? `${value}-01` : undefined);
+
 // Skills Manager
 export const SkillsManager = ({ initialSkills, onSave, onCancel, saving }) => {
   const [skills, setSkills] = useState(initialSkills || []);
@@ -32,19 +48,31 @@ export const SkillsManager = ({ initialSkills, onSave, onCancel, saving }) => {
 
 // Work Experience Form
 export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => {
-  const [formData, setFormData] = useState(experience || {
-    title: '',
-    company: '',
-    location: '',
-    startDate: '',
-    endDate: '',
-    isCurrentRole: false,
-    description: ''
-  });
+  const [formData, setFormData] = useState(() => (
+    experience
+      ? {
+        ...experience,
+        startDate: toMonthInputValue(experience.startDate),
+        endDate: toMonthInputValue(experience.endDate),
+      }
+      : {
+        title: '',
+        company: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        isCurrentRole: false,
+        description: ''
+      }
+  ));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      startDate: toFirstOfMonthDate(formData.startDate),
+      endDate: formData.isCurrentRole ? undefined : toFirstOfMonthDate(formData.endDate),
+    });
   };
 
   return (
@@ -98,7 +126,7 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
           <input
             type="month"
             value={formData.startDate}
-            onChange={(e) => setFormData({ ...formData, startDate: e.target.value ? `${e.target.value}-01` : '' })}
+            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -111,8 +139,9 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
           <input
             type="month"
             value={formData.endDate}
-            onChange={(e) => setFormData({ ...formData, endDate: e.target.value ? `${e.target.value}-01` : '' })}
+            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
             disabled={formData.isCurrentRole}
+            required={!formData.isCurrentRole}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
           />
         </div>
@@ -158,18 +187,30 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
 
 // Education Form
 export const EducationForm = ({ education, onSave, onCancel, saving }) => {
-  const [formData, setFormData] = useState(education || {
-    institution: '',
-    degree: '',
-    fieldOfStudy: '',
-    startDate: '',
-    endDate: '',
-    grade: ''
-  });
+  const [formData, setFormData] = useState(() => (
+    education
+      ? {
+        ...education,
+        startDate: toMonthInputValue(education.startDate),
+        endDate: toMonthInputValue(education.endDate),
+      }
+      : {
+        institution: '',
+        degree: '',
+        fieldOfStudy: '',
+        startDate: '',
+        endDate: '',
+        grade: ''
+      }
+  ));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      startDate: toFirstOfMonthDate(formData.startDate),
+      endDate: toFirstOfMonthDate(formData.endDate),
+    });
   };
 
   return (
@@ -222,8 +263,8 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
           </label>
           <input
             type="month"
-            value={formData.startDate ? new Date(formData.startDate).toISOString().slice(0, 7) : ''}
-            onChange={(e) => setFormData({ ...formData, startDate: e.target.value ? `${e.target.value}-01` : '' })}
+            value={formData.startDate}
+            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -235,8 +276,8 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
           </label>
           <input
             type="month"
-            value={formData.endDate ? new Date(formData.endDate).toISOString().slice(0, 7) : ''}
-            onChange={(e) => setFormData({ ...formData, endDate: e.target.value ? `${e.target.value}-01` : '' })}
+            value={formData.endDate}
+            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
@@ -269,18 +310,30 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
 
 // Certification Form
 export const CertificationForm = ({ certification, onSave, onCancel, saving }) => {
-  const [formData, setFormData] = useState(certification || {
-    name: '',
-    issuingOrganization: '',
-    issueDate: '',
-    expirationDate: '',
-    credentialId: '',
-    credentialUrl: ''
-  });
+  const [formData, setFormData] = useState(() => (
+    certification
+      ? {
+        ...certification,
+        issueDate: toMonthInputValue(certification.issueDate),
+        expirationDate: toMonthInputValue(certification.expirationDate),
+      }
+      : {
+        name: '',
+        issuingOrganization: '',
+        issueDate: '',
+        expirationDate: '',
+        credentialId: '',
+        credentialUrl: ''
+      }
+  ));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      ...formData,
+      issueDate: toFirstOfMonthDate(formData.issueDate),
+      expirationDate: toFirstOfMonthDate(formData.expirationDate),
+    });
   };
 
   return (
@@ -321,7 +374,7 @@ export const CertificationForm = ({ certification, onSave, onCancel, saving }) =
           <input
             type="month"
             value={formData.issueDate}
-            onChange={(e) => setFormData({ ...formData, issueDate: e.target.value ? `${e.target.value}-01` : '' })}
+            onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -334,7 +387,7 @@ export const CertificationForm = ({ certification, onSave, onCancel, saving }) =
           <input
             type="month"
             value={formData.expirationDate}
-            onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value ? `${e.target.value}-01` : '' })}
+            onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
