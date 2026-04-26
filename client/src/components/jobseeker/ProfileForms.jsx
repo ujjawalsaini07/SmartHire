@@ -3,6 +3,7 @@ import { X, Plus, Calendar, Building2, GraduationCap, Award, FolderOpen, Link as
 import Button from '@components/common/Button';
 import Modal from '@components/common/Modal';
 import SkillSearchFilter from '@components/jobs/SkillSearchFilter';
+import toast from 'react-hot-toast';
 
 const toMonthInputValue = (value) => {
   if (!value) return '';
@@ -19,6 +20,8 @@ const toMonthInputValue = (value) => {
 };
 
 const toFirstOfMonthDate = (value) => (value ? `${value}-01` : undefined);
+const CURRENT_MONTH = toMonthInputValue(new Date());
+const isFutureMonth = (value) => Boolean(value && value > CURRENT_MONTH);
 
 // Skills Manager
 export const SkillsManager = ({ initialSkills, onSave, onCancel, saving }) => {
@@ -68,6 +71,12 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (isFutureMonth(formData.startDate) || (!formData.isCurrentRole && isFutureMonth(formData.endDate))) {
+      toast.error('Future dates are not allowed.');
+      return;
+    }
+
     onSave({
       ...formData,
       startDate: toFirstOfMonthDate(formData.startDate),
@@ -127,6 +136,7 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
             type="month"
             value={formData.startDate}
             onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+            max={CURRENT_MONTH}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -142,6 +152,7 @@ export const WorkExperienceForm = ({ experience, onSave, onCancel, saving }) => 
             onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
             disabled={formData.isCurrentRole}
             required={!formData.isCurrentRole}
+            max={CURRENT_MONTH}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
           />
         </div>
@@ -206,6 +217,12 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (isFutureMonth(formData.startDate) || isFutureMonth(formData.endDate)) {
+      toast.error('Future dates are not allowed.');
+      return;
+    }
+
     onSave({
       ...formData,
       startDate: toFirstOfMonthDate(formData.startDate),
@@ -265,6 +282,7 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
             type="month"
             value={formData.startDate}
             onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+            max={CURRENT_MONTH}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -278,6 +296,7 @@ export const EducationForm = ({ education, onSave, onCancel, saving }) => {
             type="month"
             value={formData.endDate}
             onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+            max={CURRENT_MONTH}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
@@ -329,6 +348,12 @@ export const CertificationForm = ({ certification, onSave, onCancel, saving }) =
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (isFutureMonth(formData.issueDate) || isFutureMonth(formData.expirationDate)) {
+      toast.error('Future dates are not allowed.');
+      return;
+    }
+
     onSave({
       ...formData,
       issueDate: toFirstOfMonthDate(formData.issueDate),
@@ -375,6 +400,7 @@ export const CertificationForm = ({ certification, onSave, onCancel, saving }) =
             type="month"
             value={formData.issueDate}
             onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+            max={CURRENT_MONTH}
             required
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -388,6 +414,7 @@ export const CertificationForm = ({ certification, onSave, onCancel, saving }) =
             type="month"
             value={formData.expirationDate}
             onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
+            max={CURRENT_MONTH}
             className="w-full px-3 py-2 rounded-lg border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-light-text dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
