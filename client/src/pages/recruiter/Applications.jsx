@@ -161,6 +161,7 @@ export default function Applications() {
   const [localNotes, setLocalNotes] = useState({});
   const [appSearch, setAppSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [showJobDetails, setShowJobDetails] = useState(false);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, appId: null, status: null });
   const [interviewModal, setInterviewModal] = useState({ isOpen: false, appId: null, scheduledAt: '', meetingLink: '', notes: '' });
   const [closingJob, setClosingJob] = useState(false);
@@ -183,6 +184,7 @@ export default function Applications() {
     setExpandedId(null);
     setAppSearch('');
     setStatusFilter('');
+    setShowJobDetails(false);
     try {
       setLoadingApps(true);
       const res = await recruiterApi.getApplicationsForJob(job._id);
@@ -191,7 +193,13 @@ export default function Applications() {
     finally { setLoadingApps(false); }
   };
 
-  const backToJobs = () => { setView('jobs'); setSelectedJob(null); setApplications([]); setExpandedId(null); };
+  const backToJobs = () => {
+    setView('jobs');
+    setSelectedJob(null);
+    setApplications([]);
+    setExpandedId(null);
+    setShowJobDetails(false);
+  };
 
   const refreshApps = async () => {
     if (!selectedJob) return;
@@ -257,6 +265,13 @@ export default function Applications() {
     if (statusFilter) list = list.filter(a => a.status === statusFilter);
     return list;
   }, [applications, appSearch, statusFilter]);
+
+  const applicationStatusCounts = useMemo(() => (
+    applications.reduce((acc, app) => {
+      acc[app.status] = (acc[app.status] || 0) + 1;
+      return acc;
+    }, {})
+  ), [applications]);
 
   const requestStatus = (appId, newStatus, curStatus) => {
     if (curStatus === 'accepted') return;
@@ -560,118 +575,137 @@ export default function Applications() {
         </section>
 
         <section className="rounded-[28px] border border-white/70 bg-white/80 p-5 shadow-[0_16px_50px_rgba(15,23,42,0.06)] backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-500">Job brief</p>
-              <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">Complete role details</h3>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left dark:border-dark-border dark:bg-dark-card">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Screening</p>
-              <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {safeCount(selectedJob?.screeningQuestions)} questions
+              <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">Role details</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Keep this collapsed while reviewing candidates, then expand if you need the full specification.
               </p>
             </div>
-          </div>
-
-          <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.75fr)]">
-            <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Description</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left dark:border-dark-border dark:bg-dark-card">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Screening</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  {safeCount(selectedJob?.screeningQuestions)} questions
+                </p>
               </div>
-              <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-300">
-                {selectedJob?.description || 'No job description provided.'}
-              </p>
-
-              {selectedJob?.qualifications?.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Qualifications</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {selectedJob.qualifications.map((qual, idx) => (
-                      <span
-                        key={`${qual}-${idx}`}
-                        className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm text-slate-600 dark:border-dark-border dark:bg-dark-bg dark:text-slate-300"
-                      >
-                        {qual}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedJob?.screeningQuestions?.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Screening Questions</p>
-                  <div className="mt-3 space-y-3">
-                    {selectedJob.screeningQuestions.map((question, idx) => (
-                      <div key={`${question.question}-${idx}`} className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-dark-border dark:bg-dark-bg">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-slate-700 dark:text-slate-200">{question.question}</p>
-                          {question.isRequired && (
-                            <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
-                              Required
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-              {[
-                {
-                  label: 'Location',
-                  value: formatLocation(selectedJob?.location),
-                  note: selectedJob?.location?.isRemote ? toLabel(selectedJob?.location?.remoteType) : 'On-site or hybrid details',
-                  tone: 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300',
-                },
-                {
-                  label: 'Salary',
-                  value: formatSalary(selectedJob?.salary),
-                  note: selectedJob?.salary?.isVisible === false ? 'Internal view' : 'Visible range',
-                  tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300',
-                },
-                {
-                  label: 'Experience',
-                  value: toLabel(selectedJob?.experienceLevel),
-                  note: selectedJob?.experienceYears ? `${selectedJob.experienceYears.min || 0} to ${selectedJob.experienceYears.max || 'any'} years` : 'No range set',
-                  tone: 'bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300',
-                },
-                {
-                  label: 'Education',
-                  value: formatDegree(selectedJob?.education?.minDegree),
-                  note: selectedJob?.education?.preferredFields?.length ? selectedJob.education.preferredFields.join(', ') : 'No preferred field listed',
-                  tone: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300',
-                },
-                {
-                  label: 'Openings',
-                  value: metricValue(selectedJob?.numberOfOpenings || 1),
-                  note: `${metricValue(applications.length)} applicants`,
-                  tone: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300',
-                },
-                {
-                  label: 'Deadline',
-                  value: selectedJob?.applicationDeadline ? fmt(selectedJob.applicationDeadline) : 'No deadline',
-                  note: selectedJob?.postedAt ? `Posted ${fmt(selectedJob.postedAt)}` : 'Posting date unavailable',
-                  tone: 'bg-slate-50 text-slate-700 dark:bg-dark-card dark:text-slate-300',
-                },
-              ].map((item) => (
-                <div key={item.label} className={`rounded-2xl border border-white/80 p-4 shadow-sm ${item.tone}`}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] opacity-70">{item.label}</p>
-                  <p className="mt-2 text-lg font-bold leading-tight">{item.value}</p>
-                  <p className="mt-1 text-xs font-medium opacity-80">{item.note}</p>
-                </div>
-              ))}
+              <button
+                onClick={() => setShowJobDetails((prev) => !prev)}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:text-slate-200 dark:hover:bg-dark-hover"
+              >
+                {showJobDetails ? 'Hide details' : 'View full details'}
+                <ChevronDown className={`h-4 w-4 transition-transform ${showJobDetails ? 'rotate-180' : ''}`} />
+              </button>
             </div>
           </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              {
+                label: 'Location',
+                value: formatLocation(selectedJob?.location),
+                note: selectedJob?.location?.isRemote ? toLabel(selectedJob?.location?.remoteType) : 'On-site or hybrid',
+              },
+              {
+                label: 'Salary',
+                value: formatSalary(selectedJob?.salary),
+                note: selectedJob?.salary?.isVisible === false ? 'Internal view' : 'Visible range',
+              },
+              {
+                label: 'Experience',
+                value: toLabel(selectedJob?.experienceLevel),
+                note: selectedJob?.experienceYears ? `${selectedJob.experienceYears.min || 0} to ${selectedJob.experienceYears.max || 'any'} years` : 'No range set',
+              },
+              {
+                label: 'Deadline',
+                value: selectedJob?.applicationDeadline ? fmt(selectedJob.applicationDeadline) : 'No deadline',
+                note: selectedJob?.postedAt ? `Posted ${fmt(selectedJob.postedAt)}` : 'Posting date unavailable',
+              },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">{item.label}</p>
+                <p className="mt-2 text-sm font-bold leading-tight text-slate-900 dark:text-white">{item.value}</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{item.note}</p>
+              </div>
+            ))}
+          </div>
+
+          {showJobDetails && (
+            <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.75fr)]">
+              <div className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Description</p>
+                </div>
+                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-300">
+                  {selectedJob?.description || 'No job description provided.'}
+                </p>
+
+                {selectedJob?.qualifications?.length > 0 && (
+                  <div className="mt-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Qualifications</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {selectedJob.qualifications.map((qual, idx) => (
+                        <span
+                          key={`${qual}-${idx}`}
+                          className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm text-slate-600 dark:border-dark-border dark:bg-dark-bg dark:text-slate-300"
+                        >
+                          {qual}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedJob?.screeningQuestions?.length > 0 && (
+                  <div className="mt-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Screening Questions</p>
+                    <div className="mt-3 space-y-3">
+                      {selectedJob.screeningQuestions.map((question, idx) => (
+                        <div key={`${question.question}-${idx}`} className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-dark-border dark:bg-dark-bg">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-medium text-slate-700 dark:text-slate-200">{question.question}</p>
+                            {question.isRequired && (
+                              <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                                Required
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                {[
+                  {
+                    label: 'Education',
+                    value: formatDegree(selectedJob?.education?.minDegree),
+                    note: selectedJob?.education?.preferredFields?.length ? selectedJob.education.preferredFields.join(', ') : 'No preferred field listed',
+                  },
+                  {
+                    label: 'Openings',
+                    value: metricValue(selectedJob?.numberOfOpenings || 1),
+                    note: `${metricValue(applications.length)} applicants`,
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">{item.label}</p>
+                    <p className="mt-2 text-lg font-bold leading-tight text-slate-900 dark:text-white">{item.value}</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{item.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="rounded-[28px] border border-white/70 bg-white/80 p-5 shadow-[0_16px_50px_rgba(15,23,42,0.06)] backdrop-blur">
           <div className="flex flex-col gap-5">
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="space-y-4">
               <div className="relative">
                 <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
                   Search candidates
@@ -685,7 +719,7 @@ export default function Applications() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 xl:grid-cols-1 xl:min-w-[240px]">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
                   { label: 'Shown', value: filteredApps.length, tone: 'bg-slate-50 text-slate-900 dark:bg-dark-card dark:text-white' },
                   { label: 'Total', value: applications.length, tone: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' },
@@ -716,19 +750,29 @@ export default function Applications() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                {APPLICATION_STATUS_OPTIONS.map((option) => (
-                  <button
-                    key={option.value || 'all'}
-                    onClick={() => setStatusFilter(option.value)}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition ${
-                      statusFilter === option.value
-                        ? 'border-primary/30 bg-primary text-white shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:text-slate-300 dark:hover:bg-dark-hover'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                {APPLICATION_STATUS_OPTIONS.map((option) => {
+                  const optionCount = option.value ? (applicationStatusCounts[option.value] || 0) : applications.length;
+                  return (
+                    <button
+                      key={option.value || 'all'}
+                      onClick={() => setStatusFilter(option.value)}
+                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition ${
+                        statusFilter === option.value
+                          ? 'border-primary/30 bg-primary text-white shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:text-slate-300 dark:hover:bg-dark-hover'
+                      }`}
+                    >
+                      <span>{option.label}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                        statusFilter === option.value
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-100 text-slate-500 dark:bg-dark-bg dark:text-slate-300'
+                      }`}>
+                        {optionCount}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -978,8 +1022,14 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
   const latestExperience = [...(profile.workExperience || [])].sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0))[0];
   const latestEducation = [...(profile.education || [])].sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0))[0];
   const skillCount = safeCount(profile.skills);
+  const workExperienceCount = safeCount(profile.workExperience);
+  const educationCount = safeCount(profile.education);
   const resumeFile = profile.resume?.fileName || 'Resume not uploaded';
   const socialLinks = profile.socialLinks || {};
+  const topSkills = (profile.skills || [])
+    .map((skill) => (typeof skill === 'string' ? skill : skill?.name))
+    .filter(Boolean)
+    .slice(0, 3);
 
   // status-based left border color
   const borderAccent = {
@@ -1000,7 +1050,7 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
         onClick={onToggle}
         className="w-full px-5 py-4 text-left outline-none transition focus:ring-4 focus:ring-primary/10"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${isAccepted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-primary/10 text-primary'}`}>
             {initials}
           </div>
@@ -1011,15 +1061,35 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
               {isAccepted && <Lock className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" title="Locked - accepted" />}
             </div>
             <p className="mt-0.5 truncate text-sm text-slate-500 dark:text-slate-400">{app.jobSeekerId?.email}</p>
+            <p className="mt-1 line-clamp-1 text-sm font-medium text-slate-600 dark:text-slate-300">{candidateHeadline}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <StatusBadge status={app.status} />
               <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-500 dark:bg-dark-bg dark:text-slate-300">
                 Applied {fmtShort(app.appliedAt || app.createdAt)}
               </span>
+              {candidateLocation !== 'Location not specified' && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-500 dark:bg-dark-bg dark:text-slate-300">
+                  <MapPin className="h-3 w-3" />
+                  {candidateLocation}
+                </span>
+              )}
             </div>
-          </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600 dark:bg-dark-bg dark:text-slate-300">
+                {workExperienceCount} roles
+              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-600 dark:bg-dark-bg dark:text-slate-300">
+                {skillCount} skills
+              </span>
+              {topSkills.map((skill, idx) => (
+                <span key={`${skill}-${idx}`} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium text-slate-600 dark:border-dark-border dark:bg-dark-card dark:text-slate-300">
+                  {skill}
+                </span>
+                ))}
+              </div>
+            </div>
 
-          <div className="flex flex-shrink-0 items-center gap-3">
+          <div className="flex flex-shrink-0 items-center justify-between gap-3 sm:min-w-[96px] sm:flex-col sm:items-end">
             {app.rating > 0 && (
               <div className="hidden sm:flex gap-0.5">
                 {[1, 2, 3, 4, 5].map(s => <Star key={s} className={`h-3.5 w-3.5 ${app.rating >= s ? 'fill-amber-400 text-amber-400' : 'text-slate-200 dark:text-slate-700'}`} />)}
@@ -1142,8 +1212,8 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Experience', value: `${safeCount(profile.workExperience)} roles`, tone: 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300' },
-                    { label: 'Education', value: `${safeCount(profile.education)} entries`, tone: 'bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300' },
+                    { label: 'Experience', value: `${workExperienceCount} roles`, tone: 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-300' },
+                    { label: 'Education', value: `${educationCount} entries`, tone: 'bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-300' },
                     { label: 'Skills', value: `${skillCount} listed`, tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' },
                     { label: 'Resume', value: profile.resume?.fileName ? 'Uploaded' : 'Missing', tone: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' },
                   ].map((item) => (
@@ -1222,24 +1292,6 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
                 )}
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Rate Candidate</p>
-                <StarRow value={app.rating} onChange={r => onRate(app._id, r)} />
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Internal Notes</p>
-                <textarea rows={4} placeholder="Private notes for your team…"
-                  className="w-full resize-none rounded-2xl border border-slate-200 p-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-primary/40 focus:ring-4 focus:ring-primary/10 dark:border-dark-border dark:bg-dark-bg dark:text-slate-200 dark:focus:ring-primary/20"
-                  value={localNotes[app._id] ?? latestNote}
-                  onChange={e => setLocalNotes(prev => ({ ...prev, [app._id]: e.target.value }))}
-                />
-                <button onClick={() => onSaveNotes(app._id, localNotes[app._id] ?? latestNote)}
-                  className="mt-3 w-full rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
-                  Save Note
-                </button>
-              </div>
-
               <div className="space-y-2.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
                 <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Pipeline Actions</p>
 
@@ -1272,6 +1324,24 @@ function AppCard({ app, isExpanded, onToggle, onStatus, onDelete, onRate, onSave
                     <Trash2 className="h-3.5 w-3.5" /> Delete Application
                   </button>
                 )}
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Rate Candidate</p>
+                <StarRow value={app.rating} onChange={r => onRate(app._id, r)} />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-card">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Internal Notes</p>
+                <textarea rows={4} placeholder="Private notes for your team…"
+                  className="w-full resize-none rounded-2xl border border-slate-200 p-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-primary/40 focus:ring-4 focus:ring-primary/10 dark:border-dark-border dark:bg-dark-bg dark:text-slate-200 dark:focus:ring-primary/20"
+                  value={localNotes[app._id] ?? latestNote}
+                  onChange={e => setLocalNotes(prev => ({ ...prev, [app._id]: e.target.value }))}
+                />
+                <button onClick={() => onSaveNotes(app._id, localNotes[app._id] ?? latestNote)}
+                  className="mt-3 w-full rounded-xl bg-slate-900 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
+                  Save Note
+                </button>
               </div>
             </div>
           </div>
