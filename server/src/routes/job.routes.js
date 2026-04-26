@@ -8,6 +8,7 @@ import {
   updateJob,
   deleteJob,
   closeJob,
+  reopenJob,
   getMyJobs,
   trackJobView,
   toggleFeaturedJob,
@@ -90,6 +91,13 @@ jobRouter.delete("/:id", protect, authorize("recruiter"), deleteJob);
  * @access  Private (Recruiter - Owner)
  */
 jobRouter.patch("/:id/close", protect, authorize("recruiter"), closeJob);
+
+/**
+ * @route   PATCH /api/v1/jobs/:id/reopen
+ * @desc    Reopen a closed/filled job (goes to pending-approval)
+ * @access  Private (Recruiter - Owner)
+ */
+jobRouter.patch("/:id/reopen", protect, authorize("recruiter"), reopenJob);
 
 /**
  * @route   PATCH /api/v1/jobs/:id/featured

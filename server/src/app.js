@@ -9,6 +9,7 @@ import jobseekerRoutes from "./routes/jobseeker.routes.js";
 import recruiterRoutes from "./routes/recruiter.routes.js";
 import adminRecruiterRoutes from "./routes/adminRecruiter.routes.js";
 import adminJobRoutes from "./routes/adminJob.routes.js";
+import adminSettingsRoutes from "./routes/adminSettings.routes.js";
 import jobRoutes from "./routes/job.routes.js";
 import applicationRouter from "./routes/applications.routes.js";
 import saveJobsRouter from "./routes/savedJobs.routes.js";
@@ -19,6 +20,7 @@ import emailRouter from "./routes/email.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
 import { requestLogger } from "./config/logger.js";
 import { handleMulterError } from "./middlewares/upload/upload.middleware.js";
+import { enforceMaintenanceMode } from "./middlewares/system/maintenance.middleware.js";
 
 const app = express();
 app.set("trust proxy", 1); 
@@ -67,6 +69,8 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use(enforceMaintenanceMode);
+
 app.use("/api/v1/auth", authRoutes); // auth routes
 
 app.use("/api/v1/users", userRouter); // user routes
@@ -75,6 +79,7 @@ app.use("/api/v1/recruiters", recruiterRoutes); // recruiter routes
 app.use("/api/v1/admin/recruiters", adminRecruiterRoutes); // adminrecruiter routes
 app.use("/api/v1/jobs", jobRoutes); // job routes
 app.use("/api/v1/admin/jobs", adminJobRoutes); // admin job routes
+app.use("/api/v1/admin/settings", adminSettingsRoutes); // admin settings routes
 app.use("/api/v1/applications", applicationRouter); // applications routes
 app.use("/api/v1/saved-jobs", saveJobsRouter); // saved jobs routes
 app.use("/api/v1/skills", skillsRouter); // skills jobs routes

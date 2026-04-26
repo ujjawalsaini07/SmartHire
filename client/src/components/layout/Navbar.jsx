@@ -92,15 +92,15 @@ const Navbar = () => {
   ];
 
   const recruiterNavLinks = [
-    { to: '/recruiter/dashboard', label: 'Dashboard' },
-    { to: '/contact', label: 'Contact' },
+    // { to: '/recruiter/dashboard', label: 'Dashboard' },
+    // { to: '/contact', label: 'Contact' },
   ];
 
   const jobseekerNavLinks = [];
 
   const adminNavLinks = [
-    { to: '/admin/dashboard', label: 'Dashboard' },
-    { to: '/contact', label: 'Contact' },
+    // { to: '/admin/dashboard', label: 'Dashboard' },
+    // { to: '/contact', label: 'Contact' },
   ];
 
   const getNavLinks = () => {

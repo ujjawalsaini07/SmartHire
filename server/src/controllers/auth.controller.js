@@ -1,4 +1,6 @@
 import User from "../models/User.model.js";
+import Application from "../models/Application.model.js";
+import SystemSettings from "../models/SystemSettings.model.js";
 import jwt from "jsonwebtoken";
 import {
   sendVerificationEmail,
@@ -42,6 +44,14 @@ export const register = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User already exists with this email",
+      });
+    }
+
+    const systemSettings = await SystemSettings.getSingleton();
+    if (!systemSettings.registrationOpen) {
+      return res.status(403).json({
+        success: false,
+        message: "Registration is temporarily closed by admin settings.",
       });
     }
 
@@ -129,6 +139,14 @@ export const login = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
+      });
+    }
+
+    const systemSettings = await SystemSettings.getSingleton();
+    if (systemSettings.maintenanceMode && user.role !== "admin") {
+      return res.status(503).json({
+        success: false,
+        message: "Platform is in maintenance mode. Only admins can login right now.",
       });
     }
 
@@ -245,6 +263,14 @@ export const refreshToken = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Invalid refresh token",
+      });
+    }
+
+    const systemSettings = await SystemSettings.getSingleton();
+    if (systemSettings.maintenanceMode && user.role !== "admin") {
+      return res.status(503).json({
+        success: false,
+        message: "Platform is in maintenance mode. Only admins can access right now.",
       });
     }
 
@@ -440,8 +466,6 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
-
-import Application from "../models/Application.model.js";
 
 /**
  * @desc    Get current user

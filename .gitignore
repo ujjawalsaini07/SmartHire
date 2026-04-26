@@ -41,6 +41,5 @@ coverage/
 *.swp
 *.swo
 
-
 # ---- upload dir ---- 
 changes.txt

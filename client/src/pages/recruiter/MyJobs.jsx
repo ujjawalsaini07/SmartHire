@@ -44,6 +44,7 @@ const MyJobs = () => {
   // Modals
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, jobId: null, jobTitle: '' });
   const [closeModal, setCloseModal] = useState({ isOpen: false, jobId: null, jobTitle: '' });
+  const [reopenModal, setReopenModal] = useState({ isOpen: false, jobId: null, jobTitle: '' });
 
   // Fetch Jobs
   const fetchJobs = async () => {
@@ -127,13 +128,28 @@ const MyJobs = () => {
   const handleCloseJob = async () => {
     try {
       setActionLoading(true);
-      await recruiterApi.closeJob(closeModal.jobId, { reason: 'closed' });
+      await recruiterApi.closeJob(closeModal.jobId);
       toast.success('Job closed successfully');
       setCloseModal({ isOpen: false, jobId: null, jobTitle: '' });
-      fetchJobs(); // Refresh list
+      fetchJobs();
     } catch (error) {
       console.error('Close error:', error);
       toast.error(error.response?.data?.message || 'Failed to close job');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReopenJob = async () => {
+    try {
+      setActionLoading(true);
+      await recruiterApi.reopenJob(reopenModal.jobId);
+      toast.success('Job submitted for re-approval! It will go live once an admin approves it.');
+      setReopenModal({ isOpen: false, jobId: null, jobTitle: '' });
+      fetchJobs();
+    } catch (error) {
+      console.error('Reopen error:', error);
+      toast.error(error.response?.data?.message || 'Failed to reopen job');
     } finally {
       setActionLoading(false);
     }
@@ -312,6 +328,18 @@ const MyJobs = () => {
                           <XCircle className="w-4 h-4" />
                         </Button>
                       )}
+
+                      {(job.status === 'closed' || job.status === 'filled') && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                          onClick={() => setReopenModal({ isOpen: true, jobId: job._id, jobTitle: job.title })}
+                          title="Reopen Job"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                      )}
                       
                       <Button 
                         variant="ghost" 
@@ -421,6 +449,29 @@ const MyJobs = () => {
         </div>
       </Modal>
 
+      {/* Reopen Confirmation Modal */}
+      <Modal
+        isOpen={reopenModal.isOpen}
+        onClose={() => setReopenModal({ isOpen: false, jobId: null, jobTitle: '' })}
+        title="Reopen Job Posting"
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 text-blue-900 rounded-md flex items-start">
+            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+            <p className="text-sm">
+              Reopening <strong>{reopenModal.jobTitle}</strong> will submit it for admin re-approval before it becomes visible to candidates again.
+            </p>
+          </div>
+          <div className="flex justify-end space-x-3">
+            <Button variant="ghost" onClick={() => setReopenModal({ isOpen: false, jobId: null, jobTitle: '' })} disabled={actionLoading}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleReopenJob} disabled={actionLoading}>
+              {actionLoading ? 'Submitting...' : 'Reopen for Approval'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

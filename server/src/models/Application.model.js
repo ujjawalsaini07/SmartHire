@@ -151,6 +151,16 @@ const ApplicationSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+
+    // Snapshot: populated when job is deleted so accepted candidates retain context
+    _deletedJobTitle: {
+      type: String,
+      trim: true,
+    },
+    _deletedJobCompany: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt

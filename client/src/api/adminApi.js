@@ -165,6 +165,17 @@ export const adminApi = {
     return response.data;
   },
 
+  // Platform Settings
+  getSystemSettings: async () => {
+    const response = await api.get('/admin/settings');
+    return response.data;
+  },
+
+  updateSystemSettings: async (settingsData) => {
+    const response = await api.patch('/admin/settings', settingsData);
+    return response.data;
+  },
+
   // Analytics
   getAdminDashboardStats: async () => {
     const response = await api.get('/analytics/admin/dashboard');

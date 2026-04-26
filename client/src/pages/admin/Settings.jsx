@@ -1,20 +1,26 @@
-import { useState } from 'react';
-import { Settings as SettingsIcon, Shield, Server, Key } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Settings as SettingsIcon, Server, Key } from 'lucide-react';
 import Card from '@components/common/Card';
 import Button from '@components/common/Button';
 import toast from 'react-hot-toast';
 import { authApi } from '@api/authApi';
+import { adminApi } from '@api/adminApi';
 import Input from '@components/common/Input';
+import Spinner from '@components/common/Spinner';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('platform');
-  
-  // Tab 1: Platform State
-  const [platformConfig, setPlatformConfig] = useState({
+  const defaultPlatformConfig = {
     registrationOpen: true,
     maintenanceMode: false,
-    autoModerateJobs: true
-  });
+    autoModerateJobs: true,
+  };
+
+  // Tab 1: Platform State
+  const [platformConfig, setPlatformConfig] = useState(defaultPlatformConfig);
+  const [savedPlatformConfig, setSavedPlatformConfig] = useState(defaultPlatformConfig);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
 
   // Tab 2: Password State
   const [passwordForm, setPasswordForm] = useState({
@@ -24,9 +30,54 @@ const Settings = () => {
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const handleConfigSave = (e) => {
+  const hasConfigChanges =
+    platformConfig.registrationOpen !== savedPlatformConfig.registrationOpen ||
+    platformConfig.maintenanceMode !== savedPlatformConfig.maintenanceMode ||
+    platformConfig.autoModerateJobs !== savedPlatformConfig.autoModerateJobs;
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setIsLoadingConfig(true);
+        const response = await adminApi.getSystemSettings();
+        const incoming = response?.data || {};
+        const normalized = {
+          registrationOpen: incoming.registrationOpen ?? defaultPlatformConfig.registrationOpen,
+          maintenanceMode: incoming.maintenanceMode ?? defaultPlatformConfig.maintenanceMode,
+          autoModerateJobs: incoming.autoModerateJobs ?? defaultPlatformConfig.autoModerateJobs,
+        };
+        setPlatformConfig(normalized);
+        setSavedPlatformConfig(normalized);
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to load platform settings');
+      } finally {
+        setIsLoadingConfig(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleConfigSave = async (e) => {
     e.preventDefault();
-    toast.success('Platform configuration saved successfully');
+    try {
+      setIsSavingConfig(true);
+      const response = await adminApi.updateSystemSettings(platformConfig);
+      const saved = response?.data || platformConfig;
+      const normalized = {
+        registrationOpen: saved.registrationOpen ?? platformConfig.registrationOpen,
+        maintenanceMode: saved.maintenanceMode ?? platformConfig.maintenanceMode,
+        autoModerateJobs: saved.autoModerateJobs ?? platformConfig.autoModerateJobs,
+      };
+
+      setPlatformConfig(normalized);
+      setSavedPlatformConfig(normalized);
+      toast.success('Platform configuration saved successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to save platform settings');
+    } finally {
+      setIsSavingConfig(false);
+    }
   };
 
   const handlePasswordChange = async (e) => {
@@ -94,6 +145,11 @@ const Settings = () => {
             {activeTab === 'platform' && (
               <>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Platform Configuration</h2>
+                {isLoadingConfig ? (
+                  <div className="py-12 flex justify-center">
+                    <Spinner size="md" />
+                  </div>
+                ) : (
                 <form onSubmit={handleConfigSave} className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -101,7 +157,7 @@ const Settings = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">Allow new users to sign up.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" checked={platformConfig.registrationOpen} onChange={() => setPlatformConfig({...platformConfig, registrationOpen: !platformConfig.registrationOpen})} />
+                      <input type="checkbox" className="sr-only peer" checked={platformConfig.registrationOpen} onChange={() => setPlatformConfig({...platformConfig, registrationOpen: !platformConfig.registrationOpen})} disabled={isSavingConfig} />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                   </div>
@@ -112,7 +168,7 @@ const Settings = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">Automatically approve jobs from verified recruiters.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" checked={platformConfig.autoModerateJobs} onChange={() => setPlatformConfig({...platformConfig, autoModerateJobs: !platformConfig.autoModerateJobs})} />
+                      <input type="checkbox" className="sr-only peer" checked={platformConfig.autoModerateJobs} onChange={() => setPlatformConfig({...platformConfig, autoModerateJobs: !platformConfig.autoModerateJobs})} disabled={isSavingConfig} />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                   </div>
@@ -123,15 +179,18 @@ const Settings = () => {
                       <p className="text-sm text-error-500">Put the site into maintenance mode. Only admins will have access.</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" checked={platformConfig.maintenanceMode} onChange={() => setPlatformConfig({...platformConfig, maintenanceMode: !platformConfig.maintenanceMode})} />
+                      <input type="checkbox" className="sr-only peer" checked={platformConfig.maintenanceMode} onChange={() => setPlatformConfig({...platformConfig, maintenanceMode: !platformConfig.maintenanceMode})} disabled={isSavingConfig} />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                   </div>
 
                   <div className="pt-4 border-t border-gray-100 dark:border-dark-border flex justify-end">
-                    <Button type="submit">Save Changes</Button>
+                    <Button type="submit" isLoading={isSavingConfig} disabled={!hasConfigChanges || isSavingConfig}>
+                      Save Changes
+                    </Button>
                   </div>
                 </form>
+                )}
               </>
             )}
 

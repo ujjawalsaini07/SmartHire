@@ -2,6 +2,7 @@ import Job from "../models/Jobs.models.js";
 import RecruiterProfile from "../models/RecruiterProfile.model.js";
 import JobSeekerProfile from "../models/JobSeekerProfile.model.js";
 import JobView from "../models/JobView.model.js";
+import SystemSettings from "../models/SystemSettings.model.js";
 import mongoose from "mongoose";
 
 /**
@@ -451,6 +452,7 @@ export const updateJob = async (req, res) => {
   try {
     const { id } = req.params;
     const recruiterId = req.user.id;
+    let wasAutoModerated = false;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -492,21 +494,41 @@ export const updateJob = async (req, res) => {
     delete sanitizedBody.isFeatured;
     delete sanitizedBody.status; // Handle status separately
 
-    // ⚠️ Only allow status changes from draft to pending-approval
-   if (req.body.status) {
+    // ⚠️ Status transitions allowed for recruiters
+    if (req.body.status) {
       if (job.status === "draft" && req.body.status === "pending-approval") {
-        // Submit: Draft -> Pending
-        await job.submitForApproval();
+        const settings = await SystemSettings.getSingleton();
+
+        if (settings.autoModerateJobs) {
+          const recruiterProfile = await RecruiterProfile.findOne({ userId: recruiterId }).select("isVerified");
+          if (recruiterProfile?.isVerified) {
+            job.status = "active";
+            job.moderatedBy = null;
+            job.moderatedAt = new Date();
+            job.moderationNotes = "Auto-approved by platform settings.";
+            wasAutoModerated = true;
+          } else {
+            await job.submitForApproval();
+          }
+        } else {
+          await job.submitForApproval();
+        }
       } else if (job.status === "pending-approval" && req.body.status === "draft") {
-        // Withdraw: Pending -> Draft
         job.status = "draft";
-        // Optionally reset any verification/approval flags if they exist
       } else if (req.body.status !== job.status) {
         return res.status(403).json({
           success: false,
-          message: "You can only toggle between Draft and Pending Approval. Other status changes require admin action.",
+          message: "You can only toggle between Draft and Pending Approval. Other status changes require the close/reopen endpoints.",
         });
       }
+    }
+
+    // If recruiter edits a closed/filled job's content, it must go through approval again
+    if (["closed", "filled"].includes(job.status) && Object.keys(sanitizedBody).length > 0) {
+      job.status = "pending-approval";
+      job.closedAt = null;
+      job.moderatedBy = null;
+      job.moderatedAt = null;
     }
 
     // Update job with sanitized data using Mongoose's .set() for proper array updates
@@ -522,7 +544,9 @@ export const updateJob = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Job posting updated successfully",
+      message: wasAutoModerated
+        ? "Job auto-approved and published successfully"
+        : "Job posting updated successfully",
       data: updatedJob,
     });
   } catch (error) {
@@ -588,7 +612,21 @@ export const deleteJob = async (req, res) => {
       });
     }
 
-    // Delete the job
+    const Application = mongoose.model("Application");
+
+    // Delete only non-accepted applications (ghost prevention)
+    // Accepted/hired/offered applications are preserved so job seekers retain their
+    // acceptance record, but the job title is snapshotted onto the application.
+    await Application.updateMany(
+      { jobId: id, status: { $in: ["accepted", "hired", "offered"] } },
+      { $set: { _deletedJobTitle: job.title, _deletedJobCompany: job.companyId } }
+    );
+    await Application.deleteMany({
+      jobId: id,
+      status: { $nin: ["accepted", "hired", "offered"] }
+    });
+
+    // Delete the job itself
     await Job.findByIdAndDelete(id);
 
     res.status(200).json({
@@ -613,43 +651,77 @@ export const closeJob = async (req, res) => {
   try {
     const { id } = req.params;
     const recruiterId = req.user.id;
-    const { reason = "closed" } = req.body; // 'closed' or 'filled'
 
-    // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid job ID" });
+    }
+
+    const job = await Job.findById(id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    if (job.recruiterId.toString() !== recruiterId) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    // Only active jobs can be closed directly
+    if (!['active'].includes(job.status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid job ID",
+        message: `Cannot close a job with status "${job.status}". Only active jobs can be closed.`,
       });
     }
 
-    // Find job and check ownership
-    const job = await Job.findById(id);
+    job.status = "closed";
+    job.closedAt = new Date();
+    await job.save();
 
-    if (!job) {
-      return res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
-
-    // Check if user is the owner
-    if (job.recruiterId.toString() !== recruiterId) {
-      return res.status(403).json({
-        success: false,
-        message: "You are not authorized to close this job",
-      });
-    }
-
-    // Close the job using the schema method
-    if (reason === "filled") {
-      await job.markAsFilled();
-    } else {
-      await job.closeJob();
-    }
-
-    // Populate the closed job
     const closedJob = await Job.findById(job._id)
+      .populate("recruiterId", "name email")
+      .populate("companyId", "companyName companyLogo industry")
+      .populate("requiredSkills", "name")
+      .populate("category", "name");
+
+    res.status(200).json({ success: true, message: "Job closed successfully", data: closedJob });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error closing job", error: error.message });
+  }
+};
+
+/**
+ * @desc    Reopen a closed job (goes back to pending-approval)
+ * @route   PATCH /api/v1/jobs/:id/reopen
+ * @access  Private (Recruiter - Owner)
+ */
+export const reopenJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const recruiterId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid job ID" });
+    }
+
+    const job = await Job.findById(id);
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+    if (job.recruiterId.toString() !== recruiterId) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    if (!['closed', 'filled'].includes(job.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Only closed or filled jobs can be reopened. Current status: "${job.status}"`,
+      });
+    }
+
+    // Reopening requires admin re-approval
+    job.status = "pending-approval";
+    job.closedAt = null;
+    job.moderatedBy = null;
+    job.moderatedAt = null;
+    job.moderationNotes = null;
+    await job.save();
+
+    const updatedJob = await Job.findById(job._id)
       .populate("recruiterId", "name email")
       .populate("companyId", "companyName companyLogo industry")
       .populate("requiredSkills", "name")
@@ -657,15 +729,11 @@ export const closeJob = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Job marked as ${reason === "filled" ? "filled" : "closed"} successfully`,
-      data: closedJob,
+      message: "Job submitted for re-approval. It will go live once approved by an admin.",
+      data: updatedJob,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error closing job posting",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Error reopening job", error: error.message });
   }
 };
 

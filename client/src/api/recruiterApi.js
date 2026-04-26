@@ -79,6 +79,12 @@ export const recruiterApi = {
     return response.data;
   },
 
+  // Reopen a closed job posting (goes to pending-approval)
+  reopenJob: async (jobId) => {
+    const response = await api.patch(`/jobs/${jobId}/reopen`);
+    return response.data;
+  },
+
   // ============================================
   // Application Management
   // ============================================

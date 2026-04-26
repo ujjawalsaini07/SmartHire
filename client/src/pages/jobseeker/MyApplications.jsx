@@ -159,8 +159,13 @@ const MyApplications = () => {
                 
                 <div className="flex-1">
                   <div className="flex justify-between items-start md:block">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                      {app.jobId?.title || 'Unknown Role'}
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                      {app.jobId?.title || app._deletedJobTitle || 'Unknown Role'}
+                      {!app.jobId && app._deletedJobTitle && (
+                        <span className="text-xs font-normal text-orange-500 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full border border-orange-200 dark:border-orange-800">
+                          Position removed
+                        </span>
+                      )}
                     </h3>
                     <div className="md:hidden">
                       {getStatusBadge(app.status)}
@@ -170,7 +175,7 @@ const MyApplications = () => {
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-2">
                     <div className="flex items-center">
                       <Building className="w-4 h-4 mr-1.5" />
-                      {app.jobId?.companyId?.companyName || app.jobId?.company || 'Company'}
+                      {app.jobId?.companyId?.companyName || app.jobId?.company || app._deletedJobCompany || 'Company'}
                     </div>
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-1.5" />
