@@ -42,6 +42,12 @@ export const authApi = {
     const response = await api.post('/auth/change-password', { currentPassword, newPassword });
     return response.data;
   },
+
+  // Delete authenticated recruiter/jobseeker account
+  deleteMyAccount: async () => {
+    const response = await api.delete('/users/me');
+    return response.data;
+  },
   
   // Get current user
   getCurrentUser: async () => {

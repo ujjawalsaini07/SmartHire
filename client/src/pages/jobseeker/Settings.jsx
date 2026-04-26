@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import { Settings as SettingsIcon, Bell, Shield, Key } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings as SettingsIcon, Bell, Shield, Key, Eye, EyeOff } from 'lucide-react';
 import Card from '@components/common/Card';
 import Button from '@components/common/Button';
 import toast from 'react-hot-toast';
 import { authApi } from '@api/authApi';
 import Input from '@components/common/Input';
+import Modal from '@components/common/Modal';
+import useAuthStore from '@store/authStore';
 
 const Settings = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState('notifications');
   
   // Tab 1: Notifications State
@@ -22,7 +27,17 @@ const Settings = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
+  const requiredDeleteText = 'DELETE';
+  const isDeleteTextValid = deleteConfirmationText.trim() === requiredDeleteText;
 
   const handleNotificationsSave = (e) => {
     e.preventDefault();
@@ -47,6 +62,40 @@ const Settings = () => {
       toast.error(err.response?.data?.message || 'Failed to change password');
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const openDeleteModal = () => {
+    setDeleteConfirmationText('');
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    if (isDeletingAccount) return;
+    setIsDeleteModalOpen(false);
+    setDeleteConfirmationText('');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!isDeleteTextValid) {
+      return toast.error('Please type DELETE to confirm account deletion');
+    }
+
+    try {
+      setIsDeletingAccount(true);
+      await authApi.deleteMyAccount();
+      closeDeleteModal();
+      logout();
+      toast.success('Your account has been deleted successfully');
+      navigate('/');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete account');
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -149,28 +198,63 @@ const Settings = () => {
               <>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Change Password</h2>
                 <form onSubmit={handlePasswordChange} className="space-y-4">
-                  <Input
-                    label="Current Password"
-                    type="password"
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                    required
-                  />
-                  <Input
-                    label="New Password"
-                    type="password"
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                    required
-                    helperText="Minimum 8 characters"
-                  />
-                  <Input
-                    label="Confirm New Password"
-                    type="password"
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      label="Current Password"
+                      type={showPasswords.current ? 'text' : 'password'}
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                      className="pr-12"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('current')}
+                      className="absolute right-3 top-10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      aria-label={showPasswords.current ? 'Hide current password' : 'Show current password'}
+                    >
+                      {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    <Input
+                      label="New Password"
+                      type={showPasswords.new ? 'text' : 'password'}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                      className="pr-12"
+                      required
+                      helperText="Minimum 8 characters"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('new')}
+                      className="absolute right-3 top-10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      aria-label={showPasswords.new ? 'Hide new password' : 'Show new password'}
+                    >
+                      {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    <Input
+                      label="Confirm New Password"
+                      type={showPasswords.confirm ? 'text' : 'password'}
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                      className="pr-12"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                      className="absolute right-3 top-10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      aria-label={showPasswords.confirm ? 'Hide confirm password' : 'Show confirm password'}
+                    >
+                      {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                   <div className="pt-4 flex justify-end">
                     <Button type="submit" isLoading={isChangingPassword}>
                       Update Password
@@ -200,7 +284,13 @@ const Settings = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                       Once you delete your account, there is no going back. Please be certain.
                     </p>
-                    <Button variant="outline" className="border-error-500 text-error-500 hover:bg-error-50 dark:hover:bg-error-900/20">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      isLoading={isDeletingAccount}
+                      onClick={openDeleteModal}
+                      className="border-error-500 text-error-500 hover:bg-error-50 dark:hover:bg-error-900/20"
+                    >
                       Delete Account
                     </Button>
                   </div>
@@ -211,6 +301,45 @@ const Settings = () => {
           </Card>
         </div>
       </div>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        title="Confirm Account Deletion"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+            This action is permanent. To continue, type <span className="font-semibold text-error-600">DELETE</span> below.
+          </p>
+          <Input
+            label="Type DELETE to confirm"
+            value={deleteConfirmationText}
+            onChange={(e) => setDeleteConfirmationText(e.target.value)}
+            placeholder="DELETE"
+            autoFocus
+          />
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={closeDeleteModal}
+              disabled={isDeletingAccount}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              isLoading={isDeletingAccount}
+              disabled={!isDeleteTextValid || isDeletingAccount}
+              onClick={handleDeleteAccount}
+            >
+              Delete Account
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

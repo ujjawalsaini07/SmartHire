@@ -6,6 +6,7 @@ import {
   activateUser,
   deactivateUser,
   deleteUser,
+  deleteOwnAccount,
 } from "../controllers/user.controller.js";
 
 const userRouter = e.Router();
@@ -28,6 +29,22 @@ const userRouter = e.Router();
  * @response 403 - { success: false, message: "Admin access required" }
  */
 userRouter.get("/", protect, authorize("admin"), getUsers);
+
+/**
+ * @route   DELETE /api/v1/users/me
+ * @desc    Delete currently authenticated account
+ * @access  Private (Job Seeker or Recruiter)
+ * @headers  Authorization: Bearer <access_token>
+ * @response 200 - { success: true, message: "Your account has been deleted successfully" }
+ * @response 401 - { success: false, message: "Not authorized" }
+ * @response 403 - { success: false, message: "Role not allowed" }
+ */
+userRouter.delete(
+  "/me",
+  protect,
+  authorize("jobseeker", "recruiter"),
+  deleteOwnAccount,
+);
 
 /**
  * @route   GET /api/v1/users/:id

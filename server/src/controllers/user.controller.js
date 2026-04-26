@@ -1,4 +1,11 @@
 import User from "../models/User.model.js";
+import Job from "../models/Jobs.models.js";
+import Application from "../models/Application.model.js";
+import JobSeekerProfile from "../models/JobSeekerProfile.model.js";
+import RecruiterProfile from "../models/RecruiterProfile.model.js";
+import SavedJob from "../models/SavedJobs.model.js";
+import Notification from "../models/Notification.model.js";
+import JobView from "../models/JobView.model.js";
 
 /**
  * @desc    Get all users with pagination
@@ -267,6 +274,83 @@ export const deleteUser = async (req, res) => {
       success: false,
       message: "Error deleting user",
       error: error.message
+    });
+  }
+};
+
+/**
+ * @desc    Delete currently authenticated account (jobseeker/recruiter)
+ * @route   DELETE /api/v1/users/me
+ * @access  Private/Jobseeker or Recruiter
+ */
+export const deleteOwnAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select("name email role");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (!["jobseeker", "recruiter"].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only recruiter and job seeker accounts can use this action",
+      });
+    }
+
+    if (user.role === "jobseeker") {
+      await Promise.all([
+        JobSeekerProfile.deleteOne({ userId }),
+        Application.deleteMany({ jobSeekerId: userId }),
+        SavedJob.deleteMany({ jobSeekerId: userId }),
+        JobView.deleteMany({ jobSeekerId: userId }),
+      ]);
+    }
+
+    if (user.role === "recruiter") {
+      const recruiterJobs = await Job.find({ recruiterId: userId }).select("_id");
+      const recruiterJobIds = recruiterJobs.map((job) => job._id);
+
+      await Promise.all([
+        RecruiterProfile.deleteOne({ userId }),
+        Application.deleteMany({ recruiterId: userId }),
+        Job.deleteMany({ recruiterId: userId }),
+      ]);
+
+      if (recruiterJobIds.length > 0) {
+        await Promise.all([
+          Application.deleteMany({ jobId: { $in: recruiterJobIds } }),
+          SavedJob.deleteMany({ jobId: { $in: recruiterJobIds } }),
+          JobView.deleteMany({ jobId: { $in: recruiterJobIds } }),
+        ]);
+      }
+    }
+
+    await Promise.all([
+      Notification.deleteMany({ user: userId }),
+      User.findByIdAndDelete(userId),
+    ]);
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Your account has been deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting your account",
+      error: error.message,
     });
   }
 };
