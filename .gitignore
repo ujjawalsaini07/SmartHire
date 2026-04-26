@@ -43,3 +43,7 @@ coverage/
 .codex
 # ---- upload dir ---- 
 changes.txt
+
+#project work 
+notimplemented.md
+bugs.md
