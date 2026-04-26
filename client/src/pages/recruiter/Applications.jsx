@@ -370,7 +370,7 @@ export default function Applications() {
                 Applications Hub
               </div>
               <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Review candidates in a cleaner, calmer workspace.
+                Review candidates workspace.
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Choose a posting to inspect applicants, schedule interviews, and move talent through the pipeline with less visual noise.
