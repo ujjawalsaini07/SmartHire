@@ -1,0 +1,142 @@
+/* ============================================================
+   SmartHire Design Tokens — Light Mode (root)
+   ============================================================ */
+:root {
+  /* ── Brand ── */
+  --color-mint:   #AAFFC7;
+  --color-teal:   #00C9B1;
+  --color-deep:   #007A6B;
+  --color-navy:   #0D2137;
+
+  /* ── Backgrounds ── */
+  --color-bg-base:    #F5F9FF;
+  --color-bg-card:    #FFFFFF;
+  --color-bg-subtle:  #EBF3FF;
+  --color-bg-elevated:#FFFFFF;
+
+  /* ── Text ── */
+  --color-text-primary:   #0D2137;
+  --color-text-secondary: #3B5068;
+  --color-text-muted:     #7A95B0;
+
+  /* ── Borders ── */
+  --color-border:        #D4E4F5;
+  --color-border-strong: #A8C5DE;
+
+  /* ── Semantic ── */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error:   #EF4444;
+  --color-info:    #3B82F6;
+
+  /* ── Accents (light mode aliases) ── */
+  --color-accent-teal-bg:  rgba(0, 201, 177, 0.10);
+  --color-accent-mint-bg:  rgba(170, 255, 199, 0.15);
+
+  /* ── Dark Mode Backgrounds (applied via .dark class) ── */
+  --dm-bg-base:     #0B1829;
+  --dm-bg-card:     #112238;
+  --dm-bg-elevated: #162D44;
+  --dm-bg-subtle:   #0F2233;
+
+  /* ── Dark Mode Text ── */
+  --dm-text-primary:   #E6F0FA;
+  --dm-text-secondary: #94B3CC;
+  --dm-text-muted:     #5C7F9B;
+
+  /* ── Dark Mode Borders ── */
+  --dm-border:        rgba(255,255,255,0.08);
+  --dm-border-strong: rgba(255,255,255,0.16);
+
+  /* ── Dark Mode Accents ── */
+  --dm-accent-mint:    #AAFFC7;
+  --dm-accent-teal:    #00C9B1;
+  --dm-accent-primary: #3B82F6;
+
+  /* ── Dark Mode Semantic ── */
+  --dm-success: #4ADE80;
+  --dm-warning: #FBBF24;
+  --dm-error:   #F87171;
+
+  /* ── Spacing (4px base) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── Radius ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-full: 9999px;
+
+  /* ── Font Families ── */
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Type Scale ── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  30px;
+  --text-3xl:  36px;
+  --text-4xl:  48px;
+  --text-hero: 64px;
+
+  /* ── Shadows ── */
+  --shadow-xs:  0 1px 3px rgba(13,33,55,0.06), 0 1px 2px rgba(13,33,55,0.04);
+  --shadow-sm:  0 4px 12px rgba(13,33,55,0.08), 0 2px 4px rgba(13,33,55,0.04);
+  --shadow-md:  0 8px 24px rgba(13,33,55,0.12), 0 4px 8px rgba(13,33,55,0.06);
+  --shadow-lg:  0 20px 48px rgba(13,33,55,0.16), 0 8px 16px rgba(13,33,55,0.08);
+  --shadow-xl:  0 32px 72px rgba(13,33,55,0.22), 0 12px 24px rgba(13,33,55,0.10);
+  --shadow-teal: 0 8px 32px rgba(0,201,177,0.28);
+  --shadow-mint: 0 8px 32px rgba(170,255,199,0.22);
+
+  /* ── Transitions ── */
+  --transition-fast:   150ms cubic-bezier(0.4,0,0.2,1);
+  --transition-base:   200ms cubic-bezier(0.4,0,0.2,1);
+  --transition-smooth: 300ms cubic-bezier(0.4,0,0.2,1);
+  --transition-slow:   500ms cubic-bezier(0.4,0,0.2,1);
+
+  /* ── Toast ── */
+  --toast-bg:   #FFFFFF;
+  --toast-text: #0D2137;
+}
+
+/* ============================================================
+   Dark Mode Overrides — applied via <html class="dark">
+   ============================================================ */
+html.dark {
+  --color-bg-base:    var(--dm-bg-base);
+  --color-bg-card:    var(--dm-bg-card);
+  --color-bg-subtle:  var(--dm-bg-subtle);
+  --color-bg-elevated: var(--dm-bg-elevated);
+
+  --color-text-primary:   var(--dm-text-primary);
+  --color-text-secondary: var(--dm-text-secondary);
+  --color-text-muted:     var(--dm-text-muted);
+
+  --color-border:        var(--dm-border);
+  --color-border-strong: var(--dm-border-strong);
+
+  --color-success: var(--dm-success);
+  --color-warning: var(--dm-warning);
+  --color-error:   var(--dm-error);
+
+  --toast-bg:   var(--dm-bg-elevated);
+  --toast-text: var(--dm-text-primary);
+}

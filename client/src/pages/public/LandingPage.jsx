@@ -16,9 +16,9 @@ const LandingPage = () => {
       <main>
         <Hero />
         <Statistics />
+        <FeaturedJobs />
         <Features />
         <HowItWorks />
-        <FeaturedJobs />
         <Testimonials />
         <CTASection />
       </main>

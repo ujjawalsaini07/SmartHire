@@ -1,80 +1,151 @@
-import { motion } from 'framer-motion';
-import { Star, Quote } from 'lucide-react';
-import Card from '@components/common/Card';
-import Avatar from '@components/common/Avatar';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Star, Quote, MessageSquare } from 'lucide-react';
+
+const testimonials = [
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    role: 'UX Designer',
+    company: 'Airbnb',
+    content: 'SmartHire made my job search incredibly smooth. Within a week of creating my profile I had three interviews scheduled — and I landed my dream role.',
+    rating: 5,
+    initials: 'SJ',
+    accent: 'var(--color-teal)',
+  },
+  {
+    id: 2,
+    name: 'Michael Chen',
+    role: 'Senior Engineer',
+    company: 'Stripe',
+    content: 'The skills assessment feature was a game-changer. Recruiters knew exactly what I could bring before we spoke — no more wasted screening calls.',
+    rating: 5,
+    initials: 'MC',
+    accent: '#3B82F6',
+  },
+  {
+    id: 3,
+    name: 'Emily Rodriguez',
+    role: 'Hiring Manager',
+    company: 'Figma',
+    content: 'As a recruiter, the candidate quality on SmartHire blows every other platform out of the water. The pipeline tools save us hours every week.',
+    rating: 5,
+    initials: 'ER',
+    accent: '#7C3AED',
+  },
+];
 
 const Testimonials = () => {
-  const testimonials = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      role: "UX Designer",
-      content: "SmartHire made my job search incredibly easy. Within a week of creating my profile, I had three interviews scheduled and landed my dream job!",
-      rating: 5
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      role: "Software Engineer",
-      content: "The skill assessment features really helped me stand out. Recruiters knew exactly what I could bring to the table before we even spoke.",
-      rating: 5
-    },
-    {
-      id: 3,
-      name: "Emily Rodriguez",
-      role: "Marketing Director",
-      content: "As a hiring manager, this platform is a game-changer. The candidate quality is consistently higher than other platforms we've used.",
-      rating: 4
-    }
-  ];
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="py-20">
+    <section
+      ref={ref}
+      className="py-24"
+      style={{
+        background: 'linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-base) 100%)',
+        borderTop: '1px solid var(--color-border)',
+        borderBottom: '1px solid var(--color-border)',
+      }}
+    >
       <div className="container-custom">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
-            What People Say
-          </h2>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">
-            Join thousands of satisfied job seekers and employers.
-          </p>
+
+        {/* Header */}
+        <div className="max-w-2xl mx-auto text-center mb-14">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            className="section-label justify-center"
+          >
+            <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
+            Testimonials
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.06 }}
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            People{' '}
+            <span className="gradient-text">love</span>
+            {' '}SmartHire
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.12 }}
+            className="text-[var(--color-text-secondary)] dark:text-[var(--dm-text-secondary)] text-lg"
+          >
+            Join over 50,000 professionals who found their next opportunity here.
+          </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+        {/* Cards */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {testimonials.map((t, i) => (
+            <motion.article
+              key={t.id}
+              initial={{ opacity: 0, y: 24 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.52, delay: i * 0.10, ease: [0.22, 1, 0.36, 1] }}
+              className="card p-7 flex flex-col gap-5 relative"
             >
-              <Card className="relative h-full overflow-visible">
-                <div className="absolute -top-6 left-8 rounded-xl bg-gradient-to-br from-primary-500 to-accent-600 p-3 text-white shadow-soft">
-                    <Quote className="w-5 h-5" />
+              {/* Quote icon */}
+              <div
+                className="absolute top-6 right-6 w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center"
+                style={{ background: 'rgba(0,0,0,0.05)' }}
+              >
+                <Quote className="w-4 h-4 text-[var(--color-text-muted)] dark:text-[var(--dm-text-muted)]" aria-hidden="true" />
+              </div>
+
+              {/* Stars */}
+              <div className="flex gap-0.5" aria-label={`${t.rating} out of 5 stars`} role="img">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <Star
+                    key={j}
+                    className={`w-4 h-4 ${j < t.rating ? 'fill-[#F59E0B] text-[#F59E0B]' : 'text-[var(--color-border)]'}`}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
+
+              {/* Content */}
+              <blockquote className="text-[15px] text-[var(--color-text-primary)] dark:text-[var(--dm-text-primary)] leading-relaxed flex-1">
+                "{t.content}"
+              </blockquote>
+
+              {/* Divider */}
+              <div className="h-px" style={{ background: 'var(--color-border)' }} />
+
+              {/* Author */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                  style={{ background: t.accent }}
+                >
+                  {t.initials}
                 </div>
-                <div className="pt-8">
-                    <div className="flex mb-4">
-                        {[...Array(5)].map((_, i) => (
-                            <Star 
-                                key={i} 
-                                className={`w-4 h-4 ${i < testimonial.rating ? 'text-warning-500 fill-warning-500' : 'text-gray-300'}`} 
-                            />
-                        ))}
-                    </div>
-                    <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6 italic">
-                        "{testimonial.content}"
-                    </p>
-                    <div className="flex items-center space-x-3">
-                        <Avatar size="md" />
-                        <div>
-                            <h4 className="font-semibold">{testimonial.name}</h4>
-                            <p className="text-xs text-light-text-muted dark:text-dark-text-muted">{testimonial.role}</p>
-                        </div>
-                    </div>
+                <div>
+                  <p
+                    className="text-sm font-semibold text-[var(--color-text-primary)] dark:text-[var(--dm-text-primary)]"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {t.name}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)] dark:text-[var(--dm-text-muted)]">
+                    {t.role} · {t.company}
+                  </p>
                 </div>
-              </Card>
-            </motion.div>
+              </div>
+
+              {/* Accent bar at bottom */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-[var(--radius-xl)]"
+                style={{ background: t.accent, opacity: 0.7 }}
+              />
+            </motion.article>
           ))}
         </div>
       </div>

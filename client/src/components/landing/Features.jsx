@@ -1,73 +1,126 @@
-import { motion } from 'framer-motion';
-import { Target, Shield, Clock, Award } from 'lucide-react';
-import Card from '@components/common/Card';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Zap, ShieldCheck, Rocket, BarChart3, Sparkles, Globe } from 'lucide-react';
+
+const features = [
+  {
+    icon: Zap,
+    title: 'AI-Powered Matching',
+    description: 'Our intelligent algorithm surfaces roles that align with your skills, experience, and career goals — not just keywords.',
+    accent: 'var(--color-teal)',
+    bg: 'rgba(0,201,177,0.10)',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Verified Employers',
+    description: 'Every company on SmartHire goes through our verification process — so you only see legitimate, quality opportunities.',
+    accent: '#3B82F6',
+    bg: 'rgba(59,130,246,0.10)',
+  },
+  {
+    icon: Rocket,
+    title: 'One-Click Apply',
+    description: 'Apply to multiple roles in seconds using your saved SmartHire profile and resume — no re-filling forms.',
+    accent: '#7C3AED',
+    bg: 'rgba(124,58,237,0.10)',
+  },
+  {
+    icon: BarChart3,
+    title: 'Application Analytics',
+    description: 'Track every application with real-time status updates, interview schedules, and offer timelines in one place.',
+    accent: '#F59E0B',
+    bg: 'rgba(245,158,11,0.10)',
+  },
+  {
+    icon: Globe,
+    title: 'Remote-First Network',
+    description: '50,000+ companies offering remote and hybrid positions. Work from anywhere while building your dream career.',
+    accent: '#EF4444',
+    bg: 'rgba(239,68,68,0.10)',
+  },
+  {
+    icon: Sparkles,
+    title: 'Skill Assessments',
+    description: 'Stand out from the crowd with verified skill badges that show recruiters exactly what you bring to the table.',
+    accent: '#10B981',
+    bg: 'rgba(16,185,129,0.10)',
+  },
+];
 
 const Features = () => {
-  const features = [
-    {
-      icon: Target,
-      title: "Smart Matching",
-      description: "Our AI-powered algorithm connects you with jobs that perfectly match your skills and experience.",
-      color: "text-primary-600",
-      bg: "bg-primary-50 dark:bg-primary-900/20"
-    },
-    {
-      icon: Shield,
-      title: "Verified Employers",
-      description: "We verify every employer to ensure legitimate opportunities and a safe job search experience.",
-      color: "text-accent-600",
-      bg: "bg-accent-50 dark:bg-accent-900/20"
-    },
-    {
-      icon: Clock,
-      title: "Fast Application",
-      description: "Apply to multiple jobs with a single click using your stored profile and resume.",
-      color: "text-success-600",
-      bg: "bg-success-50 dark:bg-success-900/20"
-    },
-    {
-      icon: Award,
-      title: "Skill Assessment",
-      description: "Showcase your expertise with our skill verification tests and stand out to recruiters.",
-      color: "text-warning-600",
-      bg: "bg-warning-50 dark:bg-warning-900/20"
-    }
-  ];
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="relative overflow-hidden py-20">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(76,140,228,0.14),transparent_35%),radial-gradient(circle_at_85%_85%,rgba(145,208,108,0.16),transparent_34%)]" />
+    <section className="py-24" ref={ref}>
       <div className="container-custom">
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-light-text dark:text-dark-text mb-4">
-            Why Choose SmartHire?
-          </h2>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">
-            We provide the tools you need to find your dream job or the perfect candidate faster and easier.
-          </p>
+
+        {/* Header */}
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="section-label justify-center"
+          >
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+            Why SmartHire
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.05 }}
+            className="text-4xl md:text-5xl font-bold mb-4 text-balance"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Built for the way{' '}
+            <span className="gradient-text">people hire</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.12 }}
+            className="text-[var(--color-text-secondary)] dark:text-[var(--dm-text-secondary)] text-lg"
+          >
+            From discovery to offer letter, SmartHire streamlines every step of the hiring process for both candidates and companies.
+          </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
+        {/* Feature grid */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {features.map((feat, i) => {
+            const Icon = feat.icon;
             return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+              <motion.article
+                key={feat.title}
+                initial={{ opacity: 0, y: 24 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.55, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                className="card card-hover p-7 group"
               >
-                <Card hover className="h-full border-light-border/80 p-8 text-center dark:border-dark-border/80">
-                  <div className={`mb-6 inline-flex rounded-2xl border border-light-border/80 p-3 ${feature.bg} ${feature.color} dark:border-dark-border/80`}>
-                    <Icon className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-light-text-secondary dark:text-dark-text-secondary">
-                    {feature.description}
-                  </p>
-                </Card>
-              </motion.div>
+                <div
+                  className="w-12 h-12 rounded-[var(--radius-lg)] flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                  style={{ background: feat.bg }}
+                >
+                  <Icon className="w-6 h-6" style={{ color: feat.accent }} aria-hidden="true" />
+                </div>
+
+                <h3
+                  className="text-lg font-bold mb-2.5 text-[var(--color-text-primary)] dark:text-[var(--dm-text-primary)]"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {feat.title}
+                </h3>
+                <p className="text-sm text-[var(--color-text-secondary)] dark:text-[var(--dm-text-secondary)] leading-relaxed">
+                  {feat.description}
+                </p>
+
+                {/* Accent corner line */}
+                <div
+                  className="mt-5 h-0.5 w-0 group-hover:w-10 rounded-full transition-all duration-500"
+                  style={{ background: feat.accent }}
+                />
+              </motion.article>
             );
           })}
         </div>
