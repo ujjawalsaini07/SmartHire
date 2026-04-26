@@ -415,7 +415,7 @@ export default function Applications() {
                     onClick={() => setJobStatusFilter(option.value)}
                     className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
                       jobStatusFilter === option.value
-                        ? 'border-primary/30 bg-primary text-white shadow-sm'
+                        ? 'border-primary-500/30 bg-primary-600 text-white shadow-sm hover:bg-primary-700'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:text-slate-300 dark:hover:bg-dark-hover'
                     }`}
                   >
@@ -758,7 +758,7 @@ export default function Applications() {
                       onClick={() => setStatusFilter(option.value)}
                       className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition ${
                         statusFilter === option.value
-                          ? 'border-primary/30 bg-primary text-white shadow-sm'
+                          ? 'border-primary-500/30 bg-primary-600 text-white shadow-sm hover:bg-primary-700'
                           : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-card dark:text-slate-300 dark:hover:bg-dark-hover'
                       }`}
                     >

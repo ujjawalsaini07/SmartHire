@@ -11,7 +11,7 @@ import Avatar from '@components/common/Avatar';
 import { notificationApi } from '@api/notificationApi';
 import toast from 'react-hot-toast';
 import Logo from '@components/common/Logo';
-
+import { Link } from 'react-router-dom';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
